@@ -444,21 +444,23 @@ async function loadPending() {
         '<td style="font-size:12px;color:var(--muted)">' + volume + '</td>' +
         '<td>' + fmtDateShort(op.created_at) + '</td>' +
         '<td>' +
-          '<button class="action-btn" style="background:rgba(16,185,129,0.12);color:#34d399;border-color:rgba(16,185,129,0.3)" onclick="openApproveModal('' + op.id + '','' + op.operator_name.replace(/'/g,"\'") + '','' + op.email + '')">Approve</button>' +
-          '<button class="action-btn danger" onclick="rejectOp('' + op.id + '')">Reject</button>' +
+          '<button class="action-btn" style="background:rgba(16,185,129,0.12);color:#34d399;border-color:rgba(16,185,129,0.3)" onclick="openApproveModal(this)" data-id="' + op.id + '" data-name="' + encodeURIComponent(op.operator_name) + '" data-email="' + op.email + '">Approve</button>' +
+          '<button class="action-btn danger" onclick="rejectOp(\'' + op.id + '\')">Reject</button>' +
         '</td>' +
       '</tr>';
     }).join('');
   } catch(e) { console.error(e); }
 }
 
-function openApproveModal(id, name, email) {
+function openApproveModal(btn) {
+  var id    = btn.getAttribute('data-id');
+  var name  = decodeURIComponent(btn.getAttribute('data-name'));
+  var email = btn.getAttribute('data-email');
   currentApproveId    = id;
   currentApproveEmail = email;
   currentApproveName  = name;
   document.getElementById('approveOpName').textContent = name;
   document.getElementById('approveDisc').value = '5';
-  // Auto-generate code from company name
   var code = name.toUpperCase().replace(/[^A-Z0-9]/g,'').substr(0,6) + new Date().getFullYear();
   document.getElementById('approveCode').value = code;
   document.getElementById('approveMsg').style.display = 'none';
