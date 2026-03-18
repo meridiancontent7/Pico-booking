@@ -454,8 +454,10 @@ async function loadPending() {
 
 function openApproveModal(btn) {
   var id    = btn.getAttribute('data-id');
-  var name  = decodeURIComponent(btn.getAttribute('data-name'));
-  var email = btn.getAttribute('data-email');
+  var name  = decodeURIComponent(btn.getAttribute('data-name') || '');
+  var email = btn.getAttribute('data-email') || '';
+  console.log('Approving:', id, name, email); // debug
+  if (!id) { alert('Error: could not read operator ID. Please refresh and try again.'); return; }
   currentApproveId    = id;
   currentApproveEmail = email;
   currentApproveName  = name;
@@ -488,7 +490,10 @@ async function confirmApprove() {
       headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
       body: JSON.stringify({ status:'active', is_active:true, access_code:code, discount_pct:disc })
     });
-    if (!r.ok) throw new Error('Update failed');
+    if (!r.ok) {
+      var errText = await r.text();
+      throw new Error('Update failed: ' + errText);
+    }
 
     // Notify via n8n to send approval email
     await fetch('https://n8n.srv1432046.hstgr.cloud/webhook/pia-booking', {
