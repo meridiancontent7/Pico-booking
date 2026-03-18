@@ -145,6 +145,7 @@
     <!-- TABS -->
     <div class="tabs">
       <button class="tab on" onclick="showTab('operators')">&#x1F3E2; Operators</button>
+      <button class="tab" onclick="showTab('pending')">&#x23F3; Pending <span id="pendingCount" style="background:rgba(245,158,11,0.2);color:#fbbf24;border-radius:10px;padding:1px 7px;font-size:10px;margin-left:4px">0</span></button>
       <button class="tab" onclick="showTab('bookings')">&#x1F4CB; Bookings</button>
       <button class="tab" onclick="showTab('invoices')">&#x1F9FE; Invoices</button>
     </div>
@@ -191,6 +192,49 @@
           </thead>
           <tbody id="opTable"><tr><td colspan="7" class="loading">Loading...</td></tr></tbody>
         </table>
+      </div>
+    </div>
+
+    <!-- PENDING PANEL -->
+    <div class="panel" id="panel-pending">
+      <h2 class="section-title">Pending Registrations</h2>
+      <p style="font-size:14px;font-weight:300;color:var(--muted);margin-bottom:24px;line-height:1.65">Review operator applications below. When you approve, set the discount percentage and their access code will be generated and emailed automatically.</p>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Company</th>
+              <th>Contact</th>
+              <th>Country / Type</th>
+              <th>Volume</th>
+              <th>Applied</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="pendingTable"><tr><td colspan="6" class="loading">Loading...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- APPROVE MODAL -->
+    <div id="approveModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;align-items:center;justify-content:center">
+      <div style="background:#12253f;border:1px solid rgba(255,255,255,0.12);border-radius:16px;padding:36px;width:100%;max-width:420px;margin:20px">
+        <h3 style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;color:#f8f5ef;margin-bottom:6px">Approve Operator</h3>
+        <p style="font-size:13px;font-weight:300;color:#94b4cc;margin-bottom:24px">Set the discount percentage for <strong id="approveOpName" style="color:#f8f5ef"></strong>. Their unique access code will be generated and emailed automatically.</p>
+        <div style="margin-bottom:16px">
+          <label style="display:block;font-size:11px;font-weight:500;letter-spacing:0.10em;text-transform:uppercase;color:#94b4cc;margin-bottom:6px">Access Code</label>
+          <input type="text" id="approveCode" class="fi" style="margin-bottom:0;text-transform:uppercase" placeholder="e.g. SAFARI2026">
+          <p style="font-size:11px;color:#94b4cc;margin-top:5px">Auto-generated — edit if needed</p>
+        </div>
+        <div style="margin-bottom:24px">
+          <label style="display:block;font-size:11px;font-weight:500;letter-spacing:0.10em;text-transform:uppercase;color:#94b4cc;margin-bottom:6px">Discount Percentage</label>
+          <input type="number" id="approveDisc" class="fi" style="margin-bottom:0" value="5" min="0" max="50" placeholder="5">
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn-primary" onclick="confirmApprove()" style="flex:1">&#x2713; Approve &amp; Send Code</button>
+          <button class="btn-secondary" onclick="closeApproveModal()">Cancel</button>
+        </div>
+        <p id="approveMsg" style="font-size:12px;margin-top:12px;display:none"></p>
       </div>
     </div>
 
@@ -275,10 +319,11 @@ function showTab(name) {
   event.target.classList.add('on');
   document.getElementById('panel-' + name).classList.add('on');
   if (name === 'bookings') loadBookings();
+  if (name === 'pending')  loadPending();
 }
 
 /* ── LOAD ALL ────────────────────────────────────────────── */
-function loadAll() { loadStats(); loadOperators(); }
+function loadAll() { loadStats(); loadOperators(); loadPending(); }
 
 async function sbFetch(path) {
   var r = await fetch(SUPABASE_URL + '/rest/v1/' + path, {
@@ -369,6 +414,107 @@ async function addOperator() {
 async function toggleOp(id, current) {
   await sbPatch('pia_operators', id, { is_active: !current });
   loadOperators(); loadStats();
+}
+
+/* ── PENDING REGISTRATIONS ───────────────────────────────── */
+var currentApproveId = null;
+var currentApproveEmail = null;
+var currentApproveName = null;
+
+async function loadPending() {
+  try {
+    var data = await sbFetch('pia_operators?status=eq.pending&order=created_at.desc');
+    var tb = document.getElementById('pendingTable');
+    document.getElementById('pendingCount').textContent = data ? data.length : 0;
+    if (!data || data.length === 0) {
+      tb.innerHTML = '<tr><td colspan="6" class="empty-state">No pending registrations.</td></tr>';
+      return;
+    }
+    tb.innerHTML = data.map(function(op) {
+      var notes = op.notes || '';
+      var parts = notes.split(' | ');
+      var country = parts[0] || '—';
+      var jobTitle = parts[1] || '';
+      var bizType = parts[2] || '—';
+      var volume = parts[3] || '—';
+      return '<tr>' +
+        '<td><strong>' + op.operator_name + '</strong>' + (op.vat_number ? '<br><span style="font-size:11px;color:var(--muted)">VAT: ' + op.vat_number + '</span>' : '') + (op.website ? '<br><a href="' + op.website + '" target="_blank" style="font-size:11px;color:var(--tb)">' + op.website + '</a>' : '') + '</td>' +
+        '<td>' + op.email + '<br><span style="font-size:11px;color:var(--muted)">' + (op.phone||'') + '</span></td>' +
+        '<td>' + country + '<br><span style="font-size:11px;color:var(--muted)">' + bizType + '</span></td>' +
+        '<td style="font-size:12px;color:var(--muted)">' + volume + '</td>' +
+        '<td>' + fmtDateShort(op.created_at) + '</td>' +
+        '<td>' +
+          '<button class="action-btn" style="background:rgba(16,185,129,0.12);color:#34d399;border-color:rgba(16,185,129,0.3)" onclick="openApproveModal('' + op.id + '','' + op.operator_name.replace(/'/g,"\'") + '','' + op.email + '')">Approve</button>' +
+          '<button class="action-btn danger" onclick="rejectOp('' + op.id + '')">Reject</button>' +
+        '</td>' +
+      '</tr>';
+    }).join('');
+  } catch(e) { console.error(e); }
+}
+
+function openApproveModal(id, name, email) {
+  currentApproveId    = id;
+  currentApproveEmail = email;
+  currentApproveName  = name;
+  document.getElementById('approveOpName').textContent = name;
+  document.getElementById('approveDisc').value = '5';
+  // Auto-generate code from company name
+  var code = name.toUpperCase().replace(/[^A-Z0-9]/g,'').substr(0,6) + new Date().getFullYear();
+  document.getElementById('approveCode').value = code;
+  document.getElementById('approveMsg').style.display = 'none';
+  document.getElementById('approveModal').style.display = 'flex';
+}
+
+function closeApproveModal() {
+  document.getElementById('approveModal').style.display = 'none';
+  currentApproveId = null;
+}
+
+async function confirmApprove() {
+  var disc = parseFloat(document.getElementById('approveDisc').value) || 5;
+  var code = document.getElementById('approveCode').value.trim().toUpperCase();
+  var msg  = document.getElementById('approveMsg');
+
+  if (!code) { msg.style.display='block'; msg.style.color='#f87171'; msg.textContent='Please enter an access code.'; return; }
+
+  msg.style.display='block'; msg.style.color='#94b4cc'; msg.textContent='Approving...';
+
+  try {
+    // Update operator to active with real code and discount
+    var r = await fetch(SUPABASE_URL + '/rest/v1/pia_operators?id=eq.' + currentApproveId, {
+      method: 'PATCH',
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ status:'active', is_active:true, access_code:code, discount_pct:disc })
+    });
+    if (!r.ok) throw new Error('Update failed');
+
+    // Notify via n8n to send approval email
+    await fetch('https://n8n.srv1432046.hstgr.cloud/webhook/pia-booking', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        type:         'operator_approved',
+        operatorName: currentApproveName,
+        email:        currentApproveEmail,
+        accessCode:   code,
+        discountPct:  disc
+      })
+    });
+
+    msg.style.color='#34d399'; msg.textContent='Approved! Access code sent to ' + currentApproveEmail;
+    setTimeout(function(){ closeApproveModal(); loadPending(); loadOperators(); loadStats(); }, 2000);
+  } catch(e) {
+    msg.style.color='#f87171'; msg.textContent='Error: ' + e.message;
+  }
+}
+
+async function rejectOp(id) {
+  if (!confirm('Reject and delete this application?')) return;
+  await fetch(SUPABASE_URL + '/rest/v1/pia_operators?id=eq.' + id, {
+    method: 'DELETE',
+    headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+  });
+  loadPending(); loadStats();
 }
 
 function generateCode() {
