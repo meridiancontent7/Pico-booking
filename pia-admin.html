@@ -421,6 +421,9 @@ var currentApproveId = null;
 var currentApproveEmail = null;
 var currentApproveName = null;
 
+// Global store for pending operators
+var PENDING_OPS = {};
+
 async function loadPending() {
   try {
     var data = await sbFetch('pia_operators?status=eq.pending&order=created_at.desc');
@@ -430,13 +433,17 @@ async function loadPending() {
       tb.innerHTML = '<tr><td colspan="6" class="empty-state">No pending registrations.</td></tr>';
       return;
     }
+    // Store operators in global lookup
+    PENDING_OPS = {};
+    data.forEach(function(op){ PENDING_OPS[op.id] = op; });
+
     tb.innerHTML = data.map(function(op) {
       var notes = op.notes || '';
       var parts = notes.split(' | ');
       var country = parts[0] || '—';
-      var jobTitle = parts[1] || '';
       var bizType = parts[2] || '—';
-      var volume = parts[3] || '—';
+      var volume  = parts[3] || '—';
+      var safeId  = op.id.replace(/-/g,'_');
       return '<tr>' +
         '<td><strong>' + op.operator_name + '</strong>' + (op.vat_number ? '<br><span style="font-size:11px;color:var(--muted)">VAT: ' + op.vat_number + '</span>' : '') + (op.website ? '<br><a href="' + op.website + '" target="_blank" style="font-size:11px;color:var(--tb)">' + op.website + '</a>' : '') + '</td>' +
         '<td>' + op.email + '<br><span style="font-size:11px;color:var(--muted)">' + (op.phone||'') + '</span></td>' +
@@ -444,26 +451,23 @@ async function loadPending() {
         '<td style="font-size:12px;color:var(--muted)">' + volume + '</td>' +
         '<td>' + fmtDateShort(op.created_at) + '</td>' +
         '<td>' +
-          '<button class="action-btn" style="background:rgba(16,185,129,0.12);color:#34d399;border-color:rgba(16,185,129,0.3)" onclick="openApproveModal(this)" data-id="' + op.id + '" data-name="' + encodeURIComponent(op.operator_name) + '" data-email="' + op.email + '">Approve</button>' +
+          '<button class="action-btn" style="background:rgba(16,185,129,0.12);color:#34d399;border-color:rgba(16,185,129,0.3)" id="appbtn_' + safeId + '" onclick="openApproveById(\'' + op.id + '\')">Approve</button>' +
           '<button class="action-btn danger" onclick="rejectOp(\'' + op.id + '\')">Reject</button>' +
         '</td>' +
       '</tr>';
     }).join('');
-  } catch(e) { console.error(e); }
+  } catch(e) { console.error('loadPending error:', e); }
 }
 
-function openApproveModal(btn) {
-  var id    = btn.getAttribute('data-id');
-  var name  = decodeURIComponent(btn.getAttribute('data-name') || '');
-  var email = btn.getAttribute('data-email') || '';
-  console.log('Approving:', id, name, email); // debug
-  if (!id) { alert('Error: could not read operator ID. Please refresh and try again.'); return; }
-  currentApproveId    = id;
-  currentApproveEmail = email;
-  currentApproveName  = name;
-  document.getElementById('approveOpName').textContent = name;
+function openApproveById(id) {
+  var op = PENDING_OPS[id];
+  if (!op) { alert('Operator not found. Please refresh the page.'); return; }
+  currentApproveId    = op.id;
+  currentApproveEmail = op.email;
+  currentApproveName  = op.operator_name;
+  document.getElementById('approveOpName').textContent = op.operator_name;
   document.getElementById('approveDisc').value = '5';
-  var code = name.toUpperCase().replace(/[^A-Z0-9]/g,'').substr(0,6) + new Date().getFullYear();
+  var code = op.operator_name.toUpperCase().replace(/[^A-Z0-9]/g,'').substr(0,6) + new Date().getFullYear();
   document.getElementById('approveCode').value = code;
   document.getElementById('approveMsg').style.display = 'none';
   document.getElementById('approveModal').style.display = 'flex';
