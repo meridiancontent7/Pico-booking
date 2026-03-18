@@ -1,0 +1,1324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Your Adventure — Pico Island Adventures</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy:    #0a1628;
+      --nmid:    #12253f;
+      --teal:    #0891b2;
+      --tb:      #06b6d4;
+      --cream:   #f8f5ef;
+      --muted:   #94b4cc;
+      --ok:      #10b981;
+      --wbg:     rgba(245,158,11,0.10);
+      --wbd:     rgba(245,158,11,0.30);
+      --wtx:     #fbbf24;
+      --red:     #ef4444;
+      --bdr:     rgba(255,255,255,0.10);
+      --card:    rgba(255,255,255,0.05);
+      --cardh:   rgba(255,255,255,0.09);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--cream);min-height:100vh;padding-bottom:100px;
+      background-image:radial-gradient(ellipse at 20% 50%,rgba(8,145,178,0.08) 0%,transparent 55%),radial-gradient(ellipse at 80% 15%,rgba(6,182,212,0.06) 0%,transparent 50%);}
+    .w{max-width:660px;margin:0 auto;padding:0 20px}
+
+    /* HEADER */
+    .hdr{padding:34px 0 22px;text-align:center;border-bottom:1px solid var(--bdr);margin-bottom:36px}
+    .hbrand{font-family:'Cormorant Garamond',serif;font-size:11px;letter-spacing:0.28em;text-transform:uppercase;color:var(--tb);margin-bottom:5px}
+    .htitle{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:300;color:var(--cream);line-height:1.25}
+    .htitle i{font-style:italic}
+    .trust{display:flex;justify-content:center;flex-wrap:wrap;gap:6px 18px;margin-top:14px;padding-top:14px;border-top:1px solid var(--bdr)}
+    .ti{font-size:12px;font-weight:300;color:var(--muted)}
+
+    /* FLOW BADGE */
+    .flow-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:500;letter-spacing:0.06em;padding:4px 10px;border-radius:20px;margin-bottom:20px}
+    .flow-badge.instant{background:rgba(16,185,129,0.12);color:#34d399;border:1px solid rgba(16,185,129,0.25)}
+    .flow-badge.enquiry{background:rgba(245,158,11,0.10);color:#fbbf24;border:1px solid rgba(245,158,11,0.28)}
+
+    /* PROGRESS */
+    .prog-wrap{margin-bottom:38px}
+    .prog-track{display:flex;align-items:flex-start;justify-content:center}
+    .pstep{display:flex;flex-direction:column;align-items:center;gap:6px}
+    .pdot{width:27px;height:27px;border-radius:50%;border:2px solid rgba(255,255,255,0.14);background:transparent;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:var(--muted);transition:all 0.3s ease}
+    .pdot.act{border-color:var(--tb);background:var(--tb);color:var(--navy);box-shadow:0 0 14px rgba(6,182,212,0.4)}
+    .pdot.dn{border-color:var(--teal);background:var(--teal);color:#fff}
+    .plbl{font-size:10px;letter-spacing:0.04em;color:var(--muted);white-space:nowrap}
+    .pstep.act .plbl{color:var(--tb)}
+    .pline{width:32px;height:2px;background:rgba(255,255,255,0.09);margin-top:12px;flex-shrink:0;transition:background 0.3s}
+    .pline.dn{background:var(--teal)}
+
+    /* STEPS */
+    .step{display:none}
+    .step.on{display:block;animation:up 0.3s ease}
+    @keyframes up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    .sh{font-family:'Cormorant Garamond',serif;font-size:31px;font-weight:300;color:var(--cream);line-height:1.2;margin-bottom:7px}
+    .sh i{font-style:italic}
+    .ss{font-size:14px;font-weight:300;color:var(--muted);line-height:1.65;margin-bottom:26px}
+
+    /* PRODUCT GRID */
+    .pgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:8px}
+    @media(max-width:500px){.pgrid{grid-template-columns:1fr}}
+    .taph{text-align:center;font-size:12px;font-weight:300;color:var(--muted);margin-bottom:18px;opacity:0.7}
+
+    /* SECTION LABELS IN GRID */
+    .grid-section{grid-column:1/-1;font-size:10px;font-weight:500;letter-spacing:0.18em;text-transform:uppercase;color:var(--tb);padding:4px 0 2px;border-bottom:1px solid var(--bdr);margin-top:6px}
+
+    .pc{background:var(--card);border:2px solid var(--bdr);border-radius:14px;padding:18px 16px;cursor:pointer;text-align:left;width:100%;font-family:'DM Sans',sans-serif;color:var(--cream);transition:border-color 0.22s,background 0.22s,transform 0.22s;position:relative}
+    .pc:hover{border-color:rgba(6,182,212,0.4);background:var(--cardh);transform:translateY(-2px)}
+    .pc.sel{border-color:var(--tb);background:rgba(6,182,212,0.09);box-shadow:0 0 0 1px var(--tb),0 5px 18px rgba(6,182,212,0.14)}
+    .pc-tag{position:absolute;top:10px;right:10px;font-size:9px;font-weight:500;letter-spacing:0.06em;padding:2px 7px;border-radius:10px}
+    .pc-tag.inst{background:rgba(16,185,129,0.15);color:#34d399;border:1px solid rgba(16,185,129,0.28)}
+    .pc-tag.enq{background:rgba(245,158,11,0.12);color:#fbbf24;border:1px solid rgba(245,158,11,0.28)}
+    .pe{font-size:26px;display:block;margin-bottom:9px}
+    .pn{font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:600;color:var(--cream);line-height:1.3;margin-bottom:5px}
+    .pd{font-size:11px;font-weight:300;color:var(--muted);line-height:1.6;margin-bottom:10px}
+    .pp{font-size:13px;font-weight:500;color:var(--tb)}
+    .ppn{font-size:11px;color:var(--muted);font-weight:300}
+    .abadge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:500;padding:3px 7px;border-radius:20px;margin-top:7px}
+    .abadge.av{background:rgba(16,185,129,0.12);color:#34d399;border:1px solid rgba(16,185,129,0.25)}
+    .abadge.lim{background:rgba(245,158,11,0.12);color:#fbbf24;border:1px solid rgba(245,158,11,0.25)}
+    .adot{width:5px;height:5px;border-radius:50%;display:inline-block}
+    .av .adot{background:#34d399}
+    .lim .adot{background:#fbbf24}
+
+    /* DATE */
+    .di{width:100%;padding:15px 16px;background:var(--card);border:2px solid var(--bdr);border-radius:11px;color:var(--cream);font-family:'DM Sans',sans-serif;font-size:15px;outline:none;transition:border-color 0.2s;cursor:pointer;color-scheme:dark;margin-bottom:12px}
+    .di:focus{border-color:var(--tb)}
+
+    /* NOTICE */
+    .note{border-radius:9px;padding:12px 15px;font-size:13px;line-height:1.65;display:none;margin-bottom:14px}
+    .note.warn{background:var(--wbg);border:1px solid var(--wbd);color:var(--wtx)}
+    .note.err{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.28);color:#f87171}
+    .note.info{background:rgba(6,182,212,0.07);border:1px solid rgba(6,182,212,0.22);color:var(--muted)}
+    .note.on{display:block}
+
+    /* GROUP */
+    .grow{display:flex;align-items:center;justify-content:space-between;padding:17px 0;border-bottom:1px solid var(--bdr)}
+    .grow:last-of-type{border-bottom:none}
+    .gl{font-size:15px;color:var(--cream)}
+    .gs{font-size:12px;font-weight:300;color:var(--muted);margin-top:2px}
+    .gp{font-size:13px;color:var(--tb);margin-top:2px}
+    .ctr{display:flex;align-items:center;gap:13px}
+    .cb{width:32px;height:32px;border-radius:50%;border:2px solid var(--bdr);background:transparent;color:var(--cream);font-size:19px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.18s;line-height:1;user-select:none;font-family:inherit}
+    .cb:hover{border-color:var(--tb);color:var(--tb)}
+    .cb:disabled{opacity:0.22;cursor:not-allowed}
+    .cv{font-family:'Cormorant Garamond',serif;font-size:25px;color:var(--cream);min-width:24px;text-align:center}
+
+    /* ACCOMMODATION SELECT */
+    .acc-wrap{margin-top:20px;padding-top:20px;border-top:1px solid var(--bdr)}
+    .acc-lbl{font-size:11px;font-weight:500;letter-spacing:0.10em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;display:block}
+
+    /* DURATION BTNS */
+    .dur-wrap{margin-top:20px;padding-top:20px;border-top:1px solid var(--bdr)}
+    .dur-lbl{font-size:12px;color:var(--muted);font-weight:300;margin-bottom:9px}
+    .dur-btns{display:flex;flex-wrap:wrap;gap:7px}
+    .db{padding:7px 13px;border-radius:7px;border:2px solid var(--bdr);background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;transition:all 0.18s}
+    .db:hover,.db.sel{border-color:var(--tb);color:var(--tb);background:rgba(6,182,212,0.06)}
+
+    /* PRICE BOX */
+    .pbox{background:rgba(6,182,212,0.07);border:1px solid rgba(6,182,212,0.2);border-radius:11px;padding:17px;margin-top:22px}
+    .pblbl{font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:var(--tb);margin-bottom:9px}
+    .pl{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);font-weight:300;padding:3px 0}
+    .ptr{display:flex;justify-content:space-between;align-items:baseline;padding-top:9px;margin-top:7px;border-top:1px solid var(--bdr)}
+    .ptl{font-size:14px;font-weight:500;color:var(--cream)}
+    .pta{font-family:'Cormorant Garamond',serif;font-size:31px;font-weight:600;color:var(--cream)}
+    .ptc{font-size:14px;color:var(--muted);font-family:'DM Sans',sans-serif;font-weight:300}
+
+    /* ENQUIRY BOX */
+    .enq-box{background:var(--wbg);border:1px solid var(--wbd);border-radius:11px;padding:17px;margin-top:22px}
+    .enq-box-ttl{font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--wtx);margin-bottom:8px}
+    .enq-box p{font-size:13px;font-weight:300;color:var(--muted);line-height:1.65}
+
+    /* STICKY */
+    .sticky{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(10,22,40,0.96);backdrop-filter:blur(12px);border-top:1px solid var(--bdr);padding:10px 20px;z-index:100;align-items:center;justify-content:space-between}
+    .sticky.on{display:flex}
+    .slbl{font-size:12px;font-weight:300;color:var(--muted)}
+    .samt{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--cream)}
+    @media(min-width:640px){.sticky{display:none!important}}
+
+    /* FIELDS */
+    .field{margin-bottom:17px}
+    .flbl{display:block;font-size:11px;font-weight:500;letter-spacing:0.10em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+    .fi,.fsel{width:100%;padding:14px 15px;background:var(--card);border:2px solid var(--bdr);border-radius:9px;color:var(--cream);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:300;outline:none;transition:border-color 0.2s}
+    .fi:focus,.fsel:focus{border-color:var(--tb)}
+    .fi::placeholder{color:rgba(148,180,204,0.35)}
+    .fi.bad{border-color:var(--red)}
+    .fsel{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%2394b4cc' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;padding-right:36px}
+    .fsel option{background:var(--nmid)}
+    .fhint{font-size:11px;color:var(--muted);margin-top:5px;line-height:1.5}
+    .ferr{font-size:12px;color:var(--red);margin-top:4px;display:none}
+    .ferr.on{display:block}
+
+    /* TEXTAREA */
+    textarea.fi{resize:vertical;min-height:90px;font-size:14px;line-height:1.6}
+
+    /* TERMS */
+    .tc{background:var(--card);border:1px solid var(--bdr);border-radius:11px;padding:17px;margin-bottom:20px}
+    .tclbl{font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--tb);margin-bottom:11px}
+    .tcs{max-height:190px;overflow-y:auto;font-size:12px;font-weight:300;color:var(--muted);line-height:1.75;margin-bottom:13px;padding-right:5px;scrollbar-width:thin;scrollbar-color:rgba(6,182,212,0.3) transparent}
+    .tcs::-webkit-scrollbar{width:3px}
+    .tcs::-webkit-scrollbar-thumb{background:rgba(6,182,212,0.3);border-radius:2px}
+    .tcs h4{color:var(--cream);font-weight:500;font-size:12px;margin:11px 0 3px}
+    .tcs p{margin-bottom:6px}
+    .tcrow{display:flex;align-items:flex-start;gap:10px;cursor:pointer}
+    .tcrow input{width:16px;height:16px;flex-shrink:0;margin-top:2px;accent-color:var(--tb);cursor:pointer}
+    .tcrow span{font-size:13px;font-weight:300;color:var(--muted);line-height:1.5}
+    .tcrow strong{color:var(--cream);font-weight:400}
+    .tcerr{font-size:12px;color:var(--red);margin-top:7px;display:none}
+    .tcerr.on{display:block}
+
+    /* REVIEW */
+    .rc{background:var(--card);border:1px solid var(--bdr);border-radius:11px;padding:17px;margin-bottom:11px}
+    .rlbl{font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:var(--tb);margin-bottom:11px}
+    .rr{display:flex;justify-content:space-between;padding:4px 0;font-size:14px;border-bottom:1px solid rgba(255,255,255,0.04)}
+    .rr:last-child{border-bottom:none}
+    .rk{color:var(--muted);font-weight:300}
+    .rv{color:var(--cream);text-align:right;max-width:62%}
+    .rtot{background:rgba(6,182,212,0.07);border:1px solid rgba(6,182,212,0.22);border-radius:11px;padding:17px 19px;display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+    .rtlbl{font-size:14px;color:var(--cream)}
+    .rtsub{font-size:11px;color:var(--muted);font-weight:300;margin-top:2px}
+    .rtamt{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:600;color:var(--cream)}
+
+    /* BUTTONS */
+    .bst{display:flex;flex-direction:column;gap:10px;margin-top:8px}
+    .bn{width:100%;padding:16px 22px;background:var(--tb);color:var(--navy);border:none;border-radius:11px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:7px}
+    .bn:hover{background:#22d3ee;transform:translateY(-1px);box-shadow:0 7px 20px rgba(6,182,212,0.28)}
+    .bn:disabled{opacity:0.32;cursor:not-allowed;transform:none;box-shadow:none}
+    .bpay{width:100%;padding:18px 22px;background:linear-gradient(135deg,#0891b2,#0ea5e9);color:#fff;border:none;border-radius:11px;font-family:'DM Sans',sans-serif;font-size:16px;font-weight:500;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:9px}
+    .bpay:hover{transform:translateY(-2px);box-shadow:0 9px 26px rgba(8,145,178,0.38)}
+    .bpay:disabled{opacity:0.4;cursor:not-allowed;transform:none;box-shadow:none}
+    .benq{width:100%;padding:18px 22px;background:linear-gradient(135deg,#d97706,#f59e0b);color:#fff;border:none;border-radius:11px;font-family:'DM Sans',sans-serif;font-size:16px;font-weight:500;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:9px}
+    .benq:hover{transform:translateY(-2px);box-shadow:0 9px 26px rgba(245,158,11,0.35)}
+    .benq:disabled{opacity:0.4;cursor:not-allowed;transform:none;box-shadow:none}
+    .bb{background:transparent;color:var(--muted);border:none;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:300;cursor:pointer;padding:7px 0;transition:color 0.18s}
+    .bb:hover{color:var(--cream)}
+    .spin{width:15px;height:15px;border-radius:50%;border:2px solid rgba(255,255,255,0.25);border-top-color:#fff;animation:sp 0.7s linear infinite;display:none}
+    .spin.on{display:block}
+    @keyframes sp{to{transform:rotate(360deg)}}
+    .paynote{text-align:center;font-size:11px;color:var(--muted);font-weight:300;margin-top:11px;line-height:1.6}
+
+    /* SUCCESS */
+    #suc{display:none;text-align:center;padding:58px 16px}
+    #suc.on{display:block;animation:up 0.5s ease}
+    .sring{width:68px;height:68px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 22px}
+    .sring.paid{background:rgba(16,185,129,0.14);border:2px solid var(--ok)}
+    .sring.sent{background:rgba(245,158,11,0.12);border:2px solid var(--wtx)}
+    .sh2{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:300;color:var(--cream);margin-bottom:10px}
+    .smsg{font-size:15px;font-weight:300;color:var(--muted);line-height:1.75;max-width:420px;margin:0 auto 22px}
+    .srlbl{font-size:11px;letter-spacing:0.20em;text-transform:uppercase;color:var(--tb);margin-bottom:5px}
+    .srval{font-family:'Cormorant Garamond',serif;font-size:23px;font-weight:300;color:var(--cream);margin-bottom:26px}
+    .nx{text-align:left;max-width:400px;margin:0 auto 26px}
+    .nxlbl{font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--tb);margin-bottom:11px;text-align:center}
+    .nxi{display:flex;gap:11px;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--bdr)}
+    .nxi:last-child{border-bottom:none}
+    .nxn{width:23px;height:23px;border-radius:50%;flex-shrink:0;background:rgba(6,182,212,0.12);border:1px solid rgba(6,182,212,0.25);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:var(--tb)}
+    .nxt{font-size:13px;font-weight:300;color:var(--muted);line-height:1.6}
+    .nxt b{color:var(--cream);font-weight:400}
+
+    /* OPERATOR BANNER */
+    .op-banner{background:rgba(6,182,212,0.07);border-bottom:1px solid var(--bdr);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+    .op-banner-lbl{font-size:12px;font-weight:400;color:var(--muted);display:flex;align-items:center;gap:7px}
+    .op-banner-lbl span{font-size:14px}
+    .op-code-wrap{display:flex;align-items:center;gap:8px}
+    .op-input{padding:7px 12px;background:var(--card);border:1px solid var(--bdr);border-radius:7px;color:var(--cream);font-family:'DM Sans',sans-serif;font-size:13px;width:150px;outline:none;transition:border-color 0.2s;text-transform:uppercase}
+    .op-input:focus{border-color:var(--tb)}
+    .op-btn{padding:7px 14px;background:var(--tb);color:var(--navy);border:none;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all 0.18s;white-space:nowrap}
+    .op-btn:hover{background:#22d3ee}
+    .op-status{font-size:12px;font-weight:300;padding:0}
+    .op-status.ok{color:#34d399}
+    .op-status.bad{color:#f87171}
+    .op-applied{display:none;font-size:12px;color:#34d399;font-weight:400;align-items:center;gap:6px}
+    .op-applied.on{display:flex}
+    .op-clear{background:transparent;border:none;color:var(--muted);font-size:12px;cursor:pointer;text-decoration:underline;font-family:'DM Sans',sans-serif}
+
+    /* VAT LINE IN PRICE BOX */
+    .vat-section{border-top:1px solid var(--bdr);margin-top:8px;padding-top:8px}
+    .vat-line{display:flex;justify-content:space-between;font-size:13px;padding:3px 0}
+    .vat-key{color:var(--muted);font-weight:300}
+    .vat-val{color:var(--cream)}
+    .disc-val{color:#34d399}
+    .hidden{display:none!important}
+    .pc.oos{opacity:0.45;cursor:not-allowed}
+    .pc.oos:hover{transform:none;border-color:var(--bdr);background:var(--card)}
+    .oos-lbl{font-size:10px;color:var(--red);font-weight:500;margin-top:6px;display:block}
+    .time-btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+    .tbtn{padding:10px 16px;border-radius:9px;border:2px solid var(--bdr);background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;transition:all 0.18s;text-align:center}
+    .tbtn:hover,.tbtn.sel{border-color:var(--tb);color:var(--tb);background:rgba(6,182,212,0.06)}
+    .tbtn .ttime{font-size:14px;font-weight:500;display:block;color:var(--cream)}
+    .tbtn.sel .ttime{color:var(--tb)}
+    .tbtn .tdesc{font-size:10px;display:block;margin-top:2px}
+    @media(max-width:480px){.htitle{font-size:24px}.sh{font-size:26px}.pline{width:18px}.pdot{width:23px;height:23px;font-size:10px}}
+  </style>
+</head>
+<body>
+
+<div class="sticky" id="sticky">
+  <div><div class="slbl">Your total</div><div class="samt">&#8364;<span id="sAmt">0</span></div></div>
+  <div style="font-size:12px;color:var(--muted);font-weight:300" id="sGrp"></div>
+</div>
+
+<!-- ADMIN LINK -->
+<div style="text-align:right;padding:8px 16px;background:rgba(0,0,0,0.15);border-bottom:1px solid var(--bdr)">
+  <a href="/pia-admin.html" style="font-size:11px;font-weight:400;color:var(--muted);text-decoration:none;letter-spacing:0.08em;transition:color 0.18s" onmouseover="this.style.color='var(--tb)'" onmouseout="this.style.color='var(--muted)'">&#x2699;&#xFE0F; Admin</a>
+</div>
+
+<!-- OPERATOR BANNER -->
+<div class="op-banner" id="opBanner">
+  <div class="op-banner-lbl"><span>&#x1F3E2;</span> Tour operator or trade partner?</div>
+  <div class="op-code-wrap">
+    <div class="op-applied" id="opApplied">
+      <span>&#10003;</span>
+      <span id="opAppliedName"></span>
+      <button class="op-clear" onclick="clearOperator()">Remove</button>
+    </div>
+    <div id="opInputWrap" style="display:flex;align-items:center;gap:8px">
+      <input type="text" class="op-input" id="opCode" placeholder="ACCESS CODE" maxlength="20">
+      <button class="op-btn" onclick="verifyOperator()">Apply</button>
+    </div>
+    <span class="op-status" id="opStatus"></span>
+  </div>
+</div>
+
+<div class="w">
+
+  <header class="hdr">
+    <p class="hbrand">Pico Island Adventures</p>
+    <h1 class="htitle">Book Your <i>Atlantic Experience</i></h1>
+    <div class="trust">
+      <span class="ti">&#x1F40B; 33 years of experience</span>
+      <span class="ti">&#10022; 98% sighting success</span>
+      <span class="ti">&#x1F52C; Marine biologist guides</span>
+    </div>
+  </header>
+
+  <div class="prog-wrap"><div class="prog-track" id="pt"></div></div>
+
+  <!-- ═══ STEP 1 — CHOOSE ═══ -->
+  <div class="step on" id="step1">
+    <h2 class="sh">Which experience<br><i>calls to you?</i></h2>
+    <p class="ss">Choose your adventure. Instant booking available for day trips — premium packages are submitted as a proposal for Frank to follow up.</p>
+    <p class="taph">Tap a card to continue</p>
+    <div class="pgrid">
+
+      <div class="grid-section">&#x26A1; Book &amp; Pay Instantly</div>
+
+      <button class="pc" id="pc-whale" onclick="pickCheck('whale')">
+        <span class="pc-tag inst">Instant</span>
+        <span class="pe">&#x1F40B;</span>
+        <div class="pn">Whale &amp; Dolphin Watching</div>
+        <div class="pd">Marine biologist guided. 98% sighting success. Morning, afternoon &amp; sunset departures.</div>
+        <div class="pp">From &#8364;79 <span class="ppn">/ adult</span></div>
+        <div class="abadge lim"><span class="adot"></span>Apr 1 &#8212; Oct 30</div>
+      </button>
+
+      <button class="pc" id="pc-snorkel" onclick="pickCheck('snorkel')">
+        <span class="pc-tag inst">Instant</span>
+        <span class="pe">&#x1F30A;</span>
+        <div class="pn">Snorkelling &#8212; Princess Alice</div>
+        <div class="pd">Swim with Mobula rays at one of the world's top dive sites. No cert needed.</div>
+        <div class="pp">&#8364;225 <span class="ppn">/ person</span></div>
+        <div class="abadge lim"><span class="adot"></span>Jun 1 &#8212; Oct 15</div>
+      </button>
+
+      <button class="pc" id="pc-pab" onclick="pickCheck('pab')">
+        <span class="pc-tag inst">Instant</span>
+        <span class="pe">&#x1F93F;</span>
+        <div class="pn">Princess Alice Bank Diving</div>
+        <div class="pd">2-day package — check dive + Princess Alice Bank. Open Water cert required.</div>
+        <div class="pp">&#8364;499 <span class="ppn">/ person</span></div>
+        <div class="abadge lim"><span class="adot"></span>Jun 1 &#8212; Oct 15</div>
+      </button>
+
+      <div class="grid-section">&#x1F4CB; Submit a Proposal Request</div>
+
+      <button class="pc" id="pc-shark" onclick="pickCheck('shark')">
+        <span class="pc-tag inst">Instant</span>
+        <span class="pe">&#x1F988;</span>
+        <div class="pn">Shark Week &#8212; Without Hotel</div>
+        <div class="pd">10-day expedition. 4 shark dives, Princess Alice Bank, whale watching. Book directly.</div>
+        <div class="pp">&#8364;1,440 <span class="ppn">/ person</span></div>
+        <div class="abadge lim"><span class="adot"></span>Jun 1 &#8212; Oct 15</div>
+      </button>
+
+      <button class="pc" id="pc-sharkhotel" onclick="pickCheck('sharkhotel')">
+        <span class="pc-tag enq">Proposal</span>
+        <span class="pe">&#x1F988;</span>
+        <div class="pn">Shark Week &#8212; With Hotel</div>
+        <div class="pd">Full package with accommodation. Frank will confirm availability and hotel options.</div>
+        <div class="pp">From &#8364;1,440 <span class="ppn">/ person</span></div>
+        <div class="abadge lim"><span class="adot"></span>Jun 1 &#8212; Oct 15</div>
+      </button>
+
+      <button class="pc" id="pc-giants" onclick="pick('giants')">
+        <span class="pc-tag enq">Proposal</span>
+        <span class="pe">&#x1F30A;</span>
+        <div class="pn">Season of the Giants</div>
+        <div class="pd">15-day complete package. Blue, Fin and Sei whales during spring migration.</div>
+        <div class="pp">From &#8364;1,470 <span class="ppn">/ person</span></div>
+        <div class="abadge lim"><span class="adot"></span>Feb &#8212; June only</div>
+      </button>
+
+      <button class="pc" id="pc-scuba" onclick="pick('scuba')">
+        <span class="pc-tag enq">Proposal</span>
+        <span class="pe">&#x1F41F;</span>
+        <div class="pn">Scuba Diving</div>
+        <div class="pd">Land and boat dives around Pico. All levels. Custom programmes available.</div>
+        <div class="pp">From &#8364;110 <span class="ppn">/ 2-tank dive</span></div>
+        <div class="abadge av"><span class="adot"></span>All cert levels welcome</div>
+      </button>
+
+    </div>
+  </div>
+
+  <!-- ═══ STEP 2 — DATE ═══ -->
+  <div class="step" id="step2">
+    <div id="flowBadge2"></div>
+    <h2 class="sh">When would you<br><i>like to join us?</i></h2>
+    <p class="ss" id="dateSub">Select your preferred date.</p>
+
+    <!-- INSTANT PRODUCTS: wish date + alternative date -->
+    <div id="instantDates">
+      <label class="flbl" for="tourDate">Preferred Date</label>
+      <input type="date" class="di" id="tourDate" onchange="onDate()" style="margin-bottom:16px">
+      <label class="flbl" for="altDate">Alternative Date</label>
+      <input type="date" class="di" id="altDate" onchange="onDate()">
+      <p style="font-size:12px;font-weight:300;color:var(--muted);margin-top:8px;line-height:1.6;">We will do our best to confirm your preferred date. Your alternative date helps us secure your spot if conditions prevent the first choice.</p>
+    </div>
+
+    <!-- PROPOSAL PRODUCTS: date range -->
+    <div id="enquiryDates" class="hidden">
+      <label class="flbl" for="dateFrom">First Possible Day</label>
+      <input type="date" class="di" id="dateFrom" onchange="onDate()" style="margin-bottom:16px">
+      <label class="flbl" for="dateTo">Last Possible Day</label>
+      <input type="date" class="di" id="dateTo" onchange="onDate()">
+      <p style="font-size:12px;font-weight:300;color:var(--muted);margin-top:8px;line-height:1.6;">Offshore expeditions cannot be guaranteed for a specific date due to weather and sea conditions. Providing a flexible window gives Frank the best chance of scheduling your trip.</p>
+    </div>
+
+    <div class="note warn" id="seasonNote" style="margin-top:14px">
+      <strong>Seasonal note:</strong> Season of the Giants runs February through June for peak Blue and Fin whale sightings. Your selected date falls outside this window. We will note this in your proposal.
+    </div>
+
+    <div class="note info on" id="pabNote" style="display:none;margin-top:14px">
+      &#x26A0;&#xFE0F; <strong>Important:</strong> Due to weather conditions and the 100km offshore distance, Princess Alice Bank trips typically run twice a week. Frank will confirm your exact date after booking.
+    </div>
+
+    <!-- DEPARTURE TIME — whale watching only -->
+    <div id="timeWrap" class="hidden" style="margin-top:20px">
+      <label class="flbl">Preferred Departure Time</label>
+      <div class="time-btns">
+        <button type="button" class="tbtn" id="t-9" onclick="pickTime('09:00')">
+          <span class="ttime">9:00 AM</span>
+          <span class="tdesc">Morning</span>
+        </button>
+        <button type="button" class="tbtn" id="t-14" onclick="pickTime('14:00')">
+          <span class="ttime">2:00 PM</span>
+          <span class="tdesc">Afternoon</span>
+        </button>
+        <button type="button" class="tbtn" id="t-1730" onclick="pickTime('17:30')">
+          <span class="ttime">5:30 PM</span>
+          <span class="tdesc">Sunset</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="bst" style="margin-top:20px">
+      <button class="bn" id="btn2" disabled onclick="go(3)">Continue &rarr;</button>
+      <button class="bb" onclick="go(1)">&larr; Back</button>
+    </div>
+  </div>
+
+  <!-- ═══ STEP 3 — GROUP ═══ -->
+  <div class="step" id="step3">
+    <div id="flowBadge3"></div>
+    <h2 class="sh">Build your<br><i>group</i></h2>
+    <p class="ss">Tell us how many are joining you.</p>
+
+    <div class="grow">
+      <div>
+        <div class="gl">Adults</div>
+        <div class="gs" id="adultSub">Age 13+</div>
+        <div class="gp" id="adultTag"></div>
+      </div>
+      <div class="ctr">
+        <button class="cb" id="adn" onclick="adj('a',-1)" disabled>&#8722;</button>
+        <span class="cv" id="aval">1</span>
+        <button class="cb" onclick="adj('a',1)">&#43;</button>
+      </div>
+    </div>
+
+    <div id="childRow" class="grow">
+      <div>
+        <div class="gl">Children</div>
+        <div class="gs">Under 12</div>
+        <div class="gp" id="childTag"></div>
+      </div>
+      <div class="ctr">
+        <button class="cb" id="cdn" onclick="adj('c',-1)" disabled>&#8722;</button>
+        <span class="cv" id="cval">0</span>
+        <button class="cb" onclick="adj('c',1)">&#43;</button>
+      </div>
+    </div>
+
+    <!-- Accommodation selector for Season of the Giants -->
+    <div class="acc-wrap hidden" id="accWrap">
+      <label class="acc-lbl" for="accSel">Preferred Accommodation</label>
+      <select class="fsel" id="accSel" onchange="onAcc()">
+        <option value="">Select accommodation type</option>
+        <option value="gh_dbl">Guest house — double room (&#8364;1,470 / person)</option>
+        <option value="gh_sgl">Guest house — single room (&#8364;1,770 / person)</option>
+        <option value="ap_dbl">Apartment Maroicos — double room (&#8364;1,799 / person)</option>
+        <option value="ap_sgl">Apartment Maroicos — single room (&#8364;2,249 / person)</option>
+        <option value="ht_dbl">Hotel Caravellas — double room (&#8364;1,869 / person)</option>
+        <option value="ht_sgl">Hotel Caravellas — single room (&#8364;2,359 / person)</option>
+      </select>
+    </div>
+
+    <!-- Price box (instant products only) -->
+    <div class="pbox hidden" id="pbox">
+      <div class="pblbl">Your total</div>
+      <div id="plines"></div>
+      <div class="ptr">
+        <span class="ptl">Total</span>
+        <span class="pta"><span class="ptc">&#8364;</span><span id="ptot">0</span></span>
+      </div>
+    </div>
+
+    <!-- Enquiry info box (proposal products) -->
+    <div class="enq-box hidden" id="enqBox">
+      <div class="enq-box-ttl">&#x1F4AC; Proposal request</div>
+      <p>Your details will be sent to Frank who will contact you within 4 hours with availability, a personalised itinerary, and a payment link.</p>
+    </div>
+
+    <div class="bst">
+      <button class="bn" id="btn3" onclick="step3Next()">Continue &rarr;</button>
+      <button class="bb" onclick="go(2)">&larr; Back</button>
+    </div>
+  </div>
+
+  <!-- ═══ STEP 4 — DIVING CERT (PAB only) ═══ -->
+  <div class="step" id="step4">
+    <div class="flow-badge instant">&#x26A1; Instant Booking</div>
+    <h2 class="sh">Your diving<br><i>experience</i></h2>
+    <p class="ss">We need this to match you with the right dive briefing. It does not affect your price.</p>
+
+    <div class="field">
+      <label class="flbl" for="cert">Certification Level</label>
+      <select class="fsel" id="cert" onchange="onCert()">
+        <option value="">Select your certification</option>
+        <option value="ow">Open Water</option>
+        <option value="aow">Advanced Open Water</option>
+        <option value="rescue">Rescue Diver</option>
+        <option value="dm">Divemaster / Instructor</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label class="flbl" for="dives">Total Logged Dives</label>
+      <input type="number" class="fi" id="dives" placeholder="e.g. 52" min="0">
+      <p class="fhint">A minimum of Open Water certification is required. A mandatory check dive day around Pico precedes the Princess Alice Bank trip.</p>
+    </div>
+
+    <div class="note err" id="certWarn">
+      Princess Alice Bank requires a minimum of Open Water certification. All divers must complete a check dive day before accessing Princess Alice Bank regardless of experience level. No exceptions.
+    </div>
+
+    <div class="bst">
+      <button class="bn" id="btn4" onclick="go(5)">Continue &rarr;</button>
+      <button class="bb" onclick="go(3)">&larr; Back</button>
+    </div>
+  </div>
+
+  <!-- ═══ STEP 5 — DETAILS ═══ -->
+  <div class="step" id="step5">
+    <div id="flowBadge5"></div>
+    <h2 class="sh">Your<br><i>details</i></h2>
+    <p class="ss" id="detailSub">We will send your confirmation and updates to these contacts.</p>
+
+    <div class="field">
+      <label class="flbl" for="gn">Full Name</label>
+      <input type="text" class="fi" id="gn" placeholder="As on your passport">
+      <p class="ferr" id="eName">Please enter your full name.</p>
+    </div>
+    <div class="field">
+      <label class="flbl" for="ge">Email Address</label>
+      <input type="email" class="fi" id="ge" placeholder="your@email.com">
+      <p class="ferr" id="eEmail">Please enter a valid email address.</p>
+    </div>
+    <div class="field">
+      <label class="flbl" for="gw">WhatsApp Number</label>
+      <input type="tel" class="fi" id="gw" placeholder="+351 912 345 678">
+      <p class="fhint">Include country code.</p>
+      <p class="ferr" id="eWa">Please enter your WhatsApp number with country code.</p>
+    </div>
+
+    <!-- Extra notes field for enquiry products -->
+    <div class="field hidden" id="notesField">
+      <label class="flbl" for="gnotes">Any questions or special requests?</label>
+      <textarea class="fi" id="gnotes" placeholder="e.g. certification level, group details, specific interests..."></textarea>
+    </div>
+
+    <div class="bst">
+      <button class="bn" onclick="val5()">Review &rarr;</button>
+      <button class="bb" onclick="back5()">&larr; Back</button>
+    </div>
+  </div>
+
+  <!-- ═══ STEP 6 — REVIEW ═══ -->
+  <div class="step" id="step6">
+    <div id="flowBadge6"></div>
+    <h2 class="sh" id="step6Title">Review &amp;<br><i>confirm</i></h2>
+    <p class="ss" id="step6Sub">Check your details, agree to our terms, then pay to secure your spot.</p>
+
+    <div class="rc" id="rExp"></div>
+    <div class="rc" id="rGrp"></div>
+    <div class="rc" id="rGst"></div>
+
+    <!-- Total bar (instant only) -->
+    <div class="rtot hidden" id="rtot">
+      <div>
+        <div class="rtlbl">Total to Pay</div>
+        <div class="rtsub">Secure payment via Stripe</div>
+      </div>
+      <div class="rtamt">&#8364;<span id="rtotAmt">0</span></div>
+    </div>
+
+    <!-- Enquiry summary (proposal only) -->
+    <div class="enq-box hidden" id="enqSummary">
+      <div class="enq-box-ttl">What happens next</div>
+      <p>Frank will review your request and contact you within 4 hours on WhatsApp and email with availability, a personalised itinerary, and a payment link to confirm your spot.</p>
+    </div>
+
+    <!-- Terms -->
+    <div class="tc">
+      <div class="tclbl">Terms &amp; Conditions</div>
+      <div class="tcs">
+        <p>Please read the following terms carefully before completing your booking with Pico Island Adventures.</p>
+        <h4>1. Bookings and Confirmation</h4>
+        <p>Your booking is confirmed upon receipt of full payment. You will receive a confirmation email with your booking reference. Pico Island Adventures operates under Maritime Tourism Licence Nr. 15/2009.</p>
+        <h4>2. Cancellation Policy — No Refunds</h4>
+        <p>All bookings are strictly non-refundable. Once payment has been made, no refunds will be issued under any circumstances, including changes to travel plans, illness, or personal emergencies. We strongly recommend that guests purchase comprehensive travel insurance to cover unforeseen circumstances. All cancellation requests must be submitted in writing to Pico Island Adventures for record purposes.</p>
+        <h4>3. Cancellation by Pico Island Adventures</h4>
+        <p>We reserve the right to cancel or modify any tour due to adverse weather, sea conditions, or circumstances beyond our control. In such cases, guests will be offered an alternative date or a full refund. No additional compensation will be provided.</p>
+        <h4>4. Weather and Sea Conditions</h4>
+        <p>All tours are weather-dependent. Our skippers and marine biologists make final go or no-go decisions on safety grounds. Guest safety overrides all other considerations.</p>
+        <h4>5. Health and Safety</h4>
+        <p>Guests must be in good general health to participate. Those with heart conditions, severe seasickness history, recent surgery, or pregnancy should consult a physician before booking. All guests must follow the safety briefing given by the crew.</p>
+        <h4>6. Diving Requirements</h4>
+        <p>Access to Princess Alice Bank requires Advanced Open Water certification and 50 logged dives. All divers must complete a preparation dive day before accessing advanced sites. No exceptions will be made.</p>
+        <h4>7. Wildlife Observation</h4>
+        <p>Azorean law prohibits entering the water in the presence of whales. All wildlife interactions are conducted in accordance with Portuguese maritime and environmental law.</p>
+        <h4>8. Liability</h4>
+        <p>Guests participate in all activities at their own risk. Pico Island Adventures maintains full maritime liability insurance as required by Portuguese law. Personal belongings are the sole responsibility of the guest.</p>
+        <h4>9. Governing Law</h4>
+        <p>These terms are governed by Portuguese law. Any disputes shall be subject to the jurisdiction of the courts of the Azores, Portugal.</p>
+      </div>
+      <label class="tcrow">
+        <input type="checkbox" id="tcBox" onchange="onTc()">
+        <span>I have read and agree to the <strong>Terms and Conditions</strong>, including the cancellation policy and safety requirements.</span>
+      </label>
+      <p class="tcerr" id="tcErr">Please accept the Terms and Conditions to continue.</p>
+    </div>
+
+    <!-- PAY button (instant) -->
+    <button class="bpay hidden" id="btnPay" onclick="doPay()" disabled>
+      <span>&#x1F512;</span>
+      <span id="payLbl">Pay Securely Now</span>
+      <div class="spin" id="paySpin"></div>
+    </button>
+
+    <!-- SUBMIT ENQUIRY button (proposal) -->
+    <button class="benq hidden" id="btnEnq" onclick="doEnq()" disabled>
+      <span>&#x1F4E8;</span>
+      <span id="enqLbl">Send Proposal Request</span>
+      <div class="spin" id="enqSpin"></div>
+    </button>
+
+    <p class="paynote hidden" id="payNote">Your card is handled securely by Stripe. Pico Island Adventures never stores payment details.</p>
+    <p class="paynote hidden" id="enqNote">We will respond within 4 hours on WhatsApp and email.</p>
+
+    <div style="text-align:center;margin-top:14px">
+      <button class="bb" onclick="go(5)">&larr; Edit details</button>
+    </div>
+  </div>
+
+  <!-- ═══ SUCCESS ═══ -->
+  <div id="suc">
+    <div class="sring" id="sucRing"></div>
+    <h2 class="sh2" id="sucTitle"></h2>
+    <p class="smsg" id="sucMsg"></p>
+    <div class="srlbl">Reference</div>
+    <div class="srval" id="sucRef">&#8212;</div>
+    <div class="nx" id="sucNext"></div>
+    <p style="font-size:13px;color:var(--muted);font-weight:300">Questions? WhatsApp: <a href="https://wa.me/351292622980" style="color:var(--tb)">+351 292 622 980</a></p>
+  </div>
+
+</div>
+
+<script>
+var N8N = 'https://n8n.srv1432046.hstgr.cloud/webhook/pia-booking';
+var BASE_URL = window.location.href.split('?')[0];
+
+/* ── PRODUCT DEFINITIONS ──────────────────────────────────── */
+var P = {
+  // seasonStart/End: [month, day] — null means year-round
+  whale:      {id:'whale',      name:'Whale & Dolphin Watching',           instant:true,  ap:79,   cp:59,  flat:false, multi:false, seas:false, peak:[],         dive:false, hasChild:true,  seasonStart:[4,1],  seasonEnd:[10,30], seasonLabel:'Apr 1 — Oct 30' },
+  snorkel:    {id:'snorkel',    name:'Snorkelling — Princess Alice',        instant:true,  ap:225,  cp:0,   flat:true,  multi:false, seas:false, peak:[],         dive:false, hasChild:false, seasonStart:[6,1],  seasonEnd:[10,15], seasonLabel:'Jun 1 — Oct 15' },
+  pab:        {id:'pab',        name:'Princess Alice Bank Diving',          instant:true,  ap:499,  cp:0,   flat:true,  multi:false, seas:false, peak:[],         dive:true,  hasChild:false, seasonStart:[6,1],  seasonEnd:[10,15], seasonLabel:'Jun 1 — Oct 15' },
+  shark:      {id:'shark',      name:'Shark Week — Without Hotel',          instant:true,  ap:1440, cp:0,   flat:true,  multi:false, seas:false, peak:[],         dive:false, hasChild:false, seasonStart:[6,1],  seasonEnd:[10,15], seasonLabel:'Jun 1 — Oct 15' },
+  sharkhotel: {id:'sharkhotel', name:'Shark Week — With Hotel',             instant:false, ap:1440, cp:0,   flat:true,  multi:false, seas:false, peak:[],         dive:false, hasChild:false, seasonStart:[6,1],  seasonEnd:[10,15], seasonLabel:'Jun 1 — Oct 15' },
+  giants:     {id:'giants',     name:'Season of the Giants',                instant:false, ap:1470, cp:0,   flat:false, multi:false, seas:true,  peak:[2,3,4,5,6],dive:false, hasChild:false, seasonStart:[2,1],  seasonEnd:[6,30],  seasonLabel:'Feb 1 — Jun 30', hasAcc:true },
+  scuba:      {id:'scuba',      name:'Scuba Diving',                        instant:false, ap:110,  cp:0,   flat:false, multi:false, seas:false, peak:[],         dive:false, hasChild:false, seasonStart:null,   seasonEnd:null,    seasonLabel:'Year-round' },
+};
+
+// Helper: is today within a product's season?
+function inSeason(p) {
+  if (!p.seasonStart) return true;
+  var now = new Date();
+  var m = now.getMonth() + 1;
+  var d = now.getDate();
+  var start = p.seasonStart[0] * 100 + p.seasonStart[1];
+  var end   = p.seasonEnd[0]   * 100 + p.seasonEnd[1];
+  var cur   = m * 100 + d;
+  return cur >= start && cur <= end;
+}
+
+var ACC_PRICES = {
+  gh_dbl:1470, gh_sgl:1770, ap_dbl:1799, ap_sgl:2249, ht_dbl:1869, ht_sgl:2359
+};
+
+var ACC_LABELS = {
+  gh_dbl:'Guest house — double room', gh_sgl:'Guest house — single room',
+  ap_dbl:'Apartment Maroicos — double', ap_sgl:'Apartment Maroicos — single',
+  ht_dbl:'Hotel Caravellas — double', ht_sgl:'Hotel Caravellas — single'
+};
+
+/* ── STEPS ────────────────────────────────────────────────── */
+var STEPS_INST = [{n:1,l:'Experience'},{n:2,l:'Date'},{n:3,l:'Group'},{n:4,l:'Diving'},{n:5,l:'Details'},{n:6,l:'Review'}];
+var STEPS_ENQ  = [{n:1,l:'Experience'},{n:2,l:'Date'},{n:3,l:'Group'},{n:5,l:'Details'},{n:6,l:'Review'}];
+var STEPS_INST_NODIVE = [{n:1,l:'Experience'},{n:2,l:'Date'},{n:3,l:'Group'},{n:5,l:'Details'},{n:6,l:'Review'}];
+
+/* ── STATE ────────────────────────────────────────────────── */
+// Operator state
+var OP = {
+  code:'', name:'', email:'', discountPct:0, active:false
+};
+
+var S = {
+  pid:null, date:null, altDate:null, dateFrom:null, dateTo:null,
+  time:null,
+  adults:1, children:0, acc:'',
+  cert:null, dives:null,
+  name:'', email:'', wa:'', notes:'',
+  total:0, discountAmt:0, vatAmt:0, totalWithVat:0, ref:''
+};
+var cur = 1;
+
+/* ── INIT ─────────────────────────────────────────────────── */
+window.onload = function() {
+  var qs = window.location.search;
+  if (qs.indexOf('status=success') > -1) {
+    showSuc('paid', getParam('ref'), decodeURIComponent(getParam('email')));
+    return;
+  }
+  if (qs.indexOf('status=sent') > -1) {
+    showSuc('sent', getParam('ref'), decodeURIComponent(getParam('email')));
+    return;
+  }
+  drawProg();
+  setMinDate();
+  markSeasons();
+};
+
+function getParam(n) {
+  var parts = window.location.search.slice(1).split('&');
+  for (var i=0; i<parts.length; i++) {
+    var kv = parts[i].split('=');
+    if (kv[0]===n) return kv[1]||'';
+  }
+  return '';
+}
+
+/* ── OPERATOR VERIFICATION ────────────────────────────────── */
+async function verifyOperator() {
+  var code = document.getElementById('opCode').value.trim().toUpperCase();
+  var status = document.getElementById('opStatus');
+  if (!code) { status.textContent = 'Please enter a code.'; status.className='op-status bad'; return; }
+  status.textContent = 'Checking...'; status.className='op-status';
+  try {
+    var r = await fetch(CFG.supabaseUrl + '/rest/v1/pia_operators?access_code=eq.' + code + '&is_active=eq.true&select=operator_name,access_code,discount_pct,email', {
+      headers: { 'apikey': CFG.supabaseKey, 'Authorization': 'Bearer ' + CFG.supabaseKey }
+    });
+    var data = await r.json();
+    if (data && data.length > 0) {
+      var op = data[0];
+      OP.code = op.access_code;
+      OP.name = op.operator_name;
+      OP.email = op.email;
+      OP.discountPct = parseFloat(op.discount_pct);
+      OP.active = true;
+      // Update UI
+      document.getElementById('opAppliedName').textContent = op.operator_name + ' — ' + op.discount_pct + '% discount applied';
+      document.getElementById('opApplied').classList.add('on');
+      document.getElementById('opInputWrap').style.display = 'none';
+      status.textContent = '';
+      // Recalculate if on group step
+      if (S.pid && S.total > 0) calcPrice();
+    } else {
+      status.textContent = 'Code not recognised. Contact Pico Island Adventures.';
+      status.className = 'op-status bad';
+      OP.active = false;
+    }
+  } catch(e) {
+    status.textContent = 'Verification failed. Please try again.';
+    status.className = 'op-status bad';
+  }
+}
+
+function clearOperator() {
+  OP.code=''; OP.name=''; OP.email=''; OP.discountPct=0; OP.active=false;
+  document.getElementById('opApplied').classList.remove('on');
+  document.getElementById('opInputWrap').style.display = 'flex';
+  document.getElementById('opCode').value = '';
+  document.getElementById('opStatus').textContent = '';
+  if (S.pid && S.total > 0) calcPrice();
+}
+
+// Allow Enter key on operator input
+document.addEventListener('DOMContentLoaded', function() {
+  var opInput = document.getElementById('opCode');
+  if (opInput) opInput.addEventListener('keydown', function(e){ if(e.key==='Enter') verifyOperator(); });
+});
+
+/* ── PROGRESS ─────────────────────────────────────────────── */
+function getSteps() {
+  var p = S.pid ? P[S.pid] : null;
+  if (!p) return STEPS_INST_NODIVE;
+  if (!p.instant) return STEPS_ENQ;
+  if (p.dive) return STEPS_INST;
+  return STEPS_INST_NODIVE;
+}
+
+function drawProg() {
+  var vs = getSteps();
+  var h = '';
+  for (var i=0; i<vs.length; i++) {
+    var s = vs[i];
+    var done   = cur > s.n;
+    var active = cur === s.n;
+    var sc = active ? 'pstep act' : 'pstep';
+    var dc = done ? 'pdot dn' : (active ? 'pdot act' : 'pdot');
+    h += '<div class="' + sc + '"><div class="' + dc + '">' + (i+1) + '</div><span class="plbl">' + s.l + '</span></div>';
+    if (i < vs.length-1) h += '<div class="pline' + (done?' dn':'') + '"></div>';
+  }
+  document.getElementById('pt').innerHTML = h;
+}
+
+function flowBadge(type) {
+  if (type==='instant') return '<div class="flow-badge instant">&#x26A1; Instant Booking</div>';
+  return '<div class="flow-badge enquiry">&#x1F4CB; Proposal Request</div>';
+}
+
+/* ── NAVIGATION ───────────────────────────────────────────── */
+function go(n) {
+  document.getElementById('step'+cur).classList.remove('on');
+  cur = n;
+  document.getElementById('step'+n).classList.add('on');
+  if (n===3) setupGroup();
+  if (n===6) fillReview();
+  drawProg();
+  window.scrollTo(0,0);
+  var st = document.getElementById('sticky');
+  var p = S.pid ? P[S.pid] : null;
+  if (n>=3 && p && p.instant && S.total>0) st.classList.add('on');
+  else st.classList.remove('on');
+}
+
+/* ── PICK PRODUCT ─────────────────────────────────────────── */
+// pickCheck: gate on season before allowing selection
+function pickCheck(id) {
+  var p = P[id];
+  if (!inSeason(p)) {
+    alert(p.name + ' is only available ' + p.seasonLabel + '. Please come back during the season or contact Frank directly on WhatsApp: +351 292 622 980');
+    return;
+  }
+  pick(id);
+}
+
+function pick(id) {
+  S.pid = id;
+  S.adults = 1; S.children = 0; S.acc = '';
+  S.date = null; S.altDate = null; S.dateFrom = null; S.dateTo = null; S.time = null;
+  var p = P[id];
+  var cards = document.querySelectorAll('.pc');
+  for (var i=0; i<cards.length; i++) cards[i].classList.remove('sel');
+  document.getElementById('pc-'+id).classList.add('sel');
+
+  // Show correct date inputs for this product type
+  var id2 = document.getElementById('instantDates');
+  var ed  = document.getElementById('enquiryDates');
+  if (p.instant) { id2.classList.remove('hidden'); ed.classList.add('hidden'); }
+  else { id2.classList.add('hidden'); ed.classList.remove('hidden'); }
+
+  // Show PAB notice
+  var pabNote = document.getElementById('pabNote');
+  if (id === 'pab' || id === 'snorkel') pabNote.style.display = 'block';
+  else pabNote.style.display = 'none';
+
+  // Show time selector for whale watching only
+  var tw = document.getElementById('timeWrap');
+  if (id === 'whale') tw.classList.remove('hidden');
+  else tw.classList.add('hidden');
+
+  document.getElementById('btn2').disabled = true;
+  setTimeout(function(){ go(2); }, 260);
+}
+
+function pickTime(t) {
+  S.time = t;
+  var btns = document.querySelectorAll('.tbtn');
+  for (var i=0; i<btns.length; i++) btns[i].classList.remove('sel');
+  var map = {'09:00':'t-9','14:00':'t-14','17:30':'t-1730'};
+  if (map[t]) document.getElementById(map[t]).classList.add('sel');
+}
+
+/* ── DATE ─────────────────────────────────────────────────── */
+function setMinDate() {
+  var d = new Date(); d.setDate(d.getDate()+1);
+  var y=d.getFullYear(), m=('0'+(d.getMonth()+1)).slice(-2), dd=('0'+d.getDate()).slice(-2);
+  var minStr = y+'-'+m+'-'+dd;
+  document.getElementById('tourDate').min  = minStr;
+  document.getElementById('altDate').min   = minStr;
+  document.getElementById('dateFrom').min  = minStr;
+  document.getElementById('dateTo').min    = minStr;
+}
+
+function onDate() {
+  var p = S.pid ? P[S.pid] : null;
+
+  if (p && !p.instant) {
+    // Proposal products — date range
+    S.dateFrom = document.getElementById('dateFrom').value || null;
+    S.dateTo   = document.getElementById('dateTo').value   || null;
+    S.date = S.dateFrom; // primary date for display
+    document.getElementById('btn2').disabled = !S.dateFrom || !S.dateTo;
+  } else {
+    // Instant products — wish date + alternative
+    S.date    = document.getElementById('tourDate').value || null;
+    S.altDate = document.getElementById('altDate').value  || null;
+    document.getElementById('btn2').disabled = !S.date;
+  }
+
+  // Seasonal note (Season of Giants)
+  var note = document.getElementById('seasonNote');
+  if (p && p.seas && S.date) {
+    var mo = parseInt(S.date.split('-')[1], 10);
+    var inPk = false;
+    for (var i=0; i<p.peak.length; i++) { if (p.peak[i]===mo){inPk=true;break;} }
+    if (!inPk) note.classList.add('on'); else note.classList.remove('on');
+  } else { note.classList.remove('on'); }
+
+  // PAB notice
+  var pabNote = document.getElementById('pabNote');
+  if (p && (p.id === 'pab' || p.id === 'snorkel')) {
+    pabNote.style.display = 'block';
+  } else {
+    pabNote.style.display = 'none';
+  }
+
+  // Update step 2 badge
+  var p2 = S.pid ? P[S.pid] : null;
+  if (p2) document.getElementById('flowBadge2').innerHTML = flowBadge(p2.instant?'instant':'enquiry');
+  var ds = document.getElementById('dateSub');
+  if (p2 && !p2.instant) ds.textContent = 'Select your preferred arrival date so Frank can check availability.';
+  else ds.textContent = 'Tours depart daily, weather permitting. Select your preferred date.';
+}
+
+/* ── GROUP SETUP ──────────────────────────────────────────── */
+function setupGroup() {
+  var p = P[S.pid];
+  document.getElementById('flowBadge3').innerHTML = flowBadge(p.instant?'instant':'enquiry');
+
+  // Show correct date fields
+  var id = document.getElementById('instantDates');
+  var ed = document.getElementById('enquiryDates');
+  if (p.instant) { id.classList.remove('hidden'); ed.classList.add('hidden'); }
+  else { id.classList.add('hidden'); ed.classList.remove('hidden'); }
+
+  // Reset date fields
+  document.getElementById('tourDate').value = '';
+  document.getElementById('altDate').value  = '';
+  document.getElementById('dateFrom').value = '';
+  document.getElementById('dateTo').value   = '';
+  document.getElementById('btn2').disabled  = true;
+  document.getElementById('seasonNote').classList.remove('on');
+  document.getElementById('pabNote').style.display = 'none';
+
+  // Adult price tag
+  var at = document.getElementById('adultTag');
+  if (p.instant) {
+    if (p.flat) at.textContent = '\u20ac' + p.ap + ' per person — fixed package';
+    else at.textContent = '\u20ac' + p.ap + ' per person';
+  } else {
+    at.textContent = 'From \u20ac' + p.ap + ' per person';
+  }
+
+  // Child row
+  var cr = document.getElementById('childRow');
+  var ct = document.getElementById('childTag');
+  if (p.hasChild) {
+    cr.classList.remove('hidden');
+    ct.textContent = '\u20ac' + p.cp + ' per person';
+  } else {
+    cr.classList.add('hidden');
+    S.children = 0;
+  }
+
+  // Accommodation (Season of Giants)
+  var aw = document.getElementById('accWrap');
+  if (p.hasAcc) aw.classList.remove('hidden');
+  else { aw.classList.add('hidden'); S.acc = ''; }
+
+  // Price box vs enquiry box
+  var pb = document.getElementById('pbox');
+  var eb = document.getElementById('enqBox');
+  if (p.instant) { pb.classList.remove('hidden'); eb.classList.add('hidden'); calcPrice(); }
+  else { pb.classList.add('hidden'); eb.classList.remove('hidden'); }
+}
+
+function onAcc() {
+  S.acc = document.getElementById('accSel').value;
+  if (S.acc) { S.pid; P['giants'].ap = ACC_PRICES[S.acc]; }
+}
+
+function adj(t, d) {
+  if (t==='a') {
+    S.adults = Math.max(1, S.adults+d);
+    document.getElementById('aval').textContent = S.adults;
+    document.getElementById('adn').disabled = S.adults<=1;
+  } else {
+    S.children = Math.max(0, S.children+d);
+    document.getElementById('cval').textContent = S.children;
+    document.getElementById('cdn').disabled = S.children<=0;
+  }
+  var p = P[S.pid];
+  if (p.instant) calcPrice();
+}
+
+function calcPrice() {
+  var p = P[S.pid];
+  var adA = p.ap * S.adults;
+  var adC = (p.hasChild ? p.cp * S.children : 0);
+  var subtotal = adA + adC;
+  S.discountAmt = 0;
+  S.vatAmt = 0;
+
+  var h = '<div class="pl"><span>' + S.adults + ' adult' + (S.adults>1?'s':'') + ' x \u20ac' + p.ap + '</span><span>\u20ac' + adA + '</span></div>';
+  if (p.hasChild && S.children>0) h += '<div class="pl"><span>' + S.children + ' child' + (S.children>1?'ren':'') + ' x \u20ac' + p.cp + '</span><span>\u20ac' + adC + '</span></div>';
+
+  if (OP.active && OP.discountPct > 0) {
+    S.discountAmt = Math.round(subtotal * OP.discountPct) / 100;
+    var afterDisc = subtotal - S.discountAmt;
+    S.vatAmt = Math.round(afterDisc * 16) / 100;
+    S.total = Math.round((afterDisc + S.vatAmt) * 100) / 100;
+    h += '<div class="vat-section">';
+    h += '<div class="vat-line"><span class="vat-key">Subtotal</span><span class="vat-val">\u20ac' + subtotal.toFixed(2) + '</span></div>';
+    h += '<div class="vat-line"><span class="vat-key">' + OP.discountPct + '% trade discount</span><span class="disc-val">-\u20ac' + S.discountAmt.toFixed(2) + '</span></div>';
+    h += '<div class="vat-line"><span class="vat-key">Net price</span><span class="vat-val">\u20ac' + afterDisc.toFixed(2) + '</span></div>';
+    h += '<div class="vat-line"><span class="vat-key">VAT (IVA 16%)</span><span class="vat-val">\u20ac' + S.vatAmt.toFixed(2) + '</span></div>';
+    h += '</div>';
+  } else {
+    S.total = subtotal;
+  }
+
+  S.totalWithVat = S.total;
+  document.getElementById('plines').innerHTML = h;
+  document.getElementById('ptot').textContent = S.total.toFixed(2);
+  document.getElementById('sAmt').textContent = S.total.toFixed(2);
+  var pax = S.adults + S.children;
+  document.getElementById('sGrp').textContent = pax + ' guest' + (pax>1?'s':'');
+  document.getElementById('sticky').classList.add('on');
+}
+
+function step3Next() {
+  var p = P[S.pid];
+  if (p.dive) go(4); else go(5);
+}
+
+/* ── CERT ─────────────────────────────────────────────────── */
+function onCert() {
+  S.cert = document.getElementById('cert').value;
+  var warn = document.getElementById('certWarn');
+  // Open Water or above is acceptable — no minimum dives required
+  var ok = (S.cert === 'ow' || S.cert === 'aow' || S.cert === 'rescue' || S.cert === 'dm');
+  if (S.cert && !ok) warn.classList.add('on'); else warn.classList.remove('on');
+}
+
+/* ── STEP 5 ───────────────────────────────────────────────── */
+function val5() {
+  var name  = document.getElementById('gn').value.trim();
+  var email = document.getElementById('ge').value.trim();
+  var wa    = document.getElementById('gw').value.trim();
+  var ok = true;
+  function chk(eid, iid, bad) {
+    var e=document.getElementById(eid), inp=document.getElementById(iid);
+    if(bad){e.classList.add('on');inp.classList.add('bad');ok=false;}
+    else{e.classList.remove('on');inp.classList.remove('bad');}
+  }
+  chk('eName',  'gn',  !name);
+  chk('eEmail', 'ge',  !(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)));
+  chk('eWa',    'gw',  wa.length<6);
+  if (ok) {
+    S.name=name; S.email=email; S.wa=wa;
+    S.notes = document.getElementById('gnotes').value.trim();
+    go(6);
+  }
+}
+
+function back5() {
+  var p = P[S.pid];
+  if (p.dive) go(4); else go(3);
+}
+
+/* ── FILL REVIEW ──────────────────────────────────────────── */
+function fillReview() {
+  var p = P[S.pid];
+
+  // Set flow badge and copy
+  document.getElementById('flowBadge6').innerHTML = flowBadge(p.instant?'instant':'enquiry');
+  if (p.instant) {
+    document.getElementById('step6Title').innerHTML = 'Review &amp;<br><i>confirm</i>';
+    document.getElementById('step6Sub').textContent = 'Check your details, agree to our terms, then pay to secure your spot.';
+  } else {
+    document.getElementById('step6Title').innerHTML = 'Review &amp;<br><i>submit</i>';
+    document.getElementById('step6Sub').textContent = 'Check your details, agree to our terms, then send your proposal request to Frank.';
+  }
+
+  // Experience card
+  var h1 = '<div class="rlbl">Your Experience</div>';
+  h1 += '<div class="rr"><span class="rk">Experience</span><span class="rv">' + p.name + '</span></div>';
+  if (p.instant) {
+    h1 += '<div class="rr"><span class="rk">Preferred Date</span><span class="rv">' + fmtDate(S.date) + '</span></div>';
+    if (S.time) h1 += '<div class="rr"><span class="rk">Departure Time</span><span class="rv">' + S.time + '</span></div>';
+    if (S.altDate) h1 += '<div class="rr"><span class="rk">Alternative Date</span><span class="rv">' + fmtDate(S.altDate) + '</span></div>';
+  } else {
+    h1 += '<div class="rr"><span class="rk">First Possible Day</span><span class="rv">' + fmtDate(S.dateFrom) + '</span></div>';
+    h1 += '<div class="rr"><span class="rk">Last Possible Day</span><span class="rv">' + fmtDate(S.dateTo) + '</span></div>';
+  }
+  if (p.hasAcc && S.acc) h1 += '<div class="rr"><span class="rk">Accommodation</span><span class="rv">' + (ACC_LABELS[S.acc]||S.acc) + '</span></div>';
+  document.getElementById('rExp').innerHTML = h1;
+
+  // Group card
+  var h2 = '<div class="rlbl">Group</div>';
+  h2 += '<div class="rr"><span class="rk">Adults</span><span class="rv">' + S.adults + '</span></div>';
+  if (p.hasChild && S.children>0) h2 += '<div class="rr"><span class="rk">Children</span><span class="rv">' + S.children + '</span></div>';
+  if (p.instant) {
+    if (OP.active) {
+      var sub2 = (p.ap * S.adults) + (p.hasChild ? p.cp * S.children : 0);
+      h2 += '<div class="rr"><span class="rk">Subtotal</span><span class="rv">\u20ac' + sub2.toFixed(2) + '</span></div>';
+      h2 += '<div class="rr"><span class="rk">' + OP.discountPct + '% trade discount</span><span class="rv" style="color:#34d399">-\u20ac' + S.discountAmt.toFixed(2) + '</span></div>';
+      h2 += '<div class="rr"><span class="rk">VAT (IVA 16%)</span><span class="rv">\u20ac' + S.vatAmt.toFixed(2) + '</span></div>';
+      h2 += '<div class="rr"><span class="rk">Total (inc. VAT)</span><span class="rv">\u20ac' + S.total.toFixed(2) + '</span></div>';
+    } else {
+      h2 += '<div class="rr"><span class="rk">Total</span><span class="rv">\u20ac' + S.total + '</span></div>';
+    }
+  } else {
+    var priceStr = p.flat ? ('From \u20ac' + p.ap + ' per person') : ('From \u20ac' + p.ap + ' per person — Frank will confirm');
+    h2 += '<div class="rr"><span class="rk">Indicative price</span><span class="rv">' + priceStr + '</span></div>';
+  }
+  if (p.dive && S.cert) h2 += '<div class="rr"><span class="rk">Cert level</span><span class="rv">' + fmtCert(S.cert) + '</span></div>';
+  document.getElementById('rGrp').innerHTML = h2;
+
+  // Guest card
+  var h3 = '<div class="rlbl">Your Details</div>';
+  h3 += '<div class="rr"><span class="rk">Name</span><span class="rv">' + S.name + '</span></div>';
+  h3 += '<div class="rr"><span class="rk">Email</span><span class="rv">' + S.email + '</span></div>';
+  h3 += '<div class="rr"><span class="rk">WhatsApp</span><span class="rv">' + S.wa + '</span></div>';
+  if (S.notes) h3 += '<div class="rr"><span class="rk">Notes</span><span class="rv">' + S.notes + '</span></div>';
+  document.getElementById('rGst').innerHTML = h3;
+
+  // Show right total/summary
+  var rt = document.getElementById('rtot');
+  var es = document.getElementById('enqSummary');
+  var bp = document.getElementById('btnPay');
+  var be = document.getElementById('btnEnq');
+  var pn = document.getElementById('payNote');
+  var en = document.getElementById('enqNote');
+  if (p.instant) {
+    document.getElementById('rtotAmt').textContent = S.total;
+    rt.classList.remove('hidden'); es.classList.add('hidden');
+    bp.classList.remove('hidden'); be.classList.add('hidden');
+    pn.classList.remove('hidden'); en.classList.add('hidden');
+  } else {
+    rt.classList.add('hidden'); es.classList.remove('hidden');
+    bp.classList.add('hidden'); be.classList.remove('hidden');
+    pn.classList.add('hidden'); en.classList.remove('hidden');
+  }
+
+  // Notes field visibility
+  var nf = document.getElementById('notesField');
+  if (!p.instant) nf.classList.remove('hidden'); else nf.classList.add('hidden');
+
+  // Reset T&C
+  document.getElementById('tcBox').checked = false;
+  document.getElementById('btnPay').disabled = true;
+  document.getElementById('btnEnq').disabled = true;
+  document.getElementById('tcErr').classList.remove('on');
+
+  // Step 5 sub copy
+  document.getElementById('flowBadge5').innerHTML = flowBadge(p.instant?'instant':'enquiry');
+  var ds5 = document.getElementById('detailSub');
+  if (p.instant) ds5.textContent = 'We will send your confirmation and updates to these contacts.';
+  else ds5.textContent = 'Frank will contact you on these details within 4 hours with your custom proposal.';
+}
+
+/* ── T&C ──────────────────────────────────────────────────── */
+function onTc() {
+  var ok = document.getElementById('tcBox').checked;
+  document.getElementById('btnPay').disabled = !ok;
+  document.getElementById('btnEnq').disabled = !ok;
+  if (ok) document.getElementById('tcErr').classList.remove('on');
+}
+
+/* ── PAYMENT (instant) ────────────────────────────────────── */
+function doPay() {
+  if (!document.getElementById('tcBox').checked) {
+    document.getElementById('tcErr').classList.add('on'); return;
+  }
+  var btn=document.getElementById('btnPay'), lbl=document.getElementById('payLbl'), spn=document.getElementById('paySpin');
+  btn.disabled=true; lbl.textContent='Preparing payment...'; spn.classList.add('on');
+  S.ref = genRef();
+  var p = P[S.pid];
+  fetch(N8N, {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({
+      type:'booking',
+      bookingRef:S.ref, productId:S.pid, productName:p.name,
+      date:S.date, altDate:S.altDate, dateFrom:S.dateFrom, dateTo:S.dateTo, time:S.time, adults:S.adults, children:S.children,
+    isOperator:OP.active, operatorCode:OP.code, operatorName:OP.name, operatorEmail:OP.email,
+    discountPct:OP.discountPct, discountAmt:S.discountAmt, vatAmt:S.vatAmt, totalWithVat:S.totalWithVat,
+      certLevel:S.cert, loggedDives:S.dives,
+      guestName:S.name, email:S.email, whatsapp:S.wa,
+      totalPrice:S.total, currency:'EUR',
+      successUrl: BASE_URL+'?status=success&ref='+S.ref+'&email='+encodeURIComponent(S.email),
+      cancelUrl:  BASE_URL+'?status=cancelled',
+    })
+  })
+  .then(function(r){return r.json();})
+  .then(function(d){
+    if (d.checkoutUrl) { window.location.href=d.checkoutUrl; }
+    else { throw new Error('no url'); }
+  })
+  .catch(function(){
+    btn.disabled=false; lbl.textContent='Pay Securely Now'; spn.classList.remove('on');
+    alert('Something went wrong. Please try again or WhatsApp us: +351 292 622 980');
+  });
+}
+
+/* ── ENQUIRY (proposal) ───────────────────────────────────── */
+function doEnq() {
+  if (!document.getElementById('tcBox').checked) {
+    document.getElementById('tcErr').classList.add('on'); return;
+  }
+  var btn=document.getElementById('btnEnq'), lbl=document.getElementById('enqLbl'), spn=document.getElementById('enqSpin');
+  btn.disabled=true; lbl.textContent='Sending your request...'; spn.classList.add('on');
+  S.ref = genRef();
+  var p = P[S.pid];
+  fetch(N8N, {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({
+      type:'enquiry',
+      bookingRef:S.ref, productId:S.pid, productName:p.name,
+      date:S.date, altDate:S.altDate, dateFrom:S.dateFrom, dateTo:S.dateTo, adults:S.adults,
+      accommodation: S.acc ? (ACC_LABELS[S.acc]||S.acc) : '',
+      notes:S.notes,
+      guestName:S.name, email:S.email, whatsapp:S.wa,
+      indicativePrice: 'From \u20ac' + p.ap + ' per person',
+      successUrl: BASE_URL+'?status=sent&ref='+S.ref+'&email='+encodeURIComponent(S.email),
+    })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    window.location.href = BASE_URL+'?status=sent&ref='+S.ref+'&email='+encodeURIComponent(S.email);
+  })
+  .catch(function(){
+    btn.disabled=false; lbl.textContent='Send Proposal Request'; spn.classList.remove('on');
+    alert('Something went wrong. Please try again or WhatsApp us: +351 292 622 980');
+  });
+}
+
+/* ── SUCCESS ──────────────────────────────────────────────── */
+function showSuc(type, ref, email) {
+  document.querySelector('.hdr').style.display='block';
+  document.querySelector('.prog-wrap').style.display='none';
+  document.getElementById('sticky').style.display='none';
+  var steps = document.querySelectorAll('.step');
+  for (var i=0; i<steps.length; i++) steps[i].style.display='none';
+  var s = document.getElementById('suc');
+  s.classList.add('on');
+
+  if (type==='paid') {
+    document.getElementById('sucRing').innerHTML='&#10003;';
+    document.getElementById('sucRing').className='sring paid';
+    document.getElementById('sucTitle').textContent='You are all set!';
+    document.getElementById('sucMsg').innerHTML='Your booking is confirmed. A confirmation email is on its way to <strong>' + (email||'your inbox') + '</strong>.';
+    document.getElementById('sucNext').innerHTML = '<div class="nxlbl">What happens next</div>'
+      + '<div class="nxi"><div class="nxn">1</div><div class="nxt"><b>Check your inbox</b> — your confirmation email with full booking details is on its way.</div></div>'
+      + '<div class="nxi"><div class="nxn">2</div><div class="nxt"><b>48 hours before your tour</b> — you will receive a WhatsApp message with the meeting point and what to bring.</div></div>'
+      + '<div class="nxi"><div class="nxn">3</div><div class="nxt"><b>On the day</b> — arrive at Madalena harbour 15 minutes before departure at Port Velho 33.</div></div>';
+  } else {
+    document.getElementById('sucRing').innerHTML='&#x1F4E8;';
+    document.getElementById('sucRing').className='sring sent';
+    document.getElementById('sucTitle').textContent='Request received!';
+    document.getElementById('sucMsg').innerHTML='Frank will review your request and contact you within 4 hours on WhatsApp and at <strong>' + (email||'your email') + '</strong>.';
+    document.getElementById('sucNext').innerHTML = '<div class="nxlbl">What happens next</div>'
+      + '<div class="nxi"><div class="nxn">1</div><div class="nxt"><b>Watch for a WhatsApp message</b> from Frank within 4 hours confirming availability and your custom itinerary.</div></div>'
+      + '<div class="nxi"><div class="nxn">2</div><div class="nxt"><b>Confirm and pay</b> — Frank will send a secure payment link to hold your spot once you are happy with the proposal.</div></div>'
+      + '<div class="nxi"><div class="nxn">3</div><div class="nxt"><b>Get ready</b> — once paid, full joining instructions will be sent to your email and WhatsApp.</div></div>';
+  }
+
+  document.getElementById('sucRef').textContent = ref||'&#8212;';
+}
+
+/* ── HELPERS ──────────────────────────────────────────────── */
+function fmtDate(s) {
+  if (!s) return '&#8212;';
+  var d = new Date(s+'T12:00:00');
+  return d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+}
+function fmtCert(c) {
+  var m={ow:'Open Water',aow:'Advanced Open Water',rescue:'Rescue Diver',dm:'Divemaster / Instructor'};
+  return m[c]||c;
+}
+function markSeasons() {
+  var ids = ['whale','snorkel','pab','shark','sharkhotel','giants','scuba'];
+  for (var i=0; i<ids.length; i++) {
+    var p = P[ids[i]];
+    var el = document.getElementById('pc-'+ids[i]);
+    if (!el) continue;
+    if (!inSeason(p)) {
+      el.classList.add('oos');
+      // Add out-of-season label if not already there
+      if (!el.querySelector('.oos-lbl')) {
+        var lbl = document.createElement('span');
+        lbl.className = 'oos-lbl';
+        lbl.textContent = 'Not available — ' + p.seasonLabel;
+        el.appendChild(lbl);
+      }
+    }
+  }
+}
+
+function genRef() {
+  var ch='ABCDEFGHJKLMNPQRSTUVWXYZ23456789', r='PIA-';
+  for (var i=0;i<6;i++) r+=ch[Math.floor(Math.random()*ch.length)];
+  return r;
+}
+</script>
+</body>
+</html>
