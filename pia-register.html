@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trade Partner Registration — Pico Island Adventures</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+  <style>
+    :root{--navy:#0a1628;--nmid:#12253f;--teal:#0891b2;--tb:#06b6d4;--cream:#f8f5ef;--muted:#94b4cc;--ok:#10b981;--red:#ef4444;--bdr:rgba(255,255,255,0.10);--card:rgba(255,255,255,0.05)}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--cream);min-height:100vh;padding:40px 20px 80px;
+      background-image:radial-gradient(ellipse at 20% 50%,rgba(8,145,178,0.08) 0%,transparent 55%),radial-gradient(ellipse at 80% 15%,rgba(6,182,212,0.06) 0%,transparent 50%)}
+    .wrap{max-width:580px;margin:0 auto}
+
+    .hdr{text-align:center;margin-bottom:40px}
+    .hbrand{font-family:'Cormorant Garamond',serif;font-size:11px;letter-spacing:0.28em;text-transform:uppercase;color:var(--tb);margin-bottom:6px}
+    .htitle{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:300;color:var(--cream);line-height:1.25;margin-bottom:10px}
+    .htitle i{font-style:italic}
+    .hsub{font-size:14px;font-weight:300;color:var(--muted);line-height:1.65;max-width:440px;margin:0 auto}
+
+    .form-card{background:var(--card);border:1px solid var(--bdr);border-radius:16px;padding:36px 32px}
+    @media(max-width:480px){.form-card{padding:24px 20px}}
+
+    .section-lbl{font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:var(--tb);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--bdr)}
+
+    .field{margin-bottom:18px}
+    .flbl{display:block;font-size:11px;font-weight:500;letter-spacing:0.10em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+    .fi{width:100%;padding:14px 15px;background:rgba(255,255,255,0.04);border:2px solid var(--bdr);border-radius:9px;color:var(--cream);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:300;outline:none;transition:border-color 0.2s}
+    .fi:focus{border-color:var(--tb);background:rgba(255,255,255,0.07)}
+    .fi::placeholder{color:rgba(148,180,204,0.35)}
+    .fi.bad{border-color:var(--red)}
+    .ferr{font-size:12px;color:var(--red);margin-top:4px;display:none}
+    .ferr.on{display:block}
+    .fhint{font-size:11px;color:var(--muted);font-weight:300;margin-top:5px;line-height:1.5}
+
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    @media(max-width:480px){.form-grid{grid-template-columns:1fr}}
+
+    .divider{border:none;border-top:1px solid var(--bdr);margin:24px 0}
+
+    textarea.fi{resize:vertical;min-height:80px;font-size:14px;line-height:1.6}
+
+    .btn-submit{width:100%;padding:18px 24px;background:var(--tb);color:var(--navy);border:none;border-radius:11px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;cursor:pointer;transition:all 0.22s;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px}
+    .btn-submit:hover{background:#22d3ee;transform:translateY(-1px);box-shadow:0 7px 20px rgba(6,182,212,0.28)}
+    .btn-submit:disabled{opacity:0.35;cursor:not-allowed;transform:none;box-shadow:none}
+    .spin{width:16px;height:16px;border-radius:50%;border:2px solid rgba(10,22,40,0.3);border-top-color:var(--navy);animation:sp 0.7s linear infinite;display:none}
+    .spin.on{display:block}
+    @keyframes sp{to{transform:rotate(360deg)}}
+
+    .notice{border-radius:10px;padding:14px 18px;font-size:13px;line-height:1.65;margin-top:16px;display:none}
+    .notice.ok{background:rgba(16,185,129,0.10);border:1px solid rgba(16,185,129,0.25);color:#34d399;display:block}
+    .notice.err{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.28);color:#f87171;display:block}
+
+    .back-link{display:block;text-align:center;margin-top:24px;font-size:13px;font-weight:300;color:var(--muted);text-decoration:none;transition:color 0.18s}
+    .back-link:hover{color:var(--tb)}
+
+    .benefits{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:36px}
+    @media(max-width:480px){.benefits{grid-template-columns:1fr}}
+    .benefit{background:var(--card);border:1px solid var(--bdr);border-radius:10px;padding:16px;text-align:center}
+    .benefit-icon{font-size:22px;margin-bottom:6px}
+    .benefit-title{font-size:13px;font-weight:500;color:var(--cream);margin-bottom:3px}
+    .benefit-desc{font-size:11px;font-weight:300;color:var(--muted);line-height:1.5}
+  </style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div class="hdr">
+    <p class="hbrand">Pico Island Adventures</p>
+    <h1 class="htitle">Trade Partner <i>Registration</i></h1>
+    <p class="hsub">Apply for trade access to our booking system. Once approved you will receive a unique access code and exclusive pricing for your clients.</p>
+  </div>
+
+  <!-- BENEFITS -->
+  <div class="benefits">
+    <div class="benefit">
+      <div class="benefit-icon">&#x25CF;</div>
+      <div class="benefit-title">Trade Discount</div>
+      <div class="benefit-desc">Exclusive pricing for your clients</div>
+    </div>
+    <div class="benefit">
+      <div class="benefit-icon">&#x1F9FE;</div>
+      <div class="benefit-title">VAT Invoices</div>
+      <div class="benefit-desc">IVA invoices for every booking</div>
+    </div>
+    <div class="benefit">
+      <div class="benefit-icon">&#x26A1;</div>
+      <div class="benefit-title">Instant Booking</div>
+      <div class="benefit-desc">Book directly for your clients</div>
+    </div>
+  </div>
+
+  <div class="form-card">
+
+    <!-- COMPANY INFO -->
+    <div class="section-lbl">Company Information</div>
+
+    <div class="form-grid">
+      <div class="field">
+        <label class="flbl" for="compName">Company Name *</label>
+        <input type="text" class="fi" id="compName" placeholder="Safari Connections Ltd">
+        <p class="ferr" id="eCompName">Please enter your company name.</p>
+      </div>
+      <div class="field">
+        <label class="flbl" for="vatNum">VAT / Tax Number</label>
+        <input type="text" class="fi" id="vatNum" placeholder="PT123456789">
+        <p class="fhint">Portuguese NIF or EU VAT number</p>
+      </div>
+    </div>
+
+    <div class="form-grid">
+      <div class="field">
+        <label class="flbl" for="website">Website</label>
+        <input type="url" class="fi" id="website" placeholder="https://yourcompany.com">
+      </div>
+      <div class="field">
+        <label class="flbl" for="country">Country *</label>
+        <input type="text" class="fi" id="country" placeholder="e.g. Germany">
+        <p class="ferr" id="eCountry">Please enter your country.</p>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- CONTACT -->
+    <div class="section-lbl">Primary Contact</div>
+
+    <div class="form-grid">
+      <div class="field">
+        <label class="flbl" for="contactName">Full Name *</label>
+        <input type="text" class="fi" id="contactName" placeholder="Your full name">
+        <p class="ferr" id="eContactName">Please enter your name.</p>
+      </div>
+      <div class="field">
+        <label class="flbl" for="jobTitle">Job Title</label>
+        <input type="text" class="fi" id="jobTitle" placeholder="e.g. Sales Manager">
+      </div>
+    </div>
+
+    <div class="form-grid">
+      <div class="field">
+        <label class="flbl" for="email">Email Address *</label>
+        <input type="email" class="fi" id="email" placeholder="you@company.com">
+        <p class="ferr" id="eEmail">Please enter a valid email address.</p>
+      </div>
+      <div class="field">
+        <label class="flbl" for="phone">Phone / WhatsApp *</label>
+        <input type="tel" class="fi" id="phone" placeholder="+49 123 456 789">
+        <p class="ferr" id="ePhone">Please enter your phone number.</p>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- BUSINESS INFO -->
+    <div class="section-lbl">Business Details</div>
+
+    <div class="field">
+      <label class="flbl" for="bizType">Type of Business *</label>
+      <select class="fi" id="bizType" style="appearance:none;cursor:pointer;background-image:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%2394b4cc' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E\");background-repeat:no-repeat;background-position:right 14px center;padding-right:38px">
+        <option value="">Select business type</option>
+        <option value="tour_operator">Tour Operator</option>
+        <option value="travel_agent">Travel Agent</option>
+        <option value="hotel">Hotel / Lodge</option>
+        <option value="dive_centre">Dive Centre</option>
+        <option value="corporate">Corporate / Events</option>
+        <option value="other">Other</option>
+      </select>
+      <p class="ferr" id="eBizType">Please select your business type.</p>
+    </div>
+
+    <div class="field">
+      <label class="flbl" for="annualVol">Estimated Annual Bookings</label>
+      <select class="fi" id="annualVol" style="appearance:none;cursor:pointer;background-image:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%2394b4cc' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E\");background-repeat:no-repeat;background-position:right 14px center;padding-right:38px">
+        <option value="">Select volume</option>
+        <option value="1-5">1 to 5 bookings per year</option>
+        <option value="6-20">6 to 20 bookings per year</option>
+        <option value="21-50">21 to 50 bookings per year</option>
+        <option value="50+">More than 50 bookings per year</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label class="flbl" for="notes">Additional Notes</label>
+      <textarea class="fi" id="notes" placeholder="Tell us a bit about your business and how you plan to work with Pico Island Adventures..."></textarea>
+    </div>
+
+    <button class="btn-submit" id="btnSubmit" onclick="submitReg()">
+      <span id="btnLbl">Submit Application</span>
+      <div class="spin" id="btnSpin"></div>
+    </button>
+
+    <div class="notice" id="regNotice"></div>
+
+  </div>
+
+  <a href="index.html" class="back-link">&larr; Back to booking page</a>
+
+</div>
+
+<script>
+var N8N = 'https://n8n.srv1432046.hstgr.cloud/webhook/pia-booking';
+var SUPABASE_URL = 'https://fnzgpdhhybpkhfyanqtj.supabase.co';
+var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZuemdwZGhoeWJwa2hmeWFucXRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyODI1ODYsImV4cCI6MjA4ODg1ODU4Nn0._2ouYZglVPMDGbNNCftcMuebQ9-WqEUlnZ9a9YTNDyo';
+
+async function submitReg() {
+  var compName    = document.getElementById('compName').value.trim();
+  var vatNum      = document.getElementById('vatNum').value.trim();
+  var website     = document.getElementById('website').value.trim();
+  var country     = document.getElementById('country').value.trim();
+  var contactName = document.getElementById('contactName').value.trim();
+  var jobTitle    = document.getElementById('jobTitle').value.trim();
+  var email       = document.getElementById('email').value.trim();
+  var phone       = document.getElementById('phone').value.trim();
+  var bizType     = document.getElementById('bizType').value;
+  var annualVol   = document.getElementById('annualVol').value;
+  var notes       = document.getElementById('notes').value.trim();
+
+  var ok = true;
+  function chk(eid, iid, bad) {
+    var e=document.getElementById(eid), inp=document.getElementById(iid);
+    if(bad){e.classList.add('on');inp.classList.add('bad');ok=false;}
+    else{e.classList.remove('on');inp.classList.remove('bad');}
+  }
+  chk('eCompName',    'compName',    !compName);
+  chk('eCountry',     'country',     !country);
+  chk('eContactName', 'contactName', !contactName);
+  chk('eEmail',       'email',       !(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)));
+  chk('ePhone',       'phone',       phone.length < 6);
+  chk('eBizType',     'bizType',     !bizType);
+  if (!ok) return;
+
+  var btn  = document.getElementById('btnSubmit');
+  var lbl  = document.getElementById('btnLbl');
+  var spin = document.getElementById('btnSpin');
+  var note = document.getElementById('regNotice');
+  btn.disabled = true; lbl.textContent = 'Submitting...'; spin.classList.add('on');
+
+  // Generate a pending access code placeholder
+  var pendingCode = 'PENDING-' + Math.random().toString(36).substr(2,6).toUpperCase();
+
+  try {
+    // Save to Supabase pia_operators with status = pending
+    var r = await fetch(SUPABASE_URL + '/rest/v1/pia_operators', {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({
+        operator_name: compName,
+        access_code:   pendingCode,
+        discount_pct:  0,
+        email:         email,
+        phone:         phone,
+        website:       website,
+        vat_number:    vatNum,
+        notes:         country + (jobTitle?' | '+jobTitle:'') + (bizType?' | '+bizType:'') + (annualVol?' | '+annualVol+' bookings/yr':'') + (notes?' | '+notes:''),
+        status:        'pending',
+        is_active:     false
+      })
+    });
+
+    if (!r.ok) throw new Error('Supabase error');
+
+    // Notify admin via n8n
+    await fetch(N8N, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        type:        'operator_registration',
+        companyName: compName,
+        contactName: contactName,
+        email:       email,
+        phone:       phone,
+        country:     country,
+        bizType:     bizType,
+        annualVol:   annualVol,
+        vatNumber:   vatNum,
+        website:     website,
+        notes:       notes,
+        pendingCode: pendingCode
+      })
+    });
+
+    note.className = 'notice ok';
+    note.innerHTML = '<strong>Application received!</strong><br>Thank you ' + contactName + '. We will review your application and send your trade access code to <strong>' + email + '</strong> within 24 hours.';
+    lbl.textContent = 'Application Submitted';
+    spin.classList.remove('on');
+
+  } catch(e) {
+    btn.disabled = false;
+    lbl.textContent = 'Submit Application';
+    spin.classList.remove('on');
+    note.className = 'notice err';
+    note.textContent = 'Something went wrong. Please try again or contact us on WhatsApp: +351 292 622 980';
+  }
+}
+</script>
+</body>
+</html>
