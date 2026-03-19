@@ -190,7 +190,9 @@ ESCALATION: WhatsApp +351 292 622 980 | info@pico-island-adventures.com | Hours 
       });
 
       var data = await response.json();
-      var reply = data.content && data.content[0] ? data.content[0].text : 'I could not get a response. Please contact us on WhatsApp.';
+      // n8n wraps response in array — unwrap it
+    var payload = Array.isArray(data) ? data[0] : data;
+    var reply = (payload && payload.content && payload.content[0]) ? payload.content[0].text : 'I could not get a response. Please contact us on WhatsApp.';
 
       FAQ_HISTORY.push({ role: 'assistant', content: reply });
 
