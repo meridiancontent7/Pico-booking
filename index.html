@@ -769,8 +769,11 @@ async function verifyOperator() {
       document.getElementById('opApplied').classList.add('on');
       document.getElementById('opInputWrap').style.display = 'none';
       status.textContent = '';
-      // Recalculate if on group step
+      // Recalculate price immediately if on group step
       if (S.pid && S.total > 0) calcPrice();
+      // Also update the price box label to show operator pricing
+      var pb = document.getElementById('pbox');
+      if (pb && !pb.classList.contains('hidden')) calcPrice();
     } else {
       status.textContent = 'Code not recognised. Contact Pico Island Adventures.';
       status.className = 'op-status bad';
@@ -1176,8 +1179,16 @@ function fillReview() {
   // Step 5 sub copy
   document.getElementById('flowBadge5').innerHTML = flowBadge(p.instant?'instant':'enquiry');
   var ds5 = document.getElementById('detailSub');
-  if (p.instant) ds5.textContent = 'We will send your confirmation and updates to these contacts.';
-  else ds5.textContent = 'Frank will contact you on these details within 4 hours with your custom proposal.';
+  if (OP.active) {
+    ds5.innerHTML = 'Booking on behalf of a client as <strong style="color:var(--cream)">' + OP.name + '</strong>. Enter your client details below. Your operator email has been pre-filled.';
+    // Pre-fill operator email if field is empty
+    var geField = document.getElementById('ge');
+    if (!geField.value) geField.value = OP.email;
+  } else if (p.instant) {
+    ds5.textContent = 'We will send your confirmation and updates to these contacts.';
+  } else {
+    ds5.textContent = 'Frank will contact you on these details within 4 hours with your custom proposal.';
+  }
 }
 
 /* ── T&C ──────────────────────────────────────────────────── */
