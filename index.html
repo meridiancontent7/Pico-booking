@@ -1357,5 +1357,174 @@ function genRef() {
   return r;
 }
 </script>
+<!-- ═══ AI FAQ WIDGET ═══ -->
+<style>
+  #faqBtn{position:fixed;bottom:24px;right:24px;width:56px;height:56px;border-radius:50%;background:var(--tb);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 20px rgba(6,182,212,0.45);z-index:1000;transition:all 0.22s;color:var(--navy)}
+  #faqBtn:hover{transform:scale(1.08);box-shadow:0 6px 26px rgba(6,182,212,0.55)}
+  #faqWin{position:fixed;bottom:90px;right:24px;width:360px;max-width:calc(100vw - 32px);height:520px;max-height:calc(100vh - 110px);background:#0d1f3a;border:1px solid rgba(6,182,212,0.25);border-radius:18px;display:none;flex-direction:column;overflow:hidden;z-index:1000;box-shadow:0 12px 48px rgba(0,0,0,0.5)}
+  #faqWin.on{display:flex;animation:up 0.25s ease}
+  #faqHdr{background:rgba(6,182,212,0.1);border-bottom:1px solid rgba(6,182,212,0.15);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+  #faqHdr-left{display:flex;align-items:center;gap:10px}
+  .faq-avatar{width:32px;height:32px;border-radius:50%;background:var(--tb);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--navy);flex-shrink:0}
+  .faq-title{font-size:13px;font-weight:500;color:var(--cream)}
+  .faq-sub{font-size:11px;font-weight:300;color:var(--muted)}
+  #faqClose{background:transparent;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:2px 6px;line-height:1;transition:color 0.18s}
+  #faqClose:hover{color:var(--cream)}
+  #faqMsgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;scrollbar-width:thin;scrollbar-color:rgba(6,182,212,0.2) transparent}
+  #faqMsgs::-webkit-scrollbar{width:3px}
+  #faqMsgs::-webkit-scrollbar-thumb{background:rgba(6,182,212,0.2);border-radius:2px}
+  .faq-msg{max-width:85%;padding:10px 13px;border-radius:12px;font-size:13px;font-weight:300;line-height:1.6}
+  .faq-msg.bot{background:rgba(255,255,255,0.06);color:var(--cream);align-self:flex-start;border-bottom-left-radius:4px}
+  .faq-msg.usr{background:rgba(6,182,212,0.18);color:var(--cream);align-self:flex-end;border-bottom-right-radius:4px}
+  .faq-msg.typing{color:var(--muted);font-style:italic}
+  .faq-suggestions{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+  .faq-sug{padding:6px 11px;border:1px solid rgba(6,182,212,0.3);border-radius:20px;font-size:11px;color:var(--tb);cursor:pointer;transition:all 0.18s;background:transparent;font-family:'DM Sans',sans-serif;white-space:nowrap}
+  .faq-sug:hover{background:rgba(6,182,212,0.1);border-color:var(--tb)}
+  #faqInput-wrap{border-top:1px solid rgba(255,255,255,0.07);padding:10px 12px;display:flex;gap:8px;flex-shrink:0}
+  #faqInput{flex:1;padding:10px 13px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:var(--cream);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;transition:border-color 0.2s;resize:none;height:40px;line-height:1.4}
+  #faqInput:focus{border-color:var(--tb)}
+  #faqInput::placeholder{color:rgba(148,180,204,0.35)}
+  #faqSend{width:38px;height:40px;border-radius:10px;background:var(--tb);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--navy);transition:all 0.18s;flex-shrink:0}
+  #faqSend:hover{background:#22d3ee}
+  #faqSend:disabled{opacity:0.4;cursor:not-allowed}
+  .faq-wa-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;background:#25d366;color:#fff;border-radius:8px;font-size:12px;text-decoration:none;margin-top:6px;font-weight:500}
+</style>
+
+<button id="faqBtn" onclick="toggleFaq()" title="Ask us anything">&#x1F4AC;</button>
+
+<div id="faqWin">
+  <div id="faqHdr">
+    <div id="faqHdr-left">
+      <div class="faq-avatar">&#x1F40B;</div>
+      <div>
+        <div class="faq-title">Pico Island Adventures</div>
+        <div class="faq-sub">Ask me anything about our tours</div>
+      </div>
+    </div>
+    <button id="faqClose" onclick="toggleFaq()">&times;</button>
+  </div>
+  <div id="faqMsgs"></div>
+  <div id="faqInput-wrap">
+    <input type="text" id="faqInput" placeholder="Ask about tours, prices, diving..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendFaq();}">
+    <button id="faqSend" onclick="sendFaq()">&#x27A4;</button>
+  </div>
+</div>
+
+<script>
+var FAQ_PROXY = 'https://n8n.srv1432046.hstgr.cloud/webhook/pia-chat';
+var FAQ_HISTORY = [];
+var FAQ_OPEN = false;
+var FAQ_KB = 'PICO ISLAND ADVENTURES — AI ASSISTANT KNOWLEDGE BASE\nVersion 1.0 | Last updated March 2026\n\nABOUT PICO ISLAND ADVENTURES\nPico Island Adventures (also known as Pico Sport) is one of the oldest and most established water sports and marine tour companies in the Azores, Portugal. Founded by Frank Wirth, who first came to Pico Island in 1993, the company has been operating for over 33 years.\nAddress: Port Velho 33, 9950-3350 Madalena, Pico Island, Azores, Portugal\nPhone: +351 292 622 980 | Email: info@pico-island-adventures.com | WhatsApp: +351 292 622 980\nWebsite: www.pico-island-adventures.com | Licence: Operador Maritimo Turistico Nr. 15/2009\nBook online: https://booking.pico-island-adventures.com\n\nCANCELLATION POLICY: All bookings are strictly non-refundable. We strongly recommend travel insurance.\n\nTOURS AND PRICING:\n1. WHALE & DOLPHIN WATCHING — €79/adult, €59/child under 12. Apr 1–Oct 30. Instant booking. 98% sighting success. Departures 9am, 2pm, 5:30pm. Marine biologist guided. Children welcome.\n2. SNORKELLING — PRINCESS ALICE BANK — €225/person. Jun 1–Oct 15. Instant booking. No cert required. Full day trip, departs 4–6am. Mobula rays, whale sharks Aug–Sep.\n3. PRINCESS ALICE BANK DIVING — €499/person. Jun 1–Oct 15. Instant booking. 2-day package. Open Water cert required. Mandatory check dive day before PAB dive.\n4. SHARK WEEK (WITHOUT HOTEL) — €1,440/person. Jun 1–Oct 15. Instant booking. 10-day expedition. 4 shark dives, PAB, whale watching.\n5. SHARK WEEK (WITH HOTEL) — From €1,440/person. Jun 1–Oct 15. Proposal request. Same as above with accommodation arranged by Frank.\n6. SEASON OF THE GIANTS — From €1,470/person. Feb 1–Jun 30. Proposal request. 15-day package. Guest house double €1,470, single €1,770. Apartment double €1,799, single €2,249. Hotel double €1,869, single €2,359. Blue, Fin, Sei whales. German-speaking support.\n7. SCUBA DIVING — From €110/2-tank dive. Year-round. Proposal request. Land dives €110, boat dives €125, premium €150, offshore €225. 10-dive package €499. Night dive €75. Open Water cert required.\n\nCERTIFICATION GUIDE: Whale watching and snorkelling — no cert needed. Scuba land/boat dives — Open Water. PAB Diving — Open Water minimum. Premium boat dives — AOW. Shark Week — AOW recommended.\n\nPAB NOTICE: Trips run approximately twice a week due to 100km offshore distance and weather conditions.\n\nGETTING HERE: Pico Airport (PIX) — 8km from base. Ferry from Faial/Horta — 30 min, base is opposite terminal. Car rental available via www.pico-rentacar.com\n\nSEASONS: Whale watching Apr–Oct. Snorkel/PAB/Shark Jun–Oct. Season of Giants Feb–Jun. Scuba year-round. Sperm whales resident year-round. Blue/Fin/Sei whales Feb–Jun.\n\nWHAT TO BRING: Warm layer, waterproof jacket, sunscreen (reef-safe), sunglasses, seasickness meds, camera. Divers: C-card mandatory, logbook, undersuit for deep dives.\n\nMEETING POINT: Port Velho 33, Madalena. Arrive 15 mins before departure. Frank sends WhatsApp 48hrs before with exact time.\n\nFAQs:\n- Children on whale watching? Yes, under 12 pay €59. No minimum age.\n- Non-swimmers on whale watching? Yes, stay on boat.\n- Non-divers on dive days? Yes, cafes nearby and snorkelling available.\n- Can I climb Mount Pico on same trip? Yes — do it before diving due to decompression.\n- German spoken? Yes — Frank is German, full German support on Season of Giants.\n- Santa Maria Island? Yes — combined Pico+Santa Maria itineraries available.\n- How far in advance to book? Day trips a few days. Multi-day packages weeks/months ahead.\n- Weather cancellation? Full refund or alternative date if cancelled by Pico.\n- Dolphin snorkelling? Yes — separate trips, max 8 passengers.\n- Megalodon Project? Shark conservation project — presentation included in Shark Week.\n\nESCALATION: If unsure, direct to WhatsApp +351 292 622 980 or email info@pico-island-adventures.com. Business hours 08:00–20:00 Azores Time (UTC-1).';
+
+var FAQ_SYSTEM = 'You are the friendly AI assistant for Pico Island Adventures, a marine tour company on Pico Island in the Azores, Portugal. You answer questions warmly and knowledgeably, like a trusted local expert. You only answer questions using the information in the knowledge base below. If you cannot answer from the knowledge base, say so honestly and direct the guest to WhatsApp +351 292 622 980. Never invent prices, dates, or policies. Always encourage booking when appropriate — the goal is to convert interest into a confirmed booking. Respond in the same language the guest writes in — English or German. Keep responses concise and friendly, under 120 words where possible.\n\nKNOWLEDGE BASE:\n' + FAQ_KB;
+
+var FAQ_SUGGESTIONS = [
+  'What whales can I see?',
+  'Do I need certification?',
+  'Can children join?',
+  'What is Princess Alice Bank?',
+  'How much does shark diving cost?',
+  'When is the best time to visit?'
+];
+
+function toggleFaq() {
+  FAQ_OPEN = !FAQ_OPEN;
+  var win = document.getElementById('faqWin');
+  var btn = document.getElementById('faqBtn');
+  if (FAQ_OPEN) {
+    win.classList.add('on');
+    btn.innerHTML = '&#x2715;';
+    if (FAQ_HISTORY.length === 0) initFaq();
+    setTimeout(function(){ document.getElementById('faqInput').focus(); }, 300);
+  } else {
+    win.classList.remove('on');
+    btn.innerHTML = '&#x1F4AC;';
+  }
+}
+
+function initFaq() {
+  var msgs = document.getElementById('faqMsgs');
+  var welcome = document.createElement('div');
+  welcome.className = 'faq-msg bot';
+  welcome.innerHTML = 'Welcome to Pico Island Adventures! &#x1F30A;<br><br>I can answer questions about our whale watching, diving, snorkelling and expedition packages. What would you like to know?';
+  msgs.appendChild(welcome);
+
+  var sugs = document.createElement('div');
+  sugs.className = 'faq-suggestions';
+  FAQ_SUGGESTIONS.forEach(function(s) {
+    var b = document.createElement('button');
+    b.className = 'faq-sug';
+    b.textContent = s;
+    b.onclick = function(){ document.getElementById('faqInput').value = s; sendFaq(); };
+    sugs.appendChild(b);
+  });
+  msgs.appendChild(sugs);
+}
+
+function addMsg(text, role) {
+  var msgs = document.getElementById('faqMsgs');
+  var el = document.createElement('div');
+  el.className = 'faq-msg ' + role;
+  el.innerHTML = text.replace(/\n/g, '<br>');
+  msgs.appendChild(el);
+  msgs.scrollTop = msgs.scrollHeight;
+  return el;
+}
+
+async function sendFaq() {
+  var input = document.getElementById('faqInput');
+  var send  = document.getElementById('faqSend');
+  var text  = input.value.trim();
+  if (!text) return;
+
+  input.value = '';
+  send.disabled = true;
+  addMsg(text, 'usr');
+  FAQ_HISTORY.push({ role: 'user', content: text });
+
+  var typing = addMsg('Thinking...', 'bot typing');
+
+  try {
+    var response = await fetch(FAQ_PROXY, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 300,
+        system: FAQ_SYSTEM,
+        messages: FAQ_HISTORY
+      })
+    });
+
+    var data = await response.json();
+    var reply = data.content && data.content[0] ? data.content[0].text : 'I could not get a response. Please try again or contact us on WhatsApp.';
+
+    FAQ_HISTORY.push({ role: 'assistant', content: reply });
+
+    typing.className = 'faq-msg bot';
+    typing.innerHTML = reply.replace(/\n/g, '<br>');
+
+    // Add WhatsApp button if reply mentions contacting Frank
+    if (reply.toLowerCase().indexOf('whatsapp') > -1 || reply.toLowerCase().indexOf('contact') > -1) {
+      var wa = document.createElement('a');
+      wa.href = 'https://wa.me/351292622980';
+      wa.target = '_blank';
+      wa.className = 'faq-wa-btn';
+      wa.innerHTML = '&#x1F4F1; Chat with Frank on WhatsApp';
+      typing.appendChild(wa);
+    }
+
+    // Limit history to last 10 messages to control costs
+    if (FAQ_HISTORY.length > 10) FAQ_HISTORY = FAQ_HISTORY.slice(FAQ_HISTORY.length - 10);
+
+  } catch(e) {
+    typing.className = 'faq-msg bot';
+    typing.innerHTML = 'Something went wrong. Please try again or <a href="https://wa.me/351292622980" style="color:var(--tb)">contact us on WhatsApp</a>.';
+  }
+
+  send.disabled = false;
+  document.getElementById('faqMsgs').scrollTop = document.getElementById('faqMsgs').scrollHeight;
+}
+</script>
 </body>
 </html>
