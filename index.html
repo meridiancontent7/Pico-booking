@@ -775,7 +775,8 @@ async function verifyOperator() {
       OP.active = false;
     }
   } catch(e) {
-    status.textContent = 'Verification failed. Please try again.';
+    console.error('Operator verification error:', e);
+    status.textContent = 'Verification failed: ' + e.message;
     status.className = 'op-status bad';
   }
 }
