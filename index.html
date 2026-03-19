@@ -255,6 +255,14 @@
     .tbtn .tdesc{font-size:10px;display:block;margin-top:2px}
     @media(max-width:480px){.htitle{font-size:24px}.sh{font-size:26px}.pline{width:18px}.pdot{width:23px;height:23px;font-size:10px}}
   </style>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18013120947"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'AW-18013120947');
+  </script>
 </head>
 <body>
 
@@ -1287,6 +1295,11 @@ function showSuc(type, ref, email) {
   s.classList.add('on');
 
   if (type==='paid') {
+    // Fire Google Ads Purchase conversion
+    gtag('event', 'conversion', {
+      'send_to': 'AW-18013120947/WKDbCPnuvYscELPTqY1D',
+      'transaction_id': ref || ''
+    });
     document.getElementById('sucRing').innerHTML='&#10003;';
     document.getElementById('sucRing').className='sring paid';
     document.getElementById('sucTitle').textContent='You are all set!';
