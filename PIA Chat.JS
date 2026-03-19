@@ -5,30 +5,63 @@
   var WA_NUMBER = '351292622980';
 
   var FAQ_KB = `PICO ISLAND ADVENTURES — AI ASSISTANT KNOWLEDGE BASE
+Version 2.0 | Last updated March 2026
 
-ABOUT: Pico Island Adventures (Pico Sport) — 33+ years experience. Founded by Frank Wirth. Madalena, Pico Island, Azores, Portugal. Licence Nr. 15/2009.
+ABOUT: Pico Island Adventures (Pico Sport) — 33+ years. Frank Wirth. Port Velho 33, Madalena, Pico Island, Azores. Licence Nr. 15/2009.
 Contact: +351 292 622 980 | info@pico-island-adventures.com | WhatsApp: +351 292 622 980
-Book online: https://booking.pico-island-adventures.com
+Book: https://booking.pico-island-adventures.com
 
-CANCELLATION: All bookings strictly non-refundable. Travel insurance strongly recommended.
+CANCELLATION: All bookings strictly non-refundable EXCEPT if trip cannot run due to weather — full refund in that case. Travel insurance strongly recommended.
 
 TOURS:
-1. WHALE & DOLPHIN WATCHING — €79/adult, €59/child under 12. Apr 1–Oct 30. Instant booking. 98% sighting success. Departures 9am, 2pm, 5:30pm sunset. Marine biologist guided. 28 species recorded. Sperm whales year-round. Blue/Fin/Sei whales Feb–Jun. Children welcome, no minimum age.
-2. SNORKELLING — PRINCESS ALICE BANK — €225/person. Jun 1–Oct 15. Instant booking. No cert required. Full day, departs 4–6am. Mobula rays, barracuda, whale sharks Aug–Sep. Wetsuit and gear provided.
-3. PRINCESS ALICE BANK DIVING — €499/person. Jun 1–Oct 15. Instant booking. 2-day package. Open Water cert minimum. Mandatory check dive day before PAB. Runs ~twice/week due to 100km offshore distance.
-4. SHARK WEEK (NO HOTEL) — €1,440/person. Jun 1–Oct 15. Instant booking. 10-day expedition. 4 shark dives at Condor Bank, PAB dive, whale watching. Blue, Mako, Hammerhead sharks.
-5. SHARK WEEK (WITH HOTEL) — From €1,440/person. Jun 1–Oct 15. Proposal request. Same + accommodation.
-6. SEASON OF THE GIANTS — From €1,470/person. Feb 1–Jun 30. Proposal request. 15-day package. Guest house dbl €1,470 / sgl €1,770. Apartment dbl €1,799 / sgl €2,249. Hotel dbl €1,869 / sgl €2,359. Blue, Fin, Sei, Humpback, Sperm whales. German-speaking support.
-7. SCUBA DIVING — From €110/2-tank dive. Year-round. Proposal. Land €110, Boat €125, Premium €150, Offshore €225. 10-dive pkg €499. Night dive €75. Open Water cert required.
 
-CERTS: No cert — whale watching, snorkelling. Open Water — scuba land/boat, PAB minimum. AOW — premium boat, Shark Week recommended.
-PAB NOTE: Trips ~twice/week due to 100km distance and weather.
-SEASONS: Whale watching Apr–Oct. Snorkel/PAB/Shark Jun–Oct. Giants Feb–Jun. Scuba year-round.
-GETTING HERE: Pico Airport (PIX) 8km from base. Ferry from Faial/Horta 30 min — base opposite terminal. Car rental: www.pico-rentacar.com
-WHAT TO BRING: Warm layer, waterproof jacket, reef-safe sunscreen, sunglasses, seasick meds, camera. Divers: C-card mandatory, logbook.
-MEETING POINT: Port Velho 33, Madalena. 15 mins before departure. Frank WhatsApps 48hrs before with exact time.
-FAQs: Children welcome on all tours (whale watching under 12 = €59). Non-swimmers fine for whale watching (stay on boat). Non-diving partners can join (cafes nearby). Climb Pico mountain before diving (altitude/decompression). Frank speaks German. Santa Maria combined itineraries available. Day trips book few days ahead. Multi-day packages book weeks/months ahead.
-ESCALATION: WhatsApp +351 292 622 980 | info@pico-island-adventures.com | Hours 08:00–20:00 Azores Time (UTC-1)`;
+1. WHALE & DOLPHIN WATCHING — EUR 99/adult, EUR 69/child under 12. Apr 1–Oct 30. Instant booking. 98% sighting success. Departures 9am, 2pm, 5:30pm sunset. Marine biologist guided. 28 species recorded. Sperm whales year-round. Blue/Fin/Sei whales Feb–Jun. Children welcome, no minimum age. Non-swimmers fine (stay on boat). Boats: power RIBs or 12m Cheetah Marine catamaran.
+
+2. SNORKELLING — PRINCESS ALICE BANK — EUR 225/person. Jun 1–Oct 15. Instant booking. No cert required — OWD and non-divers welcome. Full day, departs ~06:00, returns 16:00–17:00, meet 06:30 at dive centre. 100km offshore — cannot depart daily, flexible dates required. Boat: 12m Cheetah Marine catamaran (toilet, spacious deck). Species: Mobula rays (99% probability, groups 2–50 animals), whale sharks (Aug–Sep), tuna, kingfish, sailfish, marlin, barracuda, manta rays, stingrays, bonito. Light breakfast and simple lunch provided. Wetsuit and snorkel gear provided. Equipment: SMB and acoustic signal required, full diving kit, towel, sunscreen, seasick meds. No alcohol or drugs on board. Children welcome with parental supervision. Evening before: pack equipment at dive centre before 18:00.
+
+3. PRINCESS ALICE BANK DIVING — EUR 499/person. Jun 1–Oct 15. Instant booking. 2-day package. Open Water minimum (OWD sufficient — no AOW required). Mandatory check dive day before PAB. Same boat, timing, species and safety as snorkelling above. Day 1: 2-tank check dives around Pico. Day 2: 2-tank PAB. Returning guests who already did standard dives: EUR 99 deducted. Children from 12 yrs, certified, with parent.
+
+4. SHARK WEEK NO HOTEL — EUR 1,440/person. Jun 1–Oct 15. Instant booking. 10-day expedition. 2 days Condor Bank (4 shark dives), 1 day PAB (2 dives), 1 day Baixa Rosais (2 dives), 1 day Pico coast (2 dives), 1 whale watching. Shark safety briefing by Megalodon Project team. Includes transfers. 10 dives total. Shark briefing evening before departure is mandatory.
+
+5. SHARK WEEK WITH HOTEL — From EUR 1,440/person. Jun 1–Oct 15. Proposal request. Same as above + accommodation arranged by Frank.
+
+6. SEASON OF THE GIANTS — From EUR 1,470/person. Feb 1–Jun 30 only. Proposal. 15-day package. Guest house dbl EUR 1,470 / sgl EUR 1,770. Apartment dbl EUR 1,799 / sgl EUR 2,249. Hotel dbl EUR 1,869 / sgl EUR 2,359. Includes 14 nights, 6 whale excursions, island tours, vineyard hike, highland exploration, whale watcher visit, Faial island tour, lava cave. German-speaking support.
+
+7. SCUBA DIVING — From EUR 110/2-tank dive. Year-round. Proposal. Land EUR 110 (OW), boat EUR 125 (OW), premium EUR 150 (AOW), offshore EUR 225 (AOW+deep), 10-dive pkg EUR 499 (OW), night dive EUR 75 (OW). Check dive mandatory before advanced sites.
+
+CONDOR BANK SHARK DIVING DETAILS: 22nm from Pico. Protected plateau. Blue sharks main species, Mako possible. Season Jun–Oct. Departs ~08:30, returns 12:00–14:00. High-speed power RIBs, 1.5hr travel. Mandatory: full neoprene suit, hood, gloves. No yellow/white/silver reflecting fins. Stays on current line. Shark briefing evening before. Alternative site Pe de Sousa used as Plan B in bad weather. Water and fruit provided.
+
+CERTS: Whale watching/snorkelling — none. PAB diving — OWD minimum. Scuba boat — OWD. Scuba premium — AOW. Shark/offshore — AOW recommended. All diving: check dive mandatory before advanced sites.
+
+SEASONS: Whale watching Apr–Oct. Snorkel/PAB/Shark Jun–Oct. Giants Feb–Jun. Scuba year-round. Sperm whales year-round. Blue/Fin/Sei Feb–Jun.
+
+PAB NOTE: ~100km offshore, runs ~twice/week. Final time confirmed 48–12hrs before. Must reconfirm after arriving on Pico.
+
+BOAT: 12m x 5.2m Cheetah Marine power catamaran (since 2026) for PAB trips. Power RIBs for shark diving.
+
+SAFETY: Fully licensed, annual inspections. Satellite comms, VHF, life rafts, life jackets. O2 rescue sets on board. Staff trained marine first aid. Portuguese man-of-war jellyfish risk in some seasons.
+
+GETTING HERE: Pico Airport (PIX) 8km from base. Ferry Faial/Horta to Madalena 30min — base opposite terminal. Car rental: www.pico-rentacar.com
+
+MEETING POINT: Port Velho 33, Madalena. 15 mins before departure. Frank WhatsApps 48–12hrs before with exact time. PAB/Shark trips: meet dive centre evening before to pack gear.
+
+WHAT TO BRING ALL TRIPS: Warm layer, waterproof jacket, reef-safe sunscreen, sunglasses, seasick meds, towel, camera/GoPro, personal snacks. DIVERS ADD: C-card mandatory, logbook, full wetsuit, SMB, acoustic signal.
+
+FAQs:
+- Children? Whale watching: no minimum, under 12 = EUR 69. Snorkelling: yes with parent. Diving/sharks: 12+ certified with parent.
+- Mobula guarantee? No but 99% probability in season.
+- Non-swimmers OK? Yes for whale watching (stay on boat).
+- Non-diving partners? Can join land dive days (cafes nearby).
+- Climb Pico mountain? Do it before diving (altitude/decompression risk).
+- German spoken? Yes — Frank is German, full German support on all tours.
+- Santa Maria? Yes — combined itineraries available.
+- Book how far ahead? Day trips: few days. Multi-day: weeks/months.
+- Alcohol on board? Strictly forbidden on all boats.
+- Seasick? Bring own medication. Catamaran is very stable.
+- Weather cancels? Full refund if tour impossible within your dates.
+
+ESCALATION: WhatsApp +351 292 622 980 | info@pico-island-adventures.com | 08:00–20:00 Azores Time (UTC-1)
+`;
 
   var FAQ_SYSTEM = 'You are the friendly AI assistant for Pico Island Adventures, a marine tour company on Pico Island in the Azores, Portugal. Answer questions warmly and knowledgeably, like a trusted local expert. Only use the knowledge base provided. If you cannot answer, honestly say so and direct the guest to WhatsApp +351 292 622 980. Never invent prices, dates, or policies. Encourage booking when appropriate — direct guests to ' + BOOKING_URL + '. Respond in the same language the guest writes in — English or German. Keep responses concise and friendly, under 120 words where possible.\n\nKNOWLEDGE BASE:\n' + FAQ_KB;
 
