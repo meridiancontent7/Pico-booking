@@ -993,6 +993,12 @@ function setupGroup() {
   // Price box vs enquiry box
   var pb = document.getElementById('pbox');
   var eb = document.getElementById('enqBox');
+  // Reset counters to defaults first
+  S.adults = 1; S.children = 0;
+  document.getElementById('aval').textContent = '1';
+  document.getElementById('cval').textContent = '0';
+  document.getElementById('adn').disabled = true;
+  document.getElementById('cdn').disabled = true;
   if (p.instant) { pb.classList.remove('hidden'); eb.classList.add('hidden'); calcPrice(); }
   else { pb.classList.add('hidden'); eb.classList.remove('hidden'); }
 }
@@ -1028,15 +1034,19 @@ function calcPrice() {
   if (p.hasChild && S.children>0) h += '<div class="pl"><span>' + S.children + ' child' + (S.children>1?'ren':'') + ' x \u20ac' + p.cp + '</span><span>\u20ac' + adC + '</span></div>';
 
   if (OP.active && OP.discountPct > 0) {
-    S.discountAmt = Math.round(subtotal * OP.discountPct) / 100;
-    var afterDisc = subtotal - S.discountAmt;
-    S.vatAmt = Math.round(afterDisc * 16) / 100;
-    S.total = Math.round((afterDisc + S.vatAmt) * 100) / 100;
+    // VAT is inclusive in the price — extract it, apply discount, then show breakdown
+    S.discountAmt = Math.round(subtotal * OP.discountPct * 100) / 10000;
+    var afterDisc  = Math.round((subtotal - S.discountAmt) * 100) / 100;
+    // Extract inclusive VAT: VAT = afterDisc / 1.16 * 0.16
+    S.vatAmt = Math.round(afterDisc / 1.16 * 0.16 * 100) / 100;
+    var netExVat = Math.round(afterDisc / 1.16 * 100) / 100;
+    S.total = afterDisc; // guest pays the discounted price (VAT already inside)
     h += '<div class="vat-section">';
-    h += '<div class="vat-line"><span class="vat-key">Subtotal</span><span class="vat-val">\u20ac' + subtotal.toFixed(2) + '</span></div>';
+    h += '<div class="vat-line"><span class="vat-key">Subtotal (inc. VAT)</span><span class="vat-val">\u20ac' + subtotal.toFixed(2) + '</span></div>';
     h += '<div class="vat-line"><span class="vat-key">' + OP.discountPct + '% trade discount</span><span class="disc-val">-\u20ac' + S.discountAmt.toFixed(2) + '</span></div>';
-    h += '<div class="vat-line"><span class="vat-key">Net price</span><span class="vat-val">\u20ac' + afterDisc.toFixed(2) + '</span></div>';
-    h += '<div class="vat-line"><span class="vat-key">VAT (IVA 16%)</span><span class="vat-val">\u20ac' + S.vatAmt.toFixed(2) + '</span></div>';
+    h += '<div class="vat-line"><span class="vat-key">Total after discount</span><span class="vat-val">\u20ac' + afterDisc.toFixed(2) + '</span></div>';
+    h += '<div class="vat-line"><span class="vat-key">VAT content (IVA 16%)</span><span class="vat-val">\u20ac' + S.vatAmt.toFixed(2) + '</span></div>';
+    h += '<div class="vat-line"><span class="vat-key">Net (ex VAT)</span><span class="vat-val">\u20ac' + netExVat.toFixed(2) + '</span></div>';
     h += '</div>';
   } else {
     S.total = subtotal;
@@ -1126,10 +1136,10 @@ function fillReview() {
   if (p.instant) {
     if (OP.active) {
       var sub2 = (p.ap * S.adults) + (p.hasChild ? p.cp * S.children : 0);
-      h2 += '<div class="rr"><span class="rk">Subtotal</span><span class="rv">\u20ac' + sub2.toFixed(2) + '</span></div>';
+      h2 += '<div class="rr"><span class="rk">Subtotal (inc. VAT)</span><span class="rv">\u20ac' + sub2.toFixed(2) + '</span></div>';
       h2 += '<div class="rr"><span class="rk">' + OP.discountPct + '% trade discount</span><span class="rv" style="color:#34d399">-\u20ac' + S.discountAmt.toFixed(2) + '</span></div>';
-      h2 += '<div class="rr"><span class="rk">VAT (IVA 16%)</span><span class="rv">\u20ac' + S.vatAmt.toFixed(2) + '</span></div>';
-      h2 += '<div class="rr"><span class="rk">Total (inc. VAT)</span><span class="rv">\u20ac' + S.total.toFixed(2) + '</span></div>';
+      h2 += '<div class="rr"><span class="rk">Total after discount</span><span class="rv">\u20ac' + S.total.toFixed(2) + '</span></div>';
+      h2 += '<div class="rr"><span class="rk">VAT content (IVA 16%)</span><span class="rv">\u20ac' + S.vatAmt.toFixed(2) + '</span></div>';
     } else {
       h2 += '<div class="rr"><span class="rk">Total</span><span class="rv">\u20ac' + S.total + '</span></div>';
     }
