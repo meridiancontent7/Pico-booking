@@ -751,8 +751,10 @@ async function verifyOperator() {
   if (!code) { status.textContent = 'Please enter a code.'; status.className='op-status bad'; return; }
   status.textContent = 'Checking...'; status.className='op-status';
   try {
-    var r = await fetch(CFG.supabaseUrl + '/rest/v1/pia_operators?access_code=eq.' + code + '&is_active=eq.true&select=operator_name,access_code,discount_pct,email', {
-      headers: { 'apikey': CFG.supabaseKey, 'Authorization': 'Bearer ' + CFG.supabaseKey }
+    var SB_URL = 'https://fnzgpdhhybpkhfyanqtj.supabase.co';
+    var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZuemdwZGhoeWJwa2hmeWFucXRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyODI1ODYsImV4cCI6MjA4ODg1ODU4Nn0._2ouYZglVPMDGbNNCftcMuebQ9-WqEUlnZ9a9YTNDyo';
+    var r = await fetch(SB_URL + '/rest/v1/pia_operators?access_code=eq.' + code + '&is_active=eq.true&select=operator_name,access_code,discount_pct,email', {
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
     });
     var data = await r.json();
     if (data && data.length > 0) {
