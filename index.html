@@ -255,6 +255,9 @@
     .tbtn .tdesc{font-size:10px;display:block;margin-top:2px}
     @media(max-width:480px){.htitle{font-size:24px}.sh{font-size:26px}.pline{width:18px}.pdot{width:23px;height:23px;font-size:10px}}
   </style>
+  <!-- Stripe.js -->
+  <script src="https://js.stripe.com/v3/"></script>
+
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18013120947"></script>
   <script>
@@ -670,6 +673,7 @@
 
 <script>
 var N8N = 'https://n8n.srv1432046.hstgr.cloud/webhook/pia-booking';
+var STRIPE_PK = 'pk_live_51TCjGs0pELS5BoBaqGB8vvnX0Fwk66SsAvuwc6QSJZHzc6WGmpUAHiXaZ44sSavhE1beGcZUqISLKAViuXphJESV00amM8OOG2';
 var BASE_URL = window.location.href.split('?')[0];
 
 /* ── PRODUCT DEFINITIONS ──────────────────────────────────── */
@@ -1243,8 +1247,17 @@ function doPay() {
   })
   .then(function(r){return r.json();})
   .then(function(d){
-    if (d.checkoutUrl) { window.location.href=d.checkoutUrl; }
-    else { throw new Error('no url'); }
+    // Handle both direct checkoutUrl and Stripe session id
+    if (d.checkoutUrl) {
+      window.location.href = d.checkoutUrl;
+    } else if (d.sessionId) {
+      var stripe = Stripe(STRIPE_PK);
+      stripe.redirectToCheckout({ sessionId: d.sessionId });
+    } else if (d.url) {
+      window.location.href = d.url;
+    } else {
+      throw new Error('no checkout url returned');
+    }
   })
   .catch(function(){
     btn.disabled=false; lbl.textContent='Pay Securely Now'; spn.classList.remove('on');
