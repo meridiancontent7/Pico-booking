@@ -299,6 +299,7 @@
 <div class="w">
 
   <header class="hdr">
+    <img src="pia-logo.png" alt="Pico Island Adventures" style="width:80px;height:80px;object-fit:contain;margin-bottom:10px;opacity:0.92">
     <p class="hbrand">Pico Island Adventures</p>
     <h1 class="htitle">Book Your <i>Atlantic Experience</i></h1>
     <div class="trust">
@@ -361,7 +362,7 @@
         <span class="pc-tag enq">Proposal</span>
         <span class="pe">&#x1F988;</span>
         <div class="pn">Shark Week &#8212; With Hotel</div>
-        <div class="pd">Full package with accommodation. Frank will confirm availability and hotel options.</div>
+        <div class="pd">Full package with accommodation. The Booking Team will confirm availability and hotel options.</div>
         <div class="pp">From &#8364;1,440 <span class="ppn">/ person</span></div>
         <div class="abadge lim"><span class="adot"></span>Jun 1 &#8212; Oct 15</div>
       </button>
@@ -416,7 +417,7 @@
     </div>
 
     <div class="note info on" id="pabNote" style="display:none;margin-top:14px">
-      &#x26A0;&#xFE0F; <strong>Important:</strong> Due to weather conditions and the 100km offshore distance, Princess Alice Bank trips typically run twice a week. Frank will confirm your exact date after booking.
+      &#x26A0;&#xFE0F; <strong>Important:</strong> Due to weather conditions and the 100km offshore distance, Princess Alice Bank trips typically run twice a week. The Booking Team will confirm your exact date after booking.
     </div>
 
     <!-- DEPARTURE TIME — whale watching only -->
@@ -449,6 +450,12 @@
     <div id="flowBadge3"></div>
     <h2 class="sh">Build your<br><i>group</i></h2>
     <p class="ss">Tell us how many are joining you.</p>
+
+    <!-- Live price display -->
+    <div id="livePriceBar" style="display:none;background:rgba(6,182,212,0.08);border:1px solid rgba(6,182,212,0.2);border-radius:10px;padding:12px 16px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:13px;color:var(--muted);font-weight:300">Total for your group</span>
+      <span style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:var(--cream)">&#8364;<span id="livePriceAmt">0</span></span>
+    </div>
 
     <div class="grow">
       <div>
@@ -503,7 +510,7 @@
     <!-- Enquiry info box (proposal products) -->
     <div class="enq-box hidden" id="enqBox">
       <div class="enq-box-ttl">&#x1F4AC; Proposal request</div>
-      <p>Your details will be sent to Frank who will contact you within 4 hours with availability, a personalised itinerary, and a payment link.</p>
+      <p>Your details will be sent to the Booking Team who will contact you within 4 hours with availability, a personalised itinerary, and a payment link.</p>
     </div>
 
     <div class="bst">
@@ -602,7 +609,7 @@
     <!-- Enquiry summary (proposal only) -->
     <div class="enq-box hidden" id="enqSummary">
       <div class="enq-box-ttl">What happens next</div>
-      <p>Frank will review your request and contact you within 4 hours on WhatsApp and email with availability, a personalised itinerary, and a payment link to confirm your spot.</p>
+      <p>The Booking Team will review your request and contact you within 4 hours on WhatsApp and email with availability, a personalised itinerary, and a payment link to confirm your spot.</p>
     </div>
 
     <!-- Terms -->
@@ -786,6 +793,8 @@ async function verifyOperator() {
       // Also update the price box label to show operator pricing
       var pb = document.getElementById('pbox');
       if (pb && !pb.classList.contains('hidden')) calcPrice();
+      // Update card prices to show operator rate
+      updateCardPrices();
     } else {
       status.textContent = 'Code not recognised. Contact Pico Island Adventures.';
       status.className = 'op-status bad';
@@ -805,6 +814,33 @@ function clearOperator() {
   document.getElementById('opCode').value = '';
   document.getElementById('opStatus').textContent = '';
   if (S.pid && S.total > 0) calcPrice();
+  updateCardPrices();
+}
+
+function updateCardPrices() {
+  var ids = ['whale','snorkel','pab','shark','sharkhotel','giants','scuba'];
+  for (var i=0; i<ids.length; i++) {
+    var p = P[ids[i]];
+    var el = document.getElementById('pc-'+ids[i]);
+    if (!el) continue;
+    var pp = el.querySelector('.pp');
+    if (!pp) continue;
+    if (OP.active && OP.discountPct > 0) {
+      var discounted = Math.round(p.ap * (1 - OP.discountPct/100));
+      var orig = '<span style="text-decoration:line-through;opacity:0.5;font-size:11px;margin-right:4px">\u20ac' + p.ap + '</span>';
+      var newp = '\u20ac' + discounted + ' <span class="ppn">/ person (trade rate)</span>';
+      pp.innerHTML = orig + newp;
+    } else {
+      // Restore original price
+      if (p.flat) {
+        pp.innerHTML = '\u20ac' + p.ap + ' <span class="ppn">/ person</span>';
+      } else if (p.hasChild) {
+        pp.innerHTML = 'From \u20ac' + p.ap + ' <span class="ppn">/ adult</span>';
+      } else {
+        pp.innerHTML = 'From \u20ac' + p.ap + ' <span class="ppn">/ person</span>';
+      }
+    }
+  }
 }
 
 // Allow Enter key on operator input
@@ -860,11 +896,7 @@ function go(n) {
 /* ── PICK PRODUCT ─────────────────────────────────────────── */
 // pickCheck: gate on season before allowing selection
 function pickCheck(id) {
-  var p = P[id];
-  if (!inSeason(p)) {
-    alert(p.name + ' is only available ' + p.seasonLabel + '. Please come back during the season or contact Frank directly on WhatsApp: +351 292 622 980');
-    return;
-  }
+  // Allow pre-booking for off-season — dates will be restricted to in-season only
   pick(id);
 }
 
@@ -894,6 +926,7 @@ function pick(id) {
   else tw.classList.add('hidden');
 
   document.getElementById('btn2').disabled = true;
+  applySeasonDates();
   setTimeout(function(){ go(2); }, 260);
 }
 
@@ -914,6 +947,47 @@ function setMinDate() {
   document.getElementById('altDate').min   = minStr;
   document.getElementById('dateFrom').min  = minStr;
   document.getElementById('dateTo').min    = minStr;
+}
+
+function applySeasonDates() {
+  var p = S.pid ? P[S.pid] : null;
+  if (!p || !p.seasonStart) return;
+
+  // Find the next in-season start date
+  var now = new Date();
+  var yr = now.getFullYear();
+  var seasonStart = new Date(yr, p.seasonStart[0]-1, p.seasonStart[1]);
+  var seasonEnd   = new Date(yr, p.seasonEnd[0]-1,   p.seasonEnd[1]);
+
+  // If season hasn't started yet this year use this year's start
+  // If season has ended use next year's start
+  if (now > seasonEnd) {
+    seasonStart = new Date(yr+1, p.seasonStart[0]-1, p.seasonStart[1]);
+    seasonEnd   = new Date(yr+1, p.seasonEnd[0]-1,   p.seasonEnd[1]);
+  }
+
+  var fmt = function(dt) {
+    var yy = dt.getFullYear();
+    var mm = ('0'+(dt.getMonth()+1)).slice(-2);
+    var dd = ('0'+dt.getDate()).slice(-2);
+    return yy+'-'+mm+'-'+dd;
+  };
+
+  var minS = fmt(seasonStart);
+  var maxS = fmt(seasonEnd);
+
+  // Apply to all date inputs
+  var ids = ['tourDate','altDate','dateFrom','dateTo'];
+  for (var i=0; i<ids.length; i++) {
+    var el = document.getElementById(ids[i]);
+    if (el) { el.min = minS; el.max = maxS; }
+  }
+
+  // Show pre-booking note if off season
+  if (!inSeason(p)) {
+    var sub = document.getElementById('dateSub');
+    if (sub) sub.innerHTML = '<span style="color:#06b6d4;font-weight:500">Pre-booking open.</span> Select a date within the ' + p.seasonLabel + ' season.';
+  }
 }
 
 function onDate() {
@@ -1071,6 +1145,13 @@ function calcPrice() {
   var pax = S.adults + S.children;
   document.getElementById('sGrp').textContent = pax + ' guest' + (pax>1?'s':'');
   document.getElementById('sticky').classList.add('on');
+  // Update live price bar
+  var lpb = document.getElementById('livePriceBar');
+  var lpa = document.getElementById('livePriceAmt');
+  if (lpb && lpa) {
+    lpb.style.display = 'flex';
+    lpa.textContent = S.total.toFixed(2);
+  }
 }
 
 function step3Next() {
@@ -1092,6 +1173,13 @@ function val5() {
   var name  = document.getElementById('gn').value.trim();
   var email = document.getElementById('ge').value.trim();
   var wa    = document.getElementById('gw').value.trim();
+
+  // For operators: auto-populate with operator details if fields are empty
+  if (OP.active) {
+    if (!name) { name = OP.name; document.getElementById('gn').value = name; }
+    if (!email) { email = OP.email; document.getElementById('ge').value = email; }
+  }
+
   var ok = true;
   function chk(eid, iid, bad) {
     var e=document.getElementById(eid), inp=document.getElementById(iid);
@@ -1100,9 +1188,10 @@ function val5() {
   }
   chk('eName',  'gn',  !name);
   chk('eEmail', 'ge',  !(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)));
-  chk('eWa',    'gw',  wa.length<6);
+  // WhatsApp optional for operators
+  if (!OP.active) chk('eWa', 'gw', wa.length<6);
   if (ok) {
-    S.name=name; S.email=email; S.wa=wa;
+    S.name=name; S.email=email; S.wa=wa||OP.code;
     S.notes = document.getElementById('gnotes').value.trim();
     go(6);
   }
@@ -1178,7 +1267,7 @@ function fillReview() {
   var pn = document.getElementById('payNote');
   var en = document.getElementById('enqNote');
   if (p.instant) {
-    document.getElementById('rtotAmt').textContent = S.total;
+    document.getElementById('rtotAmt').textContent = typeof S.total === 'number' ? S.total.toFixed(2) : S.total;
     rt.classList.remove('hidden'); es.classList.add('hidden');
     bp.classList.remove('hidden'); be.classList.add('hidden');
     pn.classList.remove('hidden'); en.classList.add('hidden');
@@ -1352,12 +1441,12 @@ function markSeasons() {
     var el = document.getElementById('pc-'+ids[i]);
     if (!el) continue;
     if (!inSeason(p)) {
-      el.classList.add('oos');
-      // Add out-of-season label if not already there
+      // Show pre-booking badge instead of greying out
       if (!el.querySelector('.oos-lbl')) {
         var lbl = document.createElement('span');
         lbl.className = 'oos-lbl';
-        lbl.textContent = 'Not available — ' + p.seasonLabel;
+        lbl.style.color = '#06b6d4';
+        lbl.textContent = 'Pre-book now — ' + p.seasonLabel;
         el.appendChild(lbl);
       }
     }
