@@ -799,18 +799,7 @@ window.onload = function() {
     }
   }
 };
-    showSuc('paid', getParam('ref'), decodeURIComponent(getParam('email')));
-    return;
-  }
-  if (qs.indexOf('status=sent') > -1) {
-    showSuc('sent', getParam('ref'), decodeURIComponent(getParam('email')));
-    return;
-  }
-  drawProg();
-  setMinDate();
-  markSeasons();
-};
-
+    
 function getParam(n) {
   var parts = window.location.search.slice(1).split('&');
   for (var i=0; i<parts.length; i++) {
