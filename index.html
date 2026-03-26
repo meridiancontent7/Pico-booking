@@ -790,6 +790,27 @@ window.onload = function() {
   drawProg();
   setMinDate();
   markSeasons();
+
+  // Auto-select product from URL parameter
+  var product = getParam('product');
+  if (product && P[product]) {
+    if (P[product].dive) {
+      pickCheck(product);
+    } else {
+      pick(product);
+    }
+  }
+};
+    showSuc('paid', getParam('ref'), decodeURIComponent(getParam('email')));
+    return;
+  }
+  if (qs.indexOf('status=sent') > -1) {
+    showSuc('sent', getParam('ref'), decodeURIComponent(getParam('email')));
+    return;
+  }
+  drawProg();
+  setMinDate();
+  markSeasons();
 };
 
 function getParam(n) {
