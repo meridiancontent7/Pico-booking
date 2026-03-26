@@ -384,7 +384,41 @@
         <div class="pp">From &#8364;110 <span class="ppn">/ 2-tank dive</span></div>
         <div class="abadge av"><span class="adot"></span>All cert levels welcome</div>
       </button>
+<button class="pc" id="pc-basic" onclick="pick('basic')">
+        <span class="pc-tag enq">Proposal</span>
+        <span class="pe">&#x1F30D;</span>
+        <div class="pn">Basic Dive Package</div>
+        <div class="pd">10 dives over 5 days around Pico Island. Perfect for families. Open Water cert required.</div>
+        <div class="pp">&#8364;499 <span class="ppn">/ person</span></div>
+        <div class="abadge lim"><span class="adot"></span>May 1 &#8212; Oct 31</div>
+      </button>
 
+      <button class="pc" id="pc-advanced" onclick="pick('advanced')">
+        <span class="pc-tag enq">Proposal</span>
+        <span class="pe">&#x1F9A0;</span>
+        <div class="pn">Advanced Dive Package</div>
+        <div class="pd">Deep-sea pinnacles + Condor Bank shark diving. Advanced + Deep Diver cert required.</div>
+        <div class="pp">&#8364;949 <span class="ppn">/ person</span></div>
+        <div class="abadge lim"><span class="adot"></span>Jun 1 &#8212; Oct 15</div>
+      </button>
+
+      <button class="pc" id="pc-bestpico" onclick="pick('bestpico')">
+        <span class="pc-tag enq">Proposal</span>
+        <span class="pe">&#x1F3C6;</span>
+        <div class="pn">Best of Pico Diving</div>
+        <div class="pd">The ultimate Pico diving week — all major sites including Princess Alice Bank, Condor Bank sharks, night dive and whale watching.</div>
+        <div class="pp">&#8364;1,499 <span class="ppn">/ person</span></div>
+        <div class="abadge lim"><span class="adot"></span>Jun 1 &#8212; Oct 15</div>
+      </button>
+
+      <button class="pc" id="pc-mobydick" onclick="pick('mobydick')">
+        <span class="pc-tag enq">Proposal</span>
+        <span class="pe">&#x1F40B;</span>
+        <div class="pn">Moby Dick Whale Week</div>
+        <div class="pd">6 whale watching excursions with marine biologist. Blue whales Apr–May, sperm whales Jun–Sep.</div>
+        <div class="pp">&#8364;449 <span class="ppn">/ person</span></div>
+        <div class="abadge lim"><span class="adot"></span>Apr 1 &#8212; Oct 31</div>
+      </button>
     </div>
   </div>
 
@@ -693,6 +727,10 @@ var P = {
   sharkhotel: {id:'sharkhotel', name:'Shark Week — With Hotel',             instant:false, ap:1440, cp:0,   flat:true,  multi:false, seas:false, peak:[],         dive:false, hasChild:false, seasonStart:[6,1],  seasonEnd:[10,15], seasonLabel:'Jun 1 — Oct 15' },
   giants:     {id:'giants',     name:'Season of the Giants',                instant:false, ap:1470, cp:0,   flat:false, multi:false, seas:true,  peak:[2,3,4,5,6],dive:false, hasChild:false, seasonStart:[2,1],  seasonEnd:[6,30],  seasonLabel:'Feb 1 — Jun 30', hasAcc:true },
   scuba:      {id:'scuba',      name:'Scuba Diving',                        instant:false, ap:110,  cp:0,   flat:false, multi:false, seas:false, peak:[],         dive:false, hasChild:false, seasonStart:null,   seasonEnd:null,    seasonLabel:'Year-round' },
+basic:      {id:'basic',      name:'Basic Dive Package',                  instant:false, ap:499,  cp:0,   flat:true,  multi:false, seas:false, peak:[],         dive:false, hasChild:false, seasonStart:[5,1],  seasonEnd:[10,31], seasonLabel:'May 1 — Oct 31' },
+  advanced:   {id:'advanced',   name:'Advanced Dive Package',               instant:false, ap:949,  cp:0,   flat:true,  multi:false, seas:false, peak:[],         dive:false, hasChild:false, seasonStart:[6,1],  seasonEnd:[10,15], seasonLabel:'Jun 1 — Oct 15' },
+  bestpico:   {id:'bestpico',   name:'Best of Pico Diving',                 instant:false, ap:1499, cp:0,   flat:true,  multi:false, seas:false, peak:[],         dive:false, hasChild:false, seasonStart:[6,1],  seasonEnd:[10,15], seasonLabel:'Jun 1 — Oct 15' },
+  mobydick:   {id:'mobydick',   name:'Moby Dick Whale Week',                instant:false, ap:449,  cp:0,   flat:true,  multi:false, seas:false, peak:[],         dive:false, hasChild:false, seasonStart:[4,1],  seasonEnd:[10,31], seasonLabel:'Apr 1 — Oct 31' },
 };
 
 // Helper: is today within a product's season?
@@ -818,7 +856,7 @@ function clearOperator() {
 }
 
 function updateCardPrices() {
-  var ids = ['whale','snorkel','pab','shark','sharkhotel','giants','scuba'];
+  var ids = ['whale','snorkel','pab','shark','sharkhotel','giants','scuba','basic','advanced','bestpico','mobydick'];
   for (var i=0; i<ids.length; i++) {
     var p = P[ids[i]];
     var el = document.getElementById('pc-'+ids[i]);
@@ -1435,7 +1473,7 @@ function fmtCert(c) {
   return m[c]||c;
 }
 function markSeasons() {
-  var ids = ['whale','snorkel','pab','shark','sharkhotel','giants','scuba'];
+  var ids = ['whale','snorkel','pab','shark','sharkhotel','giants','scuba','basic','advanced','bestpico','mobydick'];
   for (var i=0; i<ids.length; i++) {
     var p = P[ids[i]];
     var el = document.getElementById('pc-'+ids[i]);
