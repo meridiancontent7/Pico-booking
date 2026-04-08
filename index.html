@@ -314,7 +314,7 @@
   <!-- ═══ STEP 1 — CHOOSE ═══ -->
   <div class="step on" id="step1">
     <h2 class="sh">Which experience<br><i>calls to you?</i></h2>
-    <p class="ss">Choose your adventure. Instant booking available for day trips — premium packages are submitted as a proposal for Frank to follow up.</p>
+    <p class="ss">Choose your adventure. Day trips book and pay instantly — premium packages reserve your spot and our team confirms in a few hours.</p>
     <p class="taph">Tap a card to continue</p>
     <div class="pgrid">
 
@@ -347,8 +347,6 @@
         <div class="abadge lim"><span class="adot"></span>Jun 1 &#8212; Oct 15</div>
       </button>
 
-      <div class="grid-section">&#x1F4CB; Submit a Proposal Request</div>
-
       <button class="pc" id="pc-shark" onclick="pickCheck('shark')">
         <span class="pc-tag inst">Instant</span>
         <span class="pe">&#x1F988;</span>
@@ -357,6 +355,8 @@
         <div class="pp">&#8364;1,440 <span class="ppn">/ person</span></div>
         <div class="abadge lim"><span class="adot"></span>Jun 1 &#8212; Oct 15</div>
       </button>
+
+      <div class="grid-section">&#x1F4CB; Premium Packages &#8212; Reserve Your Spot</div>
 
       <button class="pc" id="pc-sharkhotel" onclick="pickCheck('sharkhotel')">
         <span class="pc-tag enq">Proposal</span>
@@ -544,7 +544,7 @@
     <!-- Enquiry info box (proposal products) -->
     <div class="enq-box hidden" id="enqBox">
       <div class="enq-box-ttl">&#x1F4AC; Proposal request</div>
-      <p>Your details will be sent to the Booking Team who will contact you within 4 hours with availability, a personalised itinerary, and a payment link.</p>
+      <p>Reserve your spot now. Our team confirms availability and sends a secure payment link within 4 hours via WhatsApp and email.</p>
     </div>
 
     <div class="bst">
@@ -643,7 +643,7 @@
     <!-- Enquiry summary (proposal only) -->
     <div class="enq-box hidden" id="enqSummary">
       <div class="enq-box-ttl">What happens next</div>
-      <p>The Booking Team will review your request and contact you within 4 hours on WhatsApp and email with availability, a personalised itinerary, and a payment link to confirm your spot.</p>
+      <p>Your spot is being held. Our team will confirm availability and send a secure payment link within 4 hours via WhatsApp and email.</p>
     </div>
 
     <!-- Terms -->
@@ -687,7 +687,7 @@
     <!-- SUBMIT ENQUIRY button (proposal) -->
     <button class="benq hidden" id="btnEnq" onclick="doEnq()" disabled>
       <span>&#x1F4E8;</span>
-      <span id="enqLbl">Send Proposal Request</span>
+      <span id="enqLbl">Reserve My Spot</span>
       <div class="spin" id="enqSpin"></div>
     </button>
 
@@ -1427,7 +1427,7 @@ function doEnq() {
     window.location.href = BASE_URL+'?status=sent&ref='+S.ref+'&email='+encodeURIComponent(S.email);
   })
   .catch(function(){
-    btn.disabled=false; lbl.textContent='Send Proposal Request'; spn.classList.remove('on');
+    btn.disabled=false; lbl.textContent='Reserve My Spot'; spn.classList.remove('on');
     alert('Something went wrong. Please try again or WhatsApp us: +351 292 622 980');
   });
 }
@@ -1460,9 +1460,9 @@ function showSuc(type, ref, email) {
     document.getElementById('sucRing').innerHTML='&#x1F4E8;';
     document.getElementById('sucRing').className='sring sent';
     document.getElementById('sucTitle').textContent='Request received!';
-    document.getElementById('sucMsg').innerHTML='Frank will review your request and contact you within 4 hours on WhatsApp and at <strong>' + (email||'your email') + '</strong>.';
+    document.getElementById('sucMsg').innerHTML='Your spot is being held. Our team will confirm and send a secure payment link within 4 hours to <strong>' + (email||'your email') + '</strong>.';
     document.getElementById('sucNext').innerHTML = '<div class="nxlbl">What happens next</div>'
-      + '<div class="nxi"><div class="nxn">1</div><div class="nxt"><b>Watch for a WhatsApp message</b> from Frank within 4 hours confirming availability and your custom itinerary.</div></div>'
+      + '<div class="nxi"><div class="nxn">1</div><div class="nxt"><b>Watch for a WhatsApp message</b> from our team within 4 hours confirming your spot and sending a secure payment link.</div></div>'
       + '<div class="nxi"><div class="nxn">2</div><div class="nxt"><b>Confirm and pay</b> — Frank will send a secure payment link to hold your spot once you are happy with the proposal.</div></div>'
       + '<div class="nxi"><div class="nxn">3</div><div class="nxt"><b>Get ready</b> — once paid, full joining instructions will be sent to your email and WhatsApp.</div></div>';
   }
