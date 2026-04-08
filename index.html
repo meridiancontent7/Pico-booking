@@ -411,13 +411,22 @@
         <div class="abadge lim"><span class="adot"></span>Jun 1 &#8212; Oct 15</div>
       </button>
 
-      <button class="pc" id="pc-mobydick" onclick="pick('mobydick')">
+     <button class="pc" id="pc-mobydick" onclick="pick('mobydick')">
         <span class="pc-tag enq">Proposal</span>
         <span class="pe">&#x1F40B;</span>
         <div class="pn">Moby Dick Whale Week</div>
         <div class="pd">6 whale watching excursions with marine biologist. Blue whales Apr–May, sperm whales Jun–Sep.</div>
         <div class="pp">&#8364;449 <span class="ppn">/ person</span></div>
         <div class="abadge lim"><span class="adot"></span>Apr 1 &#8212; Oct 31</div>
+      </button>
+
+      <button class="pc" id="pc-zodiac" onclick="pick('zodiac')">
+        <span class="pc-tag enq">Proposal</span>
+        <span class="pe">&#x1F6E5;&#xFE0F;</span>
+        <div class="pn">Zodiac Whale Watching — 6 Excursions</div>
+        <div class="pd">6 whale watching excursions aboard a Zodiac RIB. Fast, agile and close to the ocean. Groups only.</div>
+        <div class="pp">&#8364;414 <span class="ppn">/ adult</span></div>
+        <div class="abadge lim"><span class="adot"></span>Apr 1 &#8212; Oct 30</div>
       </button>
     </div>
   </div>
@@ -864,7 +873,7 @@ function clearOperator() {
 }
 
 function updateCardPrices() {
-  var ids = ['whale','snorkel','pab','shark','sharkhotel','giants','scuba','basic','advanced','bestpico','mobydick'];
+  var ids = ['whale','snorkel','pab','shark','sharkhotel','giants','scuba','basic','advanced','bestpico','mobydick','zodiac'];
   for (var i=0; i<ids.length; i++) {
     var p = P[ids[i]];
     var el = document.getElementById('pc-'+ids[i]);
@@ -1481,7 +1490,7 @@ function fmtCert(c) {
   return m[c]||c;
 }
 function markSeasons() {
-  var ids = ['whale','snorkel','pab','shark','sharkhotel','giants','scuba','basic','advanced','bestpico','mobydick'];
+  var ids = ['whale','snorkel','pab','shark','sharkhotel','giants','scuba','basic','advanced','bestpico','mobydick','zodiac'];
   for (var i=0; i<ids.length; i++) {
     var p = P[ids[i]];
     var el = document.getElementById('pc-'+ids[i]);
