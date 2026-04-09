@@ -323,9 +323,18 @@
       <button class="pc" id="pc-whale" onclick="pickCheck('whale')">
         <span class="pc-tag inst">Instant</span>
         <span class="pe">&#x1F40B;</span>
-        <div class="pn">Whale &amp; Dolphin Watching</div>
-        <div class="pd">Marine biologist guided. 98% sighting success. Morning, afternoon &amp; sunset departures.</div>
+        <div class="pn">Whale &amp; Dolphin Watching — Catamaran</div>
+        <div class="pd">13m power catamaran. Stable &amp; spacious. Marine biologist guided. 98% sighting success.</div>
         <div class="pp">From &#8364;99 <span class="ppn">/ adult</span></div>
+        <div class="abadge lim"><span class="adot"></span>Apr 1 &#8212; Oct 30</div>
+      </button>
+
+      <button class="pc" id="pc-whalezodiac" onclick="pickCheck('whalezodiac')">
+        <span class="pc-tag inst">Instant</span>
+        <span class="pe">&#x1F6E5;&#xFE0F;</span>
+        <div class="pn">Whale &amp; Dolphin Watching — Zodiac</div>
+        <div class="pd">Power Zodiac RIB. Fast &amp; thrilling. Departs Madalena or Lajes. Marine biologist guided.</div>
+        <div class="pp">From &#8364;79 <span class="ppn">/ adult</span></div>
         <div class="abadge lim"><span class="adot"></span>Apr 1 &#8212; Oct 30</div>
       </button>
 
@@ -525,7 +534,13 @@
         <button class="cb" onclick="adj('c',1)">&#43;</button>
       </div>
     </div>
-
+<!-- Package selector for whale watching -->
+    <div class="pkg-wrap hidden" id="pkgWrap">
+      <div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--bdr)">
+        <label class="acc-lbl">Select Package</label>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px" id="pkgBtns"></div>
+      </div>
+    </div>
     <!-- Accommodation selector for Season of the Giants -->
     <div class="acc-wrap hidden" id="accWrap">
       <label class="acc-lbl" for="accSel">Preferred Accommodation</label>
@@ -729,7 +744,7 @@ var BASE_URL = window.location.href.split('?')[0];
 /* ── PRODUCT DEFINITIONS ──────────────────────────────────── */
 var P = {
   // seasonStart/End: [month, day] — null means year-round
-  whale:      {id:'whale',      name:'Whale & Dolphin Watching',           instant:true,  ap:99,   cp:69,  flat:false, multi:false, seas:false, peak:[],         dive:false, hasChild:true,  seasonStart:[4,1],  seasonEnd:[10,30], seasonLabel:'Apr 1 — Oct 30' },
+  whale:      {id:'whale',      name:'Whale & Dolphin Watching — Catamaran',  instant:true,  ap:99,  cp:69,  flat:false, multi:false, seas:false, peak:[], dive:false, hasChild:true,  seasonStart:[4,1], seasonEnd:[10,30], seasonLabel:'Apr 1 — Oct 30', hasBoat:true, boat:'catamaran', pkg3a:270, pkg3c:190, pkg6a:470, pkg6c:360, grp4:89, grp8:79 }, whalezodiac:{id:'whalezodiac',name:'Whale & Dolphin Watching — Zodiac',      instant:true,  ap:79,  cp:59,  flat:false, multi:false, seas:false, peak:[], dive:false, hasChild:true,  seasonStart:[4,1], seasonEnd:[10,30], seasonLabel:'Apr 1 — Oct 30', hasBoat:true, boat:'zodiac',    pkg3a:220, pkg3c:160, pkg6a:430, pkg6c:330, grp4:69, grp8:69 },
   snorkel:    {id:'snorkel',    name:'Snorkelling — Princess Alice',        instant:true,  ap:225,  cp:0,   flat:true,  multi:false, seas:false, peak:[],         dive:false, hasChild:false, seasonStart:[6,1],  seasonEnd:[10,15], seasonLabel:'Jun 1 — Oct 15' },
   pab:        {id:'pab',        name:'Princess Alice Bank Diving',          instant:true,  ap:499,  cp:0,   flat:true,  multi:false, seas:false, peak:[],         dive:true,  hasChild:false, seasonStart:[6,1],  seasonEnd:[10,15], seasonLabel:'Jun 1 — Oct 15' },
   shark:      {id:'shark',      name:'Shark Week — Without Hotel',          instant:true,  ap:1440, cp:0,   flat:true,  multi:false, seas:false, peak:[],         dive:false, hasChild:false, seasonStart:[6,1],  seasonEnd:[10,15], seasonLabel:'Jun 1 — Oct 15' },
@@ -778,7 +793,7 @@ var OP = {
 var S = {
   pid:null, date:null, altDate:null, dateFrom:null, dateTo:null,
   time:null,
-  adults:1, children:0, acc:'',
+  adults:1, children:0, acc:'', pkg:null,
   cert:null, dives:null,
   name:'', email:'', wa:'', notes:'',
   total:0, discountAmt:0, vatAmt:0, totalWithVat:0, ref:''
@@ -873,7 +888,7 @@ function clearOperator() {
 }
 
 function updateCardPrices() {
-  var ids = ['whale','snorkel','pab','shark','sharkhotel','giants','scuba','basic','advanced','bestpico','mobydick','zodiac'];
+  var ids = ['whale','whalezodiac','snorkel','pab','shark','sharkhotel','giants','scuba','basic','advanced','bestpico','mobydick','zodiac'];
   for (var i=0; i<ids.length; i++) {
     var p = P[ids[i]];
     var el = document.getElementById('pc-'+ids[i]);
@@ -1126,6 +1141,21 @@ function setupGroup() {
     S.children = 0;
   }
 
+  // Package selector (whale watching)
+  var pw = document.getElementById('pkgWrap');
+  var pb = document.getElementById('pkgBtns');
+  if (p.hasBoat) {
+    pw.classList.remove('hidden');
+    S.pkg = '1'; // default to single excursion
+    pb.innerHTML =
+      '<button type="button" class="db sel" id="pkg-1" onclick="pickPkg(\'1\')">1 Excursion — \u20ac' + p.ap + ' adult / \u20ac' + p.cp + ' child</button>' +
+      '<button type="button" class="db" id="pkg-3" onclick="pickPkg(\'3\')">3 Excursions — \u20ac' + p.pkg3a + ' adult / \u20ac' + p.pkg3c + ' child</button>' +
+      '<button type="button" class="db" id="pkg-6" onclick="pickPkg(\'6\')">6 Excursions — \u20ac' + p.pkg6a + ' adult / \u20ac' + p.pkg6c + ' child</button>';
+  } else {
+    pw.classList.add('hidden');
+    S.pkg = null;
+  }
+
   // Accommodation (Season of Giants)
   var aw = document.getElementById('accWrap');
   if (p.hasAcc) aw.classList.remove('hidden');
@@ -1143,7 +1173,14 @@ function setupGroup() {
   if (p.instant) { pb.classList.remove('hidden'); eb.classList.add('hidden'); calcPrice(); }
   else { pb.classList.add('hidden'); eb.classList.remove('hidden'); }
 }
-
+function pickPkg(pkg) {
+  S.pkg = pkg;
+  var btns = document.querySelectorAll('#pkgBtns .db');
+  for (var i=0; i<btns.length; i++) btns[i].classList.remove('sel');
+  var el = document.getElementById('pkg-'+pkg);
+  if (el) el.classList.add('sel');
+  calcPrice();
+}
 function onAcc() {
   S.acc = document.getElementById('accSel').value;
   if (S.acc) { S.pid; P['giants'].ap = ACC_PRICES[S.acc]; }
@@ -1165,8 +1202,21 @@ function adj(t, d) {
 
 function calcPrice() {
   var p = P[S.pid];
-  var adA = p.ap * S.adults;
-  var adC = (p.hasChild ? p.cp * S.children : 0);
+  var adRate = p.ap;
+  var cRate  = p.cp;
+
+  // Group rate override (single excursion only)
+  if (p.hasBoat && (!S.pkg || S.pkg === '1')) {
+    if (S.adults >= 8) adRate = p.grp8;
+    else if (S.adults >= 4) adRate = p.grp4;
+  }
+
+  // Package rate override
+  if (p.hasBoat && S.pkg === '3') { adRate = p.pkg3a; cRate = p.pkg3c; }
+  if (p.hasBoat && S.pkg === '6') { adRate = p.pkg6a; cRate = p.pkg6c; }
+
+  var adA = adRate * S.adults;
+  var adC = (p.hasChild ? cRate * S.children : 0);
   var subtotal = adA + adC;
   S.discountAmt = 0;
   S.vatAmt = 0;
@@ -1283,6 +1333,7 @@ function fillReview() {
     h1 += '<div class="rr"><span class="rk">Last Possible Day</span><span class="rv">' + fmtDate(S.dateTo) + '</span></div>';
   }
   if (p.hasAcc && S.acc) h1 += '<div class="rr"><span class="rk">Accommodation</span><span class="rv">' + (ACC_LABELS[S.acc]||S.acc) + '</span></div>';
+  if (p.hasBoat && S.pkg) { var pkgLabel = S.pkg==='1'?'1 Excursion':S.pkg==='3'?'3 Excursions':'6 Excursions'; h1 += '<div class="rr"><span class="rk">Package</span><span class="rv">' + pkgLabel + '</span></div>'; }
   document.getElementById('rExp').innerHTML = h1;
 
   // Group card
@@ -1490,7 +1541,7 @@ function fmtCert(c) {
   return m[c]||c;
 }
 function markSeasons() {
-  var ids = ['whale','snorkel','pab','shark','sharkhotel','giants','scuba','basic','advanced','bestpico','mobydick','zodiac'];
+  var ids = ['whale','whalezodiac','snorkel','pab','shark','sharkhotel','giants','scuba','basic','advanced','bestpico','mobydick','zodiac'];
   for (var i=0; i<ids.length; i++) {
     var p = P[ids[i]];
     var el = document.getElementById('pc-'+ids[i]);
