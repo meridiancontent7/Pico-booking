@@ -742,10 +742,14 @@
     <p class="smsg" id="sucMsg"></p>
     <div class="srlbl">Reference</div>
     <div class="srval" id="sucRef">&#8212;</div>
+    <div id="holdTimer" style="display:none;margin:20px auto;padding:16px 24px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:10px;text-align:center;max-width:320px;">
+      <p style="font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:#f59e0b;margin:0 0 8px;">Your spot is held for</p>
+      <p id="holdCountdown" style="font-size:32px;font-weight:700;color:#f59e0b;margin:0;font-family:monospace;">30:00</p>
+      <p style="font-size:12px;color:var(--muted);margin:8px 0 0;">Complete payment to confirm your booking</p>
+    </div>
     <div class="nx" id="sucNext"></div>
     <p style="font-size:13px;color:var(--muted);font-weight:300">Questions? WhatsApp: <a href="https://wa.me/351292622980" style="color:var(--tb)">+351 292 622 980</a></p>
   </div>
-
 </div>
 
 <script>
@@ -1528,6 +1532,25 @@ function showSuc(type, ref, email) {
   for (var i=0; i<steps.length; i++) steps[i].style.display='none';
   var s = document.getElementById('suc');
   s.classList.add('on');
+  // Show countdown timer for hold bookings
+  if (type === 'paid') {
+    document.getElementById('holdTimer').style.display = 'none';
+  } else {
+    document.getElementById('holdTimer').style.display = 'block';
+    var mins = 30, secs = 0;
+    var countdown = setInterval(function() {
+      secs--;
+      if (secs < 0) { secs = 59; mins--; }
+      if (mins < 0) {
+        clearInterval(countdown);
+        document.getElementById('holdCountdown').textContent = 'Expired';
+        document.getElementById('holdCountdown').style.color = '#ef4444';
+        return;
+      }
+      document.getElementById('holdCountdown').textContent =
+        (mins < 10 ? '0' : '') + mins + ':' + (secs < 10 ? '0' : '') + secs;
+    }, 1000);
+  }
 
   if (type==='paid') {
     // Fire Google Ads Purchase conversion
