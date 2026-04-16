@@ -639,6 +639,12 @@
       <p class="ferr" id="eAddr">Please enter your home address.</p>
     </div>
 
+    <div class="field" id="participantField">
+      <label class="flbl" for="gparticipants">Participant Names</label>
+      <textarea class="fi" id="gparticipants" rows="3" placeholder="e.g. John Smith, Jane Smith"></textarea>
+      <p class="fhint">Please list the full name of each participant, one per line.</p>
+    </div>
+
     <!-- Extra notes field for enquiry products -->
     <div class="field hidden" id="notesField">
       <label class="flbl" for="gnotes">Any questions or special requests?</label>
@@ -799,7 +805,7 @@ var OP = {
 var S = {
   pid:null, date:null, altDate:null, dateFrom:null, dateTo:null,
   time:null,
-  adults:1, children:0, acc:'', pkg:null, address:'',
+  adults:1, children:0, acc:'', pkg:null, address:'', participantNames:'',
   cert:null, dives:null,
   name:'', email:'', wa:'', notes:'',
   total:0, discountAmt:0, vatAmt:0, totalWithVat:0, ref:''
@@ -1306,7 +1312,8 @@ function val5() {
   if (!OP.active) chk('eWa', 'gw', wa.length<6);
   if (ok) {
     S.name=name; S.email=email; S.wa=wa||OP.code;
-    S.address = document.getElementById('gaddr').value.trim();
+    S.address = document.getElementById('gaddr').value.trim();     
+    S.participantNames = document.getElementById('gparticipants').value.trim();
     S.notes = document.getElementById('gnotes').value.trim();
     go(6);
   }
@@ -1372,7 +1379,8 @@ function fillReview() {
   h3 += '<div class="rr"><span class="rk">Name</span><span class="rv">' + S.name + '</span></div>';
   h3 += '<div class="rr"><span class="rk">Email</span><span class="rv">' + S.email + '</span></div>';
   h3 += '<div class="rr"><span class="rk">WhatsApp</span><span class="rv">' + S.wa + '</span></div>';   
-  h3 += '<div class="rr"><span class="rk">Home Address</span><span class="rv">' + S.address + '</span></div>';
+  h3 += '<div class="rr"><span class="rk">Home Address</span><span class="rv">' + S.address + '</span></div>';   
+  if (S.participantNames) h3 += '<div class="rr"><span class="rk">Participants</span><span class="rv">' + S.participantNames + '</span></div>';
   if (S.notes) h3 += '<div class="rr"><span class="rk">Notes</span><span class="rv">' + S.notes + '</span></div>';
   document.getElementById('rGst').innerHTML = h3;
 
@@ -1445,7 +1453,7 @@ function doPay() {
     isOperator:OP.active, operatorCode:OP.code, operatorName:OP.name, operatorEmail:OP.email,
     discountPct:OP.discountPct, discountAmt:S.discountAmt, vatAmt:S.vatAmt, totalWithVat:S.totalWithVat,
       certLevel:S.cert, loggedDives:S.dives,
-      guestName:S.name, email:S.email, whatsapp:S.wa, address:S.address, address:S.address,
+      guestName:S.name, email:S.email, whatsapp:S.wa, address:S.address, participantNames:S.participantNames,
       totalPrice:S.total, currency:'EUR',
       successUrl: BASE_URL+'?status=success&ref='+S.ref+'&email='+encodeURIComponent(S.email),
       cancelUrl:  BASE_URL+'?status=cancelled',
@@ -1488,7 +1496,7 @@ function doEnq() {
       date:S.date, altDate:S.altDate, dateFrom:S.dateFrom, dateTo:S.dateTo, adults:S.adults,
       accommodation: S.acc ? (ACC_LABELS[S.acc]||S.acc) : '',
       notes:S.notes,
-      guestName:S.name, email:S.email, whatsapp:S.wa, address:S.address, address:S.address,
+      guestName:S.name, email:S.email, whatsapp:S.wa, address:S.address, participantNames:S.participantNames,
       indicativePrice: 'From \u20ac' + p.ap + ' per person',
       successUrl: BASE_URL+'?status=sent&ref='+S.ref+'&email='+encodeURIComponent(S.email),
     })
