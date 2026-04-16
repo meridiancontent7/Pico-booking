@@ -568,7 +568,7 @@
     <!-- Enquiry info box (proposal products) -->
     <div class="enq-box hidden" id="enqBox">
       <div class="enq-box-ttl">&#x1F4AC; Proposal request</div>
-      <p>Reserve your spot now. Our team confirms availability and sends a secure payment link within 4 hours via WhatsApp and email.</p>
+      <p>Reserve your spot now. Our team confirms availability and sends a secure payment link within 24 hours via WhatsApp and email.</p>
     </div>
 
     <div class="bst">
@@ -679,7 +679,7 @@
     <!-- Enquiry summary (proposal only) -->
     <div class="enq-box hidden" id="enqSummary">
       <div class="enq-box-ttl">What happens next</div>
-      <p>Your spot is being held. Our team will confirm availability and send a secure payment link within 4 hours via WhatsApp and email.</p>
+      <p>Your spot is being held. Our team will confirm availability and send a secure payment link within 24 hours via WhatsApp and email.</p>
     </div>
 
     <!-- Terms -->
@@ -728,7 +728,7 @@
     </button>
 
     <p class="paynote hidden" id="payNote">Your card is handled securely by Stripe. Pico Island Adventures never stores payment details.</p>
-    <p class="paynote hidden" id="enqNote">We will respond within 4 hours on WhatsApp and email.</p>
+    <p class="paynote hidden" id="enqNote">We will respond within 24 hours on WhatsApp and email.</p>
 
     <div style="text-align:center;margin-top:14px">
       <button class="bb" onclick="go(5)">&larr; Edit details</button>
@@ -1372,7 +1372,7 @@ function fillReview() {
       h2 += '<div class="rr"><span class="rk">Total</span><span class="rv">\u20ac' + S.total + '</span></div>';
     }
   } else {
-    var priceStr = p.flat ? ('From \u20ac' + p.ap + ' per person') : ('From \u20ac' + p.ap + ' per person — Frank will confirm');
+    var priceStr = p.flat ? ('From \u20ac' + p.ap + ' per person') : ('From \u20ac' + p.ap + ' per person — The Booking Team will confirm');
     h2 += '<div class="rr"><span class="rk">Indicative price</span><span class="rv">' + priceStr + '</span></div>';
   }
   if (p.dive && S.cert) h2 += '<div class="rr"><span class="rk">Cert level</span><span class="rv">' + fmtCert(S.cert) + '</span></div>';
@@ -1427,7 +1427,7 @@ function fillReview() {
   } else if (p.instant) {
     ds5.textContent = 'We will send your confirmation and updates to these contacts.';
   } else {
-    ds5.textContent = 'Frank will contact you on these details within 4 hours with your custom proposal.';
+    ds5.textContent = 'The Booking Team will contact you on these details within 24 hours with your custom proposal.';
   }
 }
 
@@ -1533,7 +1533,7 @@ function showSuc(type, ref, email) {
   var s = document.getElementById('suc');
   s.classList.add('on');
   // Show countdown timer for hold bookings
-  if (type === 'paid') {
+  if (type === 'paid' || type === 'enquiry' || type === 'sent') {
     document.getElementById('holdTimer').style.display = 'none';
   } else {
     document.getElementById('holdTimer').style.display = 'block';
@@ -1570,10 +1570,10 @@ function showSuc(type, ref, email) {
     document.getElementById('sucRing').innerHTML='&#x1F4E8;';
     document.getElementById('sucRing').className='sring sent';
     document.getElementById('sucTitle').textContent='Request received!';
-    document.getElementById('sucMsg').innerHTML='Your spot is being held. Our team will confirm and send a secure payment link within 4 hours to <strong>' + (email||'your email') + '</strong>.';
+    document.getElementById('sucMsg').innerHTML='Your spot is being held. Our team will confirm and send a secure payment link within 24 hours to <strong>' + (email||'your email') + '</strong>.';
     document.getElementById('sucNext').innerHTML = '<div class="nxlbl">What happens next</div>'
-      + '<div class="nxi"><div class="nxn">1</div><div class="nxt"><b>Watch for a WhatsApp message</b> from our team within 4 hours confirming your spot and sending a secure payment link.</div></div>'
-      + '<div class="nxi"><div class="nxn">2</div><div class="nxt"><b>Confirm and pay</b> — Frank will send a secure payment link to hold your spot once you are happy with the proposal.</div></div>'
+      + '<div class="nxi"><div class="nxn">1</div><div class="nxt"><b>Watch for a WhatsApp message</b> from our team within 24 hours confirming your spot and sending a secure payment link.</div></div>'
+      + '<div class="nxi"><div class="nxn">2</div><div class="nxt"><b>Confirm and pay</b> — The Booking Team will send a secure payment link to hold your spot once you are happy with the proposal.</div></div>'
       + '<div class="nxi"><div class="nxn">3</div><div class="nxt"><b>Get ready</b> — once paid, full joining instructions will be sent to your email and WhatsApp.</div></div>';
   }
 
