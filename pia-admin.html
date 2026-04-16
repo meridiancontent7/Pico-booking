@@ -88,6 +88,8 @@
     .badge.confirmed{background:rgba(16,185,129,0.12);color:#34d399;border:1px solid rgba(16,185,129,0.25)}
     .badge.enquiry{background:rgba(6,182,212,0.10);color:var(--tb);border:1px solid rgba(6,182,212,0.22)}
     .badge.cancelled{background:rgba(239,68,68,0.10);color:#f87171;border:1px solid rgba(239,68,68,0.20)}
+    .badge.proposal_sent { background: rgba(139,92,246,0.15); color: #a78bfa; }
+    .badge.payment_sent { background: rgba(245,158,11,0.15); color: #fbbf24; }
 
     .empty-state{text-align:center;padding:48px 20px;color:var(--muted);font-size:14px;font-weight:300}
 
@@ -344,7 +346,19 @@ async function sbFetch(path) {
   });
   return r.json();
 }
-
+async function sbPatch(endpoint, body) {
+  var res = await fetch(SUPABASE_URL + '/rest/v1/' + endpoint, {
+    method: 'PATCH',
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=minimal'
+    },
+    body: JSON.stringify(body)
+  });
+  return res;
+}
 async function sbPost(table, body) {
   var r = await fetch(SUPABASE_URL + '/rest/v1/' + table, {
     method: 'POST',
@@ -735,21 +749,39 @@ async function viewBooking(ref) {
     }
     document.getElementById('bookModalContent').innerHTML = h;
     // Action buttons
+    // Action buttons
     var actions = '';
     var bref = b.booking_ref || '';
-    if (b.status === 'hold' || b.status === 'enquiry') {
-      actions += '<button class="btn-primary" id="cbtn_' + bref + '">&#x2713; Confirm Booking</button>';
+    // Hold — guest started payment but didn't complete
+    if (b.status === 'hold') {
+      actions += '<button class="btn-primary" id="pbtn_' + bref + '">&#x1F517; Send Payment Link</button>';
     }
+    // Enquiry — proposal request submitted
+    if (b.status === 'enquiry') {
+      actions += '<button class="btn-primary" id="spbtn_' + bref + '">&#x1F4CB; Send Proposal</button>';
+      actions += '<button class="btn-secondary" id="pbtn_' + bref + '">&#x1F517; Send Payment Link</button>';
+    }
+    // Proposal sent — waiting for payment
+    if (b.status === 'proposal_sent') {
+      actions += '<button class="btn-primary" id="pbtn_' + bref + '">&#x1F517; Send Payment Link</button>';
+    }
+    // Confirmed — payment received
+    if (b.status === 'confirmed') {
+      actions += '<button class="btn-secondary" id="ibtn_' + bref + '">&#x1F9FE; Generate Invoice</button>';
+    }
+    // Cancel available for all except cancelled
     if (b.status !== 'cancelled') {
-      actions += '<button class="btn-secondary" id="xbtn_' + bref + '">Cancel</button>';
+      actions += '<button class="btn-secondary" id="xbtn_' + bref + '">&#x2715; Cancel</button>';
     }
-    actions += '<button class="btn-secondary" id="ibtn_' + bref + '">Generate Invoice</button>';
     document.getElementById('bookModalActions').innerHTML = actions;
     // Attach events after render
-    var cb = document.getElementById('cbtn_' + bref);
+    // Attach events after render
+    var pb = document.getElementById('pbtn_' + bref);
+    var spb = document.getElementById('spbtn_' + bref);
     var xb = document.getElementById('xbtn_' + bref);
     var ib = document.getElementById('ibtn_' + bref);
-    if (cb) cb.onclick = function(){ confirmBooking(bref); };
+    if (pb) pb.onclick = function(){ sendPaymentLink(b); };
+    if (spb) spb.onclick = function(){ sendProposal(b); };
     if (xb) xb.onclick = function(){ cancelBooking(bref); };
     if (ib) ib.onclick = function(){ closeBookModal(); document.getElementById('invRef').value = bref; generateInvoice(); };
     document.getElementById('bookModal').style.display = 'flex';
@@ -788,6 +820,67 @@ async function cancelBooking(ref) {
 function fmtDateShort(s) {
   if (!s) return '—';
   return new Date(s).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+}
+async function sendPaymentLink(b) {
+  var amount = prompt('Enter the amount to charge in EUR (e.g. 198):', b.total_price || '');
+  if (!amount) return;
+  try {
+    // Create Stripe payment link via n8n
+    var res = await fetch('https://n8n.srv1432046.hstgr.cloud/webhook/pia-booking', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        type: 'payment_link',
+        bookingRef: b.booking_ref,
+        productName: b.product_name,
+        guestName: b.guest_name,
+        email: b.email,
+        whatsapp: b.whatsapp,
+        totalPrice: parseFloat(amount),
+        date: b.tour_date,
+        time: b.departure_time,
+        adults: b.adults,
+        children: b.children,
+        participant_names: b.participant_names,
+        address: b.address,
+        notes: b.notes,
+        successUrl: 'https://booking.pico-island-adventures.com/?status=success&ref=' + b.booking_ref + '&email=' + encodeURIComponent(b.email),
+        cancelUrl: 'https://booking.pico-island-adventures.com/?status=cancelled'
+      })
+    });
+    var data = await res.json();
+    if (data.url) {
+      // Update status to payment_sent
+      await sbPatch('pia_bookings?booking_ref=eq.' + b.booking_ref, { status: 'payment_sent' });
+      alert('Payment link sent to ' + b.email + '!\n\nLink: ' + data.url);
+      closeBookModal();
+      loadBookings();
+    } else {
+      alert('Error generating payment link. Please try again.');
+    }
+  } catch(e) {
+    console.error(e);
+    alert('Error: ' + e.message);
+  }
+}
+
+function sendProposal(b) {
+  var subject = 'Your Pico Island Adventures Proposal — ' + b.product_name;
+  var body = 'Dear ' + b.guest_name + ',\n\n' +
+    'Thank you for your interest in ' + b.product_name + '.\n\n' +
+    'We are pleased to confirm availability for your requested date of ' + b.tour_date + '.\n\n' +
+    'Please reply to confirm and we will send you a secure payment link to hold your spot.\n\n' +
+    'See you on the Atlantic!\n\n' +
+    'The Pico Island Adventures Team\n' +
+    'WhatsApp: +351 292 622 980';
+  // Open email client with pre-filled proposal
+  window.location.href = 'mailto:' + b.email +
+    '?subject=' + encodeURIComponent(subject) +
+    '&body=' + encodeURIComponent(body);
+  // Update status to proposal_sent
+  sbPatch('pia_bookings?booking_ref=eq.' + b.booking_ref, { status: 'proposal_sent' });
+  closeBookModal();
+  loadBookings();
 }
 </script>
 </body>
