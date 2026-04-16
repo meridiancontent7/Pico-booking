@@ -692,29 +692,32 @@ async function viewBooking(ref) {
     var data = await sbFetch('pia_bookings?booking_ref=eq.' + ref + '&select=*');
     if (!data || data.length === 0) { alert('Booking not found.'); return; }
     var b = data[0];
-
     var h = '';
     // Reference + status
     h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,0.08)">';
     h += '<span style="font-family:monospace;font-size:16px;color:#f8f5ef">' + (b.booking_ref||'—') + '</span>';
     h += '<span class="badge ' + (b.status||'') + '">' + (b.status||'—') + '</span>';
     h += '</div>';
-
     // Experience
     h += '<div style="margin-bottom:14px"><div style="font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--tb);margin-bottom:8px">Experience</div>';
     h += row('Product', b.product_name||'—');
     h += row('Date', b.tour_date||'—');
+    h += row('Alternative Date', b.alt_date||'—');
+    h += row('Departure Time', b.departure_time||'—');
+    h += row('Package', b.package||'—');
     h += row('Adults', b.adults||0);
     h += row('Children', b.children||0);
+    h += row('Accommodation', b.accommodation||'—');
+    h += row('Certification Level', b.cert_level||'—');
     h += '</div>';
-
     // Guest
     h += '<div style="margin-bottom:14px"><div style="font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--tb);margin-bottom:8px">Guest</div>';
     h += row('Name', b.guest_name||'—');
     h += row('Email', b.email||'—');
     h += row('WhatsApp', b.whatsapp||'—');
+    h += row('Home Address', b.address||'—');
+    h += row('Participant Names', b.participant_names||'—');
     h += '</div>';
-
     // Pricing
     h += '<div style="margin-bottom:14px"><div style="font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--tb);margin-bottom:8px">Pricing</div>';
     h += row('Total', '€' + (b.total_price||0));
@@ -725,15 +728,12 @@ async function viewBooking(ref) {
       h += row('Total inc. VAT', '€' + (b.total_with_vat||b.total_price||0));
     }
     h += '</div>';
-
     // Notes if any
     if (b.notes) {
       h += '<div style="margin-bottom:14px"><div style="font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--tb);margin-bottom:8px">Notes</div>';
       h += '<p style="font-size:13px;color:#94b4cc">' + b.notes + '</p></div>';
     }
-
     document.getElementById('bookModalContent').innerHTML = h;
-
     // Action buttons
     var actions = '';
     var bref = b.booking_ref || '';
@@ -752,11 +752,9 @@ async function viewBooking(ref) {
     if (cb) cb.onclick = function(){ confirmBooking(bref); };
     if (xb) xb.onclick = function(){ cancelBooking(bref); };
     if (ib) ib.onclick = function(){ closeBookModal(); document.getElementById('invRef').value = bref; generateInvoice(); };
-
     document.getElementById('bookModal').style.display = 'flex';
   } catch(e) { console.error(e); alert('Error loading booking.'); }
 }
-
 function row(k, v) {
   return '<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.04)"><span style="color:#94b4cc">' + k + '</span><span style="color:#f8f5ef;text-align:right;max-width:60%">' + v + '</span></div>';
 }
