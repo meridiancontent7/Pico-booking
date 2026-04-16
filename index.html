@@ -1440,6 +1440,10 @@ function doPay() {
   if (!document.getElementById('tcBox').checked) {
     document.getElementById('tcErr').classList.add('on'); return;
   }
+  // Prevent duplicate submissions
+  if (window._paySubmitting) return;
+  window._paySubmitting = true;
+  setTimeout(function(){ window._paySubmitting = false; }, 30000);
   var btn=document.getElementById('btnPay'), lbl=document.getElementById('payLbl'), spn=document.getElementById('paySpin');
   btn.disabled=true; lbl.textContent='Preparing payment...'; spn.classList.add('on');
   S.ref = genRef();
@@ -1484,6 +1488,10 @@ function doEnq() {
   if (!document.getElementById('tcBox').checked) {
     document.getElementById('tcErr').classList.add('on'); return;
   }
+  // Prevent duplicate submissions
+  if (window._enqSubmitting) return;
+  window._enqSubmitting = true;
+  setTimeout(function(){ window._enqSubmitting = false; }, 30000);
   var btn=document.getElementById('btnEnq'), lbl=document.getElementById('enqLbl'), spn=document.getElementById('enqSpin');
   btn.disabled=true; lbl.textContent='Sending your request...'; spn.classList.add('on');
   S.ref = genRef();
