@@ -848,7 +848,7 @@ async function sendPaymentLink(b) {
         cancelUrl: 'https://booking.pico-island-adventures.com/?status=cancelled'
       })
     });
-    var data = await res.json();
+    var text = await res.text(); var data = text ? JSON.parse(text) : {};
     if (data.url) {
       // Update status to payment_sent
       await sbPatch('pia_bookings?booking_ref=eq.' + b.booking_ref, { status: 'payment_sent' });
