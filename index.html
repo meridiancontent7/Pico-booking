@@ -639,10 +639,10 @@
       <p class="ferr" id="eAddr">Please enter your home address.</p>
     </div>
 
-    <div class="field" id="participantField">
-      <label class="flbl" for="gparticipants">Participant Names</label>
-      <textarea class="fi" id="gparticipants" rows="3" placeholder="e.g. John Smith, Jane Smith"></textarea>
-      <p class="fhint">Please list the full name of each participant, one per line.</p>
+   <div class="field" id="participantField">
+      <label class="flbl">Participant Names</label>
+      <p class="fhint" style="margin-bottom:12px;">Please enter the full name of each participant.</p>
+      <div id="participantInputs"></div>
     </div>
 
     <!-- Extra notes field for enquiry products -->
@@ -1147,7 +1147,28 @@ function setupGroup() {
   var id = document.getElementById('instantDates');
   var ed = document.getElementById('enquiryDates');
   if (p.instant) { id.classList.remove('hidden'); ed.classList.add('hidden'); }
-  else { id.classList.add('hidden'); ed.classList.remove('hidden'); }
+  else { id.classList.add('hidden'); ed.classList.remove('hidden'); 
+  // Build participant name fields based on group size
+  var adults = S.adults || 1;
+  var children = S.children || 0;
+  var container = document.getElementById('participantInputs');
+  if (container) {
+    var html = '';
+    for (var a = 1; a <= adults; a++) {
+      html += '<div style="margin-bottom:10px">';
+      html += '<label class="flbl" style="font-size:12px;margin-bottom:4px">Adult ' + a + '</label>';
+      html += '<input type="text" class="fi" placeholder="Full name" data-participant="adult-' + a + '">';
+      html += '</div>';
+    }
+    for (var c = 1; c <= children; c++) {
+      html += '<div style="margin-bottom:10px">';
+      html += '<label class="flbl" style="font-size:12px;margin-bottom:4px">Child ' + c + '</label>';
+      html += '<input type="text" class="fi" placeholder="Full name" data-participant="child-' + c + '">';
+      html += '</div>';
+    }
+    container.innerHTML = html;
+  }
+       }
 
   // Reset date fields
   document.getElementById('tourDate').value = '';
@@ -1335,7 +1356,19 @@ function val5() {
   if (ok) {
     S.name=name; S.email=email; S.wa=wa||OP.code;
     S.address = document.getElementById('gaddr').value.trim();     
-    S.participantNames = document.getElementById('gparticipants').value.trim();
+    // Collect participant names from individual fields     
+    var names = [];     
+    var inputs = document.querySelectorAll('#participantInputs input');     
+    var allFilled = true;     
+    for (var i = 0; i < inputs.length; i++) {       
+      var val = inputs[i].value.trim();       
+      if (!val) { allFilled = false; break; }       
+      names.push(val);     
+    }     
+    if (!allFilled) {       
+      alert('Please enter the full name of each participant.');       
+      return;     }     
+    S.participantNames = names.join(', ');
     S.notes = document.getElementById('gnotes').value.trim();
     go(6);
   }
