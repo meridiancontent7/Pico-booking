@@ -446,10 +446,10 @@
     <h2 class="sh" id="dateHeading">When would you<br><i>like to join us?</i></h2>
     <p class="ss" id="dateSub">Select your preferred date.</p>
 
-    <!-- INSTANT PRODUCTS: wish date + alternative date -->
+   <!-- INSTANT PRODUCTS: wish date + alternative date -->
     <div id="instantDates">
       <label class="flbl" for="tourDate">Preferred Date</label>
-      <input type="date" class="di" id="tourDate" onchange="onDate()" style="margin-bottom:16px">
+      <input type="date" class="di" id="tourDate" onchange="onDateChange()" style="margin-bottom:16px">
       <label class="flbl" for="altDate">Alternative Date</label>
       <input type="date" class="di" id="altDate" onchange="onDate()">
       <p style="font-size:12px;font-weight:300;color:var(--muted);margin-top:8px;line-height:1.6;">We will do our best to confirm your preferred date. Your alternative date helps us secure your spot if conditions prevent the first choice.</p>
@@ -969,7 +969,7 @@ function go(n) {
   document.getElementById('step'+cur).classList.remove('on');
   cur = n;
   document.getElementById('step'+n).classList.add('on');
-  if (n===3) setupGroup();
+  if (n===2) {     var today = new Date();     var yyyy = today.getFullYear();     var mm = String(today.getMonth() + 1).padStart(2, '0');     var dd = String(today.getDate()).padStart(2, '0');     var todayStr = yyyy + '-' + mm + '-' + dd;     var tourDateEl = document.getElementById('tourDate');     if (tourDateEl) tourDateEl.min = todayStr;   }   if (n===3) setupGroup();
   if (n===6) fillReview();
   drawProg();
   window.scrollTo(0,0);
@@ -1078,7 +1078,25 @@ function applySeasonDates() {
     if (sub) sub.innerHTML = '<span style="color:#06b6d4;font-weight:500">Pre-booking open.</span> Select a date within the ' + p.seasonLabel + ' season.';
   }
 }
-
+function onDateChange() {
+  onDate();
+  // Set minimum date for alternative date to day after preferred date
+  var tourDate = document.getElementById('tourDate').value;
+  var altDate = document.getElementById('altDate');
+  if (tourDate) {
+    var nextDay = new Date(tourDate);
+    nextDay.setDate(nextDay.getDate() + 1);
+    var yyyy = nextDay.getFullYear();
+    var mm = String(nextDay.getMonth() + 1).padStart(2, '0');
+    var dd = String(nextDay.getDate()).padStart(2, '0');
+    altDate.min = yyyy + '-' + mm + '-' + dd;
+    // Clear alt date if it's now before the min
+    if (altDate.value && altDate.value <= tourDate) {
+      altDate.value = '';
+      S.altDate = '';
+    }
+  }
+}
 function onDate() {
   var p = S.pid ? P[S.pid] : null;
 
