@@ -770,8 +770,8 @@ async function viewBooking(ref) {
       actions += '<button class="btn-secondary" id="ibtn_' + bref + '">&#x1F9FE; Generate Invoice</button>';
     }
     // Cancel available for all except cancelled
-    if (b.status !== 'cancelled') {
-      actions += '<button class="btn-secondary" id="xbtn_' + bref + '">&#x2715; Cancel</button>';
+   if (b.status !== 'cancelled') {
+      actions += '<button class="btn-danger" id="xbtn_' + bref + '" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#f87171;" onclick="return confirm(\'Are you sure you want to cancel this booking? This cannot be undone.\')">🚫 Cancel Booking</button>';
     }
     document.getElementById('bookModalActions').innerHTML = actions;
     // Attach events after render
