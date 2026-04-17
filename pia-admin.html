@@ -881,7 +881,7 @@ function sendProposal(b) {
     '<textarea id="proposalText" style="width:100%;height:220px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#f8f5ef;padding:12px;font-size:13px;font-family:inherit;resize:vertical;box-sizing:border-box">' + proposalText + '</textarea>' +
     '<div style="display:flex;gap:10px;margin-top:16px">' +
     '<button onclick="copyProposal()" style="flex:1;padding:10px;background:rgba(6,182,212,0.15);border:1px solid rgba(6,182,212,0.3);border-radius:8px;color:#06b6d4;cursor:pointer;font-size:13px">📋 Copy Text</button>' +
-    '<a href="mailto:' + b.email + '?subject=' + encodeURIComponent('Your Pico Island Adventures Proposal — ' + b.product_name) + '" style="flex:1;padding:10px;background:rgba(6,182,212,0.15);border:1px solid rgba(6,182,212,0.3);border-radius:8px;color:#06b6d4;cursor:pointer;font-size:13px;text-align:center;text-decoration:none">✉️ Open Email</button>' +
+    '<button onclick="sendProposalEmail(\'' + b.booking_ref + '\',\'' + b.guest_name + '\',\'' + b.email + '\',\'' + b.product_name + '\',\'' + b.tour_date + '\',' + b.adults + ',' + b.children + ')" style="flex:1;padding:10px;background:rgba(6,182,212,0.15);border:1px solid rgba(6,182,212,0.3);border-radius:8px;color:#06b6d4;cursor:pointer;font-size:13px">✉️ Send Email</button>' +
     '<a href="https://wa.me/' + b.whatsapp.replace(/[^0-9]/g,'') + '?text=' + encodeURIComponent(proposalText) + '" target="_blank" style="flex:1;padding:10px;background:rgba(37,211,102,0.15);border:1px solid rgba(37,211,102,0.3);border-radius:8px;color:#25d366;cursor:pointer;font-size:13px;text-align:center;text-decoration:none">💬 WhatsApp</button>' +
     '</div>' +
     '<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="width:100%;margin-top:10px;padding:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#94b4cc;cursor:pointer;font-size:13px">Close</button>' +
@@ -897,6 +897,35 @@ function copyProposal() {
   navigator.clipboard.writeText(text).then(function() {
     alert('Proposal text copied to clipboard!');
   });
+}
+async function sendProposalEmail(bookingRef, guestName, email, productName, date, adults, children) {
+  try {
+    var res = await fetch('https://n8n.srv1432046.hstgr.cloud/webhook/pia-booking', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        type: 'proposal_email',
+        bookingRef: bookingRef,
+        guestName: guestName,
+        email: email,
+        productName: productName,
+        date: date,
+        adults: adults,
+        children: children
+      })
+    });
+    var text = await res.text();
+    var data = text ? JSON.parse(text) : {};
+    if (data.status === 'proposal_sent') {
+      alert('Proposal email sent to ' + email + ' successfully!');
+      document.querySelector('div[style*="position:fixed"]').remove();
+    } else {
+      alert('Email sent — please verify in n8n.');
+    }
+  } catch(e) {
+    console.error(e);
+    alert('Error: ' + e.message);
+  }
 }
 </script>
 </body>
