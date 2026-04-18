@@ -1146,30 +1146,31 @@ function setupGroup() {
   // Show correct date fields
   var id = document.getElementById('instantDates');
   var ed = document.getElementById('enquiryDates');
-  if (p.instant) { id.classList.remove('hidden'); ed.classList.add('hidden'); }
-  else { id.classList.add('hidden'); ed.classList.remove('hidden'); 
-  // Build participant name fields based on group size
+  if (p.instant) { pb.classList.remove('hidden'); eb.classList.add('hidden'); calcPrice(); }
+  else { pb.classList.add('hidden'); eb.classList.remove('hidden'); }
+  buildParticipantFields();
+}
+       }
+function buildParticipantFields() {
   var adults = S.adults || 1;
   var children = S.children || 0;
   var container = document.getElementById('participantInputs');
-  if (container) {
-    var html = '';
-    for (var a = 1; a <= adults; a++) {
-      html += '<div style="margin-bottom:10px">';
-      html += '<label class="flbl" style="font-size:12px;margin-bottom:4px">Adult ' + a + '</label>';
-      html += '<input type="text" class="fi" placeholder="Full name" data-participant="adult-' + a + '">';
-      html += '</div>';
-    }
-    for (var c = 1; c <= children; c++) {
-      html += '<div style="margin-bottom:10px">';
-      html += '<label class="flbl" style="font-size:12px;margin-bottom:4px">Child ' + c + '</label>';
-      html += '<input type="text" class="fi" placeholder="Full name" data-participant="child-' + c + '">';
-      html += '</div>';
-    }
-    container.innerHTML = html;
+  if (!container) return;
+  var html = '';
+  for (var a = 1; a <= adults; a++) {
+    html += '<div style="margin-bottom:10px">';
+    html += '<label class="flbl" style="font-size:12px;margin-bottom:4px">Adult ' + a + '</label>';
+    html += '<input type="text" class="fi" placeholder="Full name" data-participant="adult-' + a + '">';
+    html += '</div>';
   }
-       }
-
+  for (var c = 1; c <= children; c++) {
+    html += '<div style="margin-bottom:10px">';
+    html += '<label class="flbl" style="font-size:12px;margin-bottom:4px">Child ' + c + '</label>';
+    html += '<input type="text" class="fi" placeholder="Full name" data-participant="child-' + c + '">';
+    html += '</div>';
+  }
+  container.innerHTML = html;
+}
   // Reset date fields
   document.getElementById('tourDate').value = '';
   document.getElementById('altDate').value  = '';
@@ -1256,6 +1257,7 @@ function adj(t, d) {
   }
   var p = P[S.pid];
   if (p.instant) calcPrice();
+  buildParticipantFields();
 }
 
 function calcPrice() {
