@@ -1143,32 +1143,6 @@ function setupGroup() {
   var p = P[S.pid];
   document.getElementById('flowBadge3').innerHTML = flowBadge(p.instant?'instant':'enquiry');
 
-  // Show correct date fields
-  var id = document.getElementById('instantDates');
-  var ed = document.getElementById('enquiryDates');
-  if (p.instant) { pb.classList.remove('hidden'); eb.classList.add('hidden'); calcPrice(); }
-  else { pb.classList.add('hidden'); eb.classList.remove('hidden'); }
-  buildParticipantFields();
-}
-       
-function buildParticipantFields() {
-  var adults = S.adults || 1;
-  var children = S.children || 0;
-  var container = document.getElementById('participantInputs');
-  if (!container) return;
-  var html = '';
-  for (var a = 1; a <= adults; a++) {
-    html += '<div style="margin-bottom:10px">';
-    html += '<label class="flbl" style="font-size:12px;margin-bottom:4px">Adult ' + a + '</label>';
-    html += '<input type="text" class="fi" placeholder="Full name" data-participant="adult-' + a + '">';
-    html += '</div>';
-  }
-  for (var c = 1; c <= children; c++) {
-    html += '<div style="margin-bottom:10px">';
-    html += '<label class="flbl" style="font-size:12px;margin-bottom:4px">Child ' + c + '</label>';
-    html += '<input type="text" class="fi" placeholder="Full name" data-participant="child-' + c + '">';
-    html += '</div>';
-
   // Reset date fields
   document.getElementById('tourDate').value = '';
   document.getElementById('altDate').value  = '';
@@ -1200,11 +1174,11 @@ function buildParticipantFields() {
 
   // Package selector (whale watching)
   var pw = document.getElementById('pkgWrap');
-  var pb = document.getElementById('pkgBtns');
+  var pb2 = document.getElementById('pkgBtns');
   if (p.hasBoat) {
     pw.classList.remove('hidden');
-    S.pkg = '1'; // default to single excursion
-    pb.innerHTML =
+    S.pkg = '1';
+    pb2.innerHTML =
       '<button type="button" class="db sel" id="pkg-1" onclick="pickPkg(\'1\')">1 Excursion — \u20ac' + p.ap + ' adult / \u20ac' + p.cp + ' child</button>' +
       '<button type="button" class="db" id="pkg-3" onclick="pickPkg(\'3\')">3 Excursions — \u20ac' + p.pkg3a + ' adult / \u20ac' + p.pkg3c + ' child</button>' +
       '<button type="button" class="db" id="pkg-6" onclick="pickPkg(\'6\')">6 Excursions — \u20ac' + p.pkg6a + ' adult / \u20ac' + p.pkg6c + ' child</button>';
@@ -1221,15 +1195,38 @@ function buildParticipantFields() {
   // Price box vs enquiry box
   var pb = document.getElementById('pbox');
   var eb = document.getElementById('enqBox');
-  // Reset counters to defaults first
+
+  // Reset counters
   S.adults = 1; S.children = 0;
   document.getElementById('aval').textContent = '1';
   document.getElementById('cval').textContent = '0';
   document.getElementById('adn').disabled = true;
   document.getElementById('cdn').disabled = true;
+
   if (p.instant) { pb.classList.remove('hidden'); eb.classList.add('hidden'); calcPrice(); }
   else { pb.classList.add('hidden'); eb.classList.remove('hidden'); }
   buildParticipantFields();
+}
+
+function buildParticipantFields() {
+  var adults = S.adults || 1;
+  var children = S.children || 0;
+  var container = document.getElementById('participantInputs');
+  if (!container) return;
+  var html = '';
+  for (var a = 1; a <= adults; a++) {
+    html += '<div style="margin-bottom:10px">';
+    html += '<label class="flbl" style="font-size:12px;margin-bottom:4px">Adult ' + a + '</label>';
+    html += '<input type="text" class="fi" placeholder="Full name" data-participant="adult-' + a + '">';
+    html += '</div>';
+  }
+  for (var c = 1; c <= children; c++) {
+    html += '<div style="margin-bottom:10px">';
+    html += '<label class="flbl" style="font-size:12px;margin-bottom:4px">Child ' + c + '</label>';
+    html += '<input type="text" class="fi" placeholder="Full name" data-participant="child-' + c + '">';
+    html += '</div>';
+  }
+  container.innerHTML = html;
 }
 function pickPkg(pkg) {
   S.pkg = pkg;
