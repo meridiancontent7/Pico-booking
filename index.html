@@ -1229,6 +1229,7 @@ function buildParticipantFields() {
   document.getElementById('cdn').disabled = true;
   if (p.instant) { pb.classList.remove('hidden'); eb.classList.add('hidden'); calcPrice(); }
   else { pb.classList.add('hidden'); eb.classList.remove('hidden'); }
+  buildParticipantFields();
 }
 function pickPkg(pkg) {
   S.pkg = pkg;
