@@ -240,8 +240,78 @@
       </div>
     </div>
 
-    <!-- BOOKINGS PANEL -->
+ <!-- BOOKINGS PANEL -->
     <div class="panel" id="panel-bookings">
+      <h2 class="section-title">Create Manual Booking</h2>
+      <p style="font-size:14px;font-weight:300;color:var(--muted);margin-bottom:20px;line-height:1.65">For bookings handled via WhatsApp or email outside the booking system. A unique PIA-M- reference will be generated automatically.</p>
+      <div class="form-grid">
+        <div class="field">
+          <label class="flbl">Guest Name</label>
+          <input type="text" class="fi" id="mName" placeholder="Full name">
+        </div>
+        <div class="field">
+          <label class="flbl">Email</label>
+          <input type="email" class="fi" id="mEmail" placeholder="guest@email.com">
+        </div>
+        <div class="field">
+          <label class="flbl">WhatsApp</label>
+          <input type="text" class="fi" id="mWhatsapp" placeholder="+351 912 345 678">
+        </div>
+        <div class="field">
+          <label class="flbl">Product / Experience</label>
+          <select class="fi" id="mProduct">
+            <option value="">Select product</option>
+            <option value="Whale & Dolphin Watching — Catamaran">Whale & Dolphin Watching — Catamaran</option>
+            <option value="Whale & Dolphin Watching — Zodiac">Whale & Dolphin Watching — Zodiac</option>
+            <option value="Snorkelling — Princess Alice">Snorkelling — Princess Alice</option>
+            <option value="Princess Alice Bank Diving">Princess Alice Bank Diving</option>
+            <option value="Shark Week — Without Hotel">Shark Week — Without Hotel</option>
+            <option value="Shark Week — With Hotel">Shark Week — With Hotel</option>
+            <option value="Season of the Giants">Season of the Giants</option>
+            <option value="Scuba Diving">Scuba Diving</option>
+            <option value="Zodiac Whale Watching — 6 Excursions">Zodiac Whale Watching — 6 Excursions</option>
+            <option value="Moby Dick Whale Week">Moby Dick Whale Week</option>
+            <option value="Advanced Dive Package">Advanced Dive Package</option>
+            <option value="Basic Dive Package">Basic Dive Package</option>
+            <option value="Best of Pico Diving">Best of Pico Diving</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="flbl">Tour Date</label>
+          <input type="date" class="fi" id="mDate">
+        </div>
+        <div class="field">
+          <label class="flbl">Adults</label>
+          <input type="number" class="fi" id="mAdults" placeholder="1" min="1" value="1">
+        </div>
+        <div class="field">
+          <label class="flbl">Children</label>
+          <input type="number" class="fi" id="mChildren" placeholder="0" min="0" value="0">
+        </div>
+        <div class="field">
+          <label class="flbl">Total Price (€)</label>
+          <input type="number" class="fi" id="mTotal" placeholder="0">
+        </div>
+        <div class="field">
+          <label class="flbl">Status</label>
+          <select class="fi" id="mStatus">
+            <option value="hold">Hold</option>
+            <option value="enquiry">Enquiry</option>
+            <option value="confirmed">Confirmed</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="flbl">Notes</label>
+          <input type="text" class="fi" id="mNotes" placeholder="Any additional notes">
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn-primary" onclick="createManualBooking()">&#x2795; Create Manual Booking</button>
+        <span class="form-msg" id="mMsg"></span>
+      </div>
+
+      <div style="margin-top:36px;padding-top:28px;border-top:1px solid var(--bdr)">
       <h2 class="section-title">All Bookings</h2>
       <div class="filter-row">
         <select class="filter-sel" id="filterStatus" onchange="loadBookings()">
@@ -274,6 +344,7 @@
           </thead>
           <tbody id="bookTable"><tr><td colspan="9" class="loading">Loading...</td></tr></tbody>
         </table>
+     </div>
       </div>
     </div>
 
@@ -925,6 +996,80 @@ async function sendProposalEmail(bookingRef, guestName, email, productName, date
   } catch(e) {
     console.error(e);
     alert('Error: ' + e.message);
+  }
+}
+  /* ── MANUAL BOOKING ──────────────────────────────────────── */
+function genManualRef() {
+  var now = new Date();
+  var mm = String(now.getMonth() + 1).padStart(2,'0');
+  var yy = String(now.getFullYear()).slice(-2);
+  var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+  var rand = chars[Math.floor(Math.random()*chars.length)] + chars[Math.floor(Math.random()*chars.length)];
+  return 'PIA-M-' + rand + mm + yy;
+}
+
+async function createManualBooking() {
+  var name     = document.getElementById('mName').value.trim();
+  var email    = document.getElementById('mEmail').value.trim();
+  var whatsapp = document.getElementById('mWhatsapp').value.trim();
+  var product  = document.getElementById('mProduct').value;
+  var date     = document.getElementById('mDate').value;
+  var adults   = parseInt(document.getElementById('mAdults').value) || 1;
+  var children = parseInt(document.getElementById('mChildren').value) || 0;
+  var total    = parseFloat(document.getElementById('mTotal').value) || 0;
+  var status   = document.getElementById('mStatus').value;
+  var notes    = document.getElementById('mNotes').value.trim();
+  var msg      = document.getElementById('mMsg');
+
+  if (!name || !product || !date) {
+    msg.textContent = 'Please fill in Guest Name, Product and Date.';
+    msg.className = 'form-msg bad';
+    return;
+  }
+
+  var ref = genManualRef();
+
+  try {
+    var r = await sbPost('pia_bookings', {
+      booking_ref:  ref,
+      guest_name:   name,
+      email:        email || '',
+      whatsapp:     whatsapp || '',
+      product_name: product,
+      tour_date:    date,
+      adults:       adults,
+      children:     children,
+      total_price:  total,
+      currency:     'EUR',
+      status:       status,
+      notes:        notes
+    });
+
+    if (r.ok) {
+      msg.textContent = 'Manual booking created — Ref: ' + ref;
+      msg.className = 'form-msg ok';
+      // Clear form
+      document.getElementById('mName').value = '';
+      document.getElementById('mEmail').value = '';
+      document.getElementById('mWhatsapp').value = '';
+      document.getElementById('mProduct').value = '';
+      document.getElementById('mDate').value = '';
+      document.getElementById('mAdults').value = '1';
+      document.getElementById('mChildren').value = '0';
+      document.getElementById('mTotal').value = '';
+      document.getElementById('mStatus').value = 'hold';
+      document.getElementById('mNotes').value = '';
+      loadBookings();
+      loadStats();
+      setTimeout(function(){ msg.textContent = ''; }, 6000);
+    } else {
+      var err = await r.json();
+      msg.textContent = 'Error: ' + (err.message || 'Could not create booking.');
+      msg.className = 'form-msg bad';
+    }
+  } catch(e) {
+    msg.textContent = 'Error: ' + e.message;
+    msg.className = 'form-msg bad';
   }
 }
 </script>
