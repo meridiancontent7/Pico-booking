@@ -259,13 +259,24 @@
   <script src="https://js.stripe.com/v3/"></script>
 
   <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18013120947"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'AW-18013120947');
-  </script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-18005589993"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'AW-18005589993');
+
+  // Fire conversion ONLY on booking confirmation
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('status') === 'success') {
+    gtag('event', 'conversion', {
+      'send_to': 'AW-18005589993/aINVCNz-kKUcEOn_3YlD',
+      'value': 99.0,
+      'currency': 'EUR',
+      'transaction_id': params.get('ref') || ''
+    });
+  }
+</script>
 </head>
 <body>
 
