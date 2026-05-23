@@ -767,6 +767,17 @@
 var N8N = 'https://n8n.srv1432046.hstgr.cloud/webhook/pia-booking';
 var STRIPE_PK = 'pk_live_51TCjGs0pELS5BoBaqGB8vvnX0Fwk66SsAvuwc6QSJZHzc6WGmpUAHiXaZ44sSavhE1beGcZUqISLKAViuXphJESV00amM8OOG2';
 var BASE_URL = window.location.href.split('?')[0];
+  function getUTMParams() {
+  var params = new URLSearchParams(window.location.search);
+  return {
+    utm_source: params.get('utm_source') || '',
+    utm_medium: params.get('utm_medium') || '',
+    utm_campaign: params.get('utm_campaign') || '',
+    utm_term: params.get('utm_term') || '',
+    utm_content: params.get('utm_content') || ''
+  };
+}
+var UTM = getUTMParams();
 
 /* ── PRODUCT DEFINITIONS ──────────────────────────────────── */
 var P = {
@@ -1523,6 +1534,9 @@ function doPay() {
       certLevel:S.cert, loggedDives:S.dives,
       guestName:S.name, email:S.email, whatsapp:S.wa, address:S.address, participantNames:S.participantNames,
       totalPrice:S.total, currency:'EUR',
+utm_source:UTM.utm_source, utm_medium:UTM.utm_medium,
+utm_campaign:UTM.utm_campaign, utm_term:UTM.utm_term,
+utm_content:UTM.utm_content,
       successUrl: BASE_URL+'?status=success&ref='+S.ref+'&email='+encodeURIComponent(S.email),
       cancelUrl:  BASE_URL+'?status=cancelled',
     })
