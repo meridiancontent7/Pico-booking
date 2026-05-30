@@ -703,7 +703,7 @@
         <h4>2. Cancellation Policy — No Refunds</h4>
         <p>All bookings are strictly non-refundable. Once payment has been made, no refunds will be issued under any circumstances, including changes to travel plans, illness, or personal emergencies. We strongly recommend that guests purchase comprehensive travel insurance to cover unforeseen circumstances. All cancellation requests must be submitted in writing to Pico Island Adventures for record purposes.</p>
         <h4>3. Cancellation by Pico Island Adventures</h4>
-        <p>We reserve the right to cancel or modify any tour due to adverse weather, sea conditions, or circumstances beyond our control. In such cases, guests will be offered an alternative date or a full refund. No additional compensation will be provided.</p>
+        <p>We reserve the right to cancel or modify any tour due to adverse weather, sea conditions, technical or mechanical issues, or circumstances beyond our control. In such cases, guests will be offered an alternative date or a refund of the amount paid minus applicable credit card processing and bank transfer fees (Stripe processing fee: approximately 1.5% + €0.25 per transaction). No additional compensation will be provided.</p>
         <h4>4. Weather and Sea Conditions</h4>
         <p>All tours are weather-dependent. Our skippers and marine biologists make final go or no-go decisions on safety grounds. Guest safety overrides all other considerations.</p>
         <h4>5. Health and Safety</h4>
@@ -723,7 +723,10 @@
       </label>
       <p class="tcerr" id="tcErr">Please accept the Terms and Conditions to continue.</p>
     </div>
-
+<!-- Last minute notice -->
+    <div class="note warn hidden" id="lastMinNote">
+      &#x26A0;&#xFE0F; <strong>Last-minute booking:</strong> Your selected date is within 7 days. This booking will be processed as a request — our team will confirm availability and send a payment link within a few hours.
+    </div>
     <!-- PAY button (instant) -->
     <button class="bpay hidden" id="btnPay" onclick="doPay()" disabled>
       <span>&#x1F512;</span>
@@ -1006,6 +1009,15 @@ function go(n) {
 function pickCheck(id) {
   // Allow pre-booking for off-season — dates will be restricted to in-season only
   pick(id);
+}
+
+function isLastMinute(dateStr) {
+  if (!dateStr) return false;
+  var today = new Date();
+  today.setHours(0,0,0,0);
+  var dep = new Date(dateStr + 'T00:00:00');
+  var diff = Math.floor((dep - today) / (1000 * 60 * 60 * 24));
+  return diff <= 7;
 }
 
 function pick(id) {
@@ -1405,7 +1417,8 @@ function fillReview() {
 
   // Set flow badge and copy
   document.getElementById('flowBadge6').innerHTML = flowBadge(p.instant?'instant':'enquiry');
-  if (p.instant) {
+  var lastMin = p.instant && isLastMinute(S.date);
+  if (p.instant && !lastMin) {
     document.getElementById('step6Title').innerHTML = 'Review &amp;<br><i>confirm</i>';
     document.getElementById('step6Sub').textContent = 'Check your details, agree to our terms, then pay to secure your spot.';
   } else {
@@ -1466,7 +1479,9 @@ function fillReview() {
   var be = document.getElementById('btnEnq');
   var pn = document.getElementById('payNote');
   var en = document.getElementById('enqNote');
-  if (p.instant) {
+  var lmNote = document.getElementById('lastMinNote');
+  if (lmNote) { if (lastMin) lmNote.classList.remove('hidden'); else lmNote.classList.add('hidden'); }
+  if (p.instant && !lastMin) {
     document.getElementById('rtotAmt').textContent = typeof S.total === 'number' ? S.total.toFixed(2) : S.total;
     rt.classList.remove('hidden'); es.classList.add('hidden');
     bp.classList.remove('hidden'); be.classList.add('hidden');
@@ -1526,7 +1541,7 @@ function doPay() {
   fetch(N8N, {
     method:'POST', headers:{'Content-Type':'application/json'},
     body: JSON.stringify({
-      type:'booking',
+      type: isLastMinute(S.date) ? 'enquiry' : 'booking',
       bookingRef:S.ref, productId:S.pid, productName:p.name,
       date:S.date, altDate:S.altDate, dateFrom:S.dateFrom, dateTo:S.dateTo, time:S.time, adults:S.adults, children:S.children,
     isOperator:OP.active, operatorCode:OP.code, operatorName:OP.name, operatorEmail:OP.email,
