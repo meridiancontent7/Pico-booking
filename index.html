@@ -367,6 +367,15 @@
         <div class="abadge lim"><span class="adot"></span>Jun 1 &#8212; Oct 15</div>
       </button>
 
+      <button class="pc" id="pc-highlights" onclick="pickCheck('highlights')">
+        <span class="pc-tag inst">Instant</span>
+        <span class="pe">&#x1F93F;</span>
+        <div class="pn">Pico Diving Highlights &#8212; PAB &amp; Condor Bank</div>
+        <div class="pd">3-day package, 6 dives — mandatory check dive, Princess Alice Bank &amp; Condor Bank blue sharks. Open Water cert required.</div>
+        <div class="pp">&#8364;899 <span class="ppn">/ person</span></div>
+        <div class="abadge lim"><span class="adot"></span>Jun 1 &#8212; Oct 15</div>
+      </button>
+
       <button class="pc" id="pc-shark" onclick="pickCheck('shark')">
         <span class="pc-tag inst">Instant</span>
         <span class="pe">&#x1F988;</span>
@@ -788,6 +797,7 @@ var P = {
   whale:      {id:'whale',      name:'Whale & Dolphin Watching — Catamaran',  instant:true,  ap:99,  cp:69,  flat:false, multi:false, seas:false, peak:[], dive:false, hasChild:true,  seasonStart:[4,1], seasonEnd:[10,30], seasonLabel:'Apr 1 — Oct 30', hasBoat:true, boat:'catamaran', pkg3a:270, pkg3c:190, pkg6a:470, pkg6c:360, grp4:89, grp8:79 }, whalezodiac:{id:'whalezodiac',name:'Whale & Dolphin Watching — Zodiac',      instant:true,  ap:79,  cp:59,  flat:false, multi:false, seas:false, peak:[], dive:false, hasChild:true,  seasonStart:[4,1], seasonEnd:[10,30], seasonLabel:'Apr 1 — Oct 30', hasBoat:true, boat:'zodiac',    pkg3a:220, pkg3c:160, pkg6a:430, pkg6c:330, grp4:69, grp8:69 },
   snorkel:    {id:'snorkel',    name:'Snorkelling — Princess Alice',        instant:true,  ap:250,  cp:0,   flat:true,  multi:false, seas:false, peak:[],         dive:false, hasChild:false, seasonStart:[6,1],  seasonEnd:[10,15], seasonLabel:'Jun 1 — Oct 15' },
   pab:        {id:'pab',        name:'Princess Alice Bank Diving',          instant:true,  ap:499,  cp:0,   flat:true,  multi:false, seas:false, peak:[],         dive:true,  hasChild:false, seasonStart:[6,1],  seasonEnd:[10,15], seasonLabel:'Jun 1 — Oct 15' },
+  highlights: {id:'highlights', name:'Pico Diving Highlights — PAB &amp; Condor Bank', instant:true,  ap:899,  cp:0,   flat:true,  multi:false, seas:false, peak:[],         dive:true,  hasChild:false, seasonStart:[6,1],  seasonEnd:[10,15], seasonLabel:'Jun 1 — Oct 15' },
   shark:      {id:'shark',      name:'Shark Week — Without Hotel',          instant:true,  ap:1440, cp:0,   flat:true,  multi:false, seas:false, peak:[],         dive:false, hasChild:false, seasonStart:[6,1],  seasonEnd:[10,15], seasonLabel:'Jun 1 — Oct 15' },
   sharkhotel: {id:'sharkhotel', name:'Shark Week — With Hotel',             instant:false, ap:1440, cp:0,   flat:true,  multi:false, seas:false, peak:[],         dive:false, hasChild:false, seasonStart:[6,1],  seasonEnd:[10,15], seasonLabel:'Jun 1 — Oct 15' },
   giants:     {id:'giants',     name:'Season of the Giants',                instant:false, ap:1470, cp:0,   flat:false, multi:false, seas:true,  peak:[2,3,4,5,6],dive:false, hasChild:false, seasonStart:[2,1],  seasonEnd:[6,30],  seasonLabel:'Feb 1 — Jun 30', hasAcc:true },
@@ -929,7 +939,7 @@ function clearOperator() {
 }
 
 function updateCardPrices() {
-  var ids = ['whale','whalezodiac','snorkel','pab','shark','sharkhotel','giants','scuba','basic','advanced','bestpico','mobydick','zodiac'];
+  var ids = ['whale','whalezodiac','snorkel','pab','highlights','shark','sharkhotel','giants','scuba','basic','advanced','bestpico','mobydick','zodiac'];
   for (var i=0; i<ids.length; i++) {
     var p = P[ids[i]];
     var el = document.getElementById('pc-'+ids[i]);
@@ -1680,7 +1690,7 @@ function fmtCert(c) {
   return m[c]||c;
 }
 function markSeasons() {
-  var ids = ['whale','whalezodiac','snorkel','pab','shark','sharkhotel','giants','scuba','basic','advanced','bestpico','mobydick','zodiac'];
+  var ids = ['whale','whalezodiac','snorkel','pab','highlights','shark','sharkhotel','giants','scuba','basic','advanced','bestpico','mobydick','zodiac'];
   for (var i=0; i<ids.length; i++) {
     var p = P[ids[i]];
     var el = document.getElementById('pc-'+ids[i]);
