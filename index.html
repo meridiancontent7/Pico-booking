@@ -266,12 +266,11 @@
   gtag('js', new Date());
   gtag('config', 'AW-18005589993');
 
-  // Fire conversion ONLY on booking confirmation
   const params = new URLSearchParams(window.location.search);
   if (params.get('status') === 'success') {
     gtag('event', 'conversion', {
       'send_to': 'AW-18005589993/aINVCNz-kKUcEOn_3YlD',
-      'value': 99.0,
+      'value': parseFloat(params.get('value')) || 0,
       'currency': 'EUR',
       'transaction_id': params.get('ref') || ''
     });
@@ -1562,7 +1561,7 @@ function doPay() {
 utm_source:UTM.utm_source, utm_medium:UTM.utm_medium,
 utm_campaign:UTM.utm_campaign, utm_term:UTM.utm_term,
 utm_content:UTM.utm_content,
-      successUrl: BASE_URL+'?status=success&ref='+S.ref+'&email='+encodeURIComponent(S.email),
+      successUrl: BASE_URL+'?status=success&ref='+S.ref+'&email='+encodeURIComponent(S.email)+'&value='+S.total,
       cancelUrl:  BASE_URL+'?status=cancelled',
     })
   })
@@ -1652,11 +1651,7 @@ function showSuc(type, ref, email) {
   }
 
   if (type==='paid') {
-    // Fire Google Ads Purchase conversion
-    gtag('event', 'conversion', {
-      'send_to': 'AW-18013120947/WKDbCPnuvYscELPTqY1D',
-      'transaction_id': ref || ''
-    });
+    // Conversion handled by head tag — duplicate removed
     document.getElementById('sucRing').innerHTML='&#10003;';
     document.getElementById('sucRing').className='sring paid';
     document.getElementById('sucTitle').textContent='You are all set!';
