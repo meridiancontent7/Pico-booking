@@ -1579,8 +1579,19 @@ utm_content:UTM.utm_content,
       throw new Error('no checkout url returned');
     }
   })
-  .catch(function(){
+ .catch(function(err){
     btn.disabled=false; lbl.textContent='Pay Securely Now'; spn.classList.remove('on');
+    fetch(N8N, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        type:'payment_failed',
+        bookingRef:S.ref,
+        productId:S.pid, productName:p.name,
+        guestName:S.name, email:S.email, whatsapp:S.wa,
+        totalPrice:S.total, currency:'EUR',
+        failureReason: (err && err.message) ? err.message : 'Unknown error during Stripe session creation'
+      })
+    }).catch(function(){ /* fail silently — don't block the alert */ });
     alert('Something went wrong. Please try again or WhatsApp us: +351 292 622 980');
   });
 }
