@@ -282,10 +282,11 @@
         <div class="field">
           <label class="flbl">Tour Date</label>
           <input type="date" class="fi" id="mDate">
-          <div style="margin-bottom:14px;">
-  <label style="display:block;font-size:12px;color:#a09880;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em;">Departure Time</label>
-  <input type="time" id="mb-time" style="width:100%;padding:10px 12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#f8f5ef;font-size:14px;">
-</div>
+        </div>
+        <div class="field">
+          <label class="flbl">Departure Time</label>
+          <input type="time" class="fi" id="mTime">
+          <p style="font-size:11px;color:#a09880;margin-top:4px;margin-bottom:0;">Azores local time</p>
         </div>
         <div class="field">
           <label class="flbl">Adults</label>
@@ -1047,6 +1048,7 @@ async function createManualBooking() {
   var total    = parseFloat(document.getElementById('mTotal').value) || 0;
   var status   = document.getElementById('mStatus').value;
   var notes    = document.getElementById('mNotes').value.trim();
+  var deptime  = document.getElementById('mTime').value || null;
   var msg      = document.getElementById('mMsg');
 
   if (!name || !product || !date) {
@@ -1071,7 +1073,7 @@ async function createManualBooking() {
       currency:     'EUR',
       status:       status,
       notes:        notes,
-      departure_time: document.getElementById('mTime').value || null
+      departure_time: deptime
     });
 
     if (r.ok) {
