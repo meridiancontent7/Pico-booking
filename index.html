@@ -798,6 +798,14 @@ var BASE_URL = window.location.href.split('?')[0];
     utm_term: params.get('utm_term') || '',
     utm_content: params.get('utm_content') || ''
   };
+  }
+  function getGA4ClientId() {
+  var cookie = document.cookie.split(';').filter(function(c) {
+    return c.trim().startsWith('_ga=');
+  })[0];
+  if (!cookie) return '';
+  var parts = cookie.trim().replace('_ga=', '').split('.');
+  return parts.length >= 4 ? parts[2] + '.' + parts[3] : '';
 }
 var UTM = getUTMParams();
 
@@ -1578,6 +1586,7 @@ function doPay() {
 utm_source:UTM.utm_source, utm_medium:UTM.utm_medium,
 utm_campaign:UTM.utm_campaign, utm_term:UTM.utm_term,
 utm_content:UTM.utm_content,
+ga_client_id:getGA4ClientId(),
       successUrl: BASE_URL+'?status=success&ref='+S.ref+'&email='+encodeURIComponent(S.email)+'&value='+S.total+'&productName='+encodeURIComponent(p.name)+'&productId='+S.pid,
       cancelUrl:  BASE_URL+'?status=cancelled',
     })
