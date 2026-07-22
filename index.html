@@ -386,6 +386,15 @@
         <div class="abadge lim"><span class="adot"></span>Jun 1 &#8212; Oct 15</div>
       </button>
 
+      <button class="pc" id="pc-sharkday" onclick="pickCheck('sharkday')">
+        <span class="pc-tag inst">Instant</span>
+        <span class="pe">&#x1F988;</span>
+        <div class="pn">Shark Diving Day Trip</div>
+        <div class="pd">2-tank shark dive at Condor Bank &#8212; blue sharks &amp; mako. Includes mandatory check dive day around Pico. AOW cert required.</div>
+        <div class="pp">&#8364;499 <span class="ppn">/ person</span></div>
+        <div class="abadge lim"><span class="adot"></span>Jun 27 &#8212; Oct 15</div>
+      </button>
+
       <button class="pc" id="pc-shark" onclick="pickCheck('shark')">
         <span class="pc-tag inst">Instant</span>
         <span class="pe">&#x1F988;</span>
@@ -816,6 +825,7 @@ var P = {
   snorkel:    {id:'snorkel',    name:'Snorkelling — Princess Alice',        instant:true,  ap:250,  cp:0,   flat:true,  multi:false, seas:false, peak:[],         dive:false, hasChild:false, seasonStart:[6,1],  seasonEnd:[10,15], seasonLabel:'Jun 1 — Oct 15' },
   pab:        {id:'pab',        name:'Princess Alice Bank Diving',          instant:true,  ap:499,  cp:0,   flat:true,  multi:false, seas:false, peak:[],         dive:true,  hasChild:false, seasonStart:[6,1],  seasonEnd:[10,15], seasonLabel:'Jun 1 — Oct 15' },
   highlights: {id:'highlights', name:'Pico Diving Highlights — PAB &amp; Condor Bank', instant:true,  ap:899,  cp:0,   flat:true,  multi:false, seas:false, peak:[],         dive:true,  hasChild:false, seasonStart:[6,1],  seasonEnd:[10,15], seasonLabel:'Jun 1 — Oct 15' },
+  sharkday:   {id:'sharkday',   name:'Shark Diving Day Trip',               instant:true,  ap:499,  cp:0,   flat:true,  multi:false, seas:false, peak:[],         dive:true,  hasChild:false, seasonStart:[6,27], seasonEnd:[10,15], seasonLabel:'Jun 27 — Oct 15' },
   shark:      {id:'shark',      name:'Shark Week — Without Hotel',          instant:true,  ap:1440, cp:0,   flat:true,  multi:false, seas:false, peak:[],         dive:false, hasChild:false, seasonStart:[6,1],  seasonEnd:[10,15], seasonLabel:'Jun 1 — Oct 15' },
   sharkhotel: {id:'sharkhotel', name:'Shark Week — With Hotel',             instant:false, ap:1440, cp:0,   flat:true,  multi:false, seas:false, peak:[],         dive:false, hasChild:false, seasonStart:[6,1],  seasonEnd:[10,15], seasonLabel:'Jun 1 — Oct 15' },
   giants:     {id:'giants',     name:'Season of the Giants',                instant:false, ap:1470, cp:0,   flat:false, multi:false, seas:true,  peak:[2,3,4,5,6],dive:false, hasChild:false, seasonStart:[2,1],  seasonEnd:[6,30],  seasonLabel:'Feb 1 — Jun 30', hasAcc:true },
@@ -957,7 +967,7 @@ function clearOperator() {
 }
 
 function updateCardPrices() {
-  var ids = ['whale','whalezodiac','snorkel','pab','highlights','shark','sharkhotel','giants','scuba','basic','advanced','bestpico','mobydick','zodiac'];
+  var ids = ['whale','whalezodiac','snorkel','pab','highlights','sharkday','shark','sharkhotel','giants','scuba','basic','advanced','bestpico','mobydick','zodiac'];
   for (var i=0; i<ids.length; i++) {
     var p = P[ids[i]];
     var el = document.getElementById('pc-'+ids[i]);
@@ -1722,7 +1732,7 @@ function fmtCert(c) {
   return m[c]||c;
 }
 function markSeasons() {
-  var ids = ['whale','whalezodiac','snorkel','pab','highlights','shark','sharkhotel','giants','scuba','basic','advanced','bestpico','mobydick','zodiac'];
+  var ids = ['whale','whalezodiac','snorkel','pab','highlights','sharkday','shark','sharkhotel','giants','scuba','basic','advanced','bestpico','mobydick','zodiac'];
   for (var i=0; i<ids.length; i++) {
     var p = P[ids[i]];
     var el = document.getElementById('pc-'+ids[i]);
