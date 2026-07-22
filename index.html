@@ -274,6 +274,17 @@
       'currency': 'EUR',
       'transaction_id': params.get('ref') || ''
     });
+    // GA4 purchase event
+    gtag('event', 'purchase', {
+      transaction_id: params.get('ref') || '',
+      value: parseFloat(params.get('value')) || 0,
+      currency: 'EUR',
+      items: [{
+        item_name: params.get('productName') ? decodeURIComponent(params.get('productName')) : '',
+        price: parseFloat(params.get('value')) || 0,
+        quantity: 1
+      }]
+    });
   }
 </script>
 </head>
@@ -1547,6 +1558,12 @@ function doPay() {
   btn.disabled=true; lbl.textContent='Preparing payment...'; spn.classList.add('on');
   S.ref = genRef();
   var p = P[S.pid];
+  // GA4 begin_checkout event
+  gtag('event', 'begin_checkout', {
+    value: S.total,
+    currency: 'EUR',
+    items: [{ item_name: p.name, price: S.total, quantity: 1 }]
+  });
   fetch(N8N, {
     method:'POST', headers:{'Content-Type':'application/json'},
     body: JSON.stringify({
@@ -1561,7 +1578,7 @@ function doPay() {
 utm_source:UTM.utm_source, utm_medium:UTM.utm_medium,
 utm_campaign:UTM.utm_campaign, utm_term:UTM.utm_term,
 utm_content:UTM.utm_content,
-      successUrl: BASE_URL+'?status=success&ref='+S.ref+'&email='+encodeURIComponent(S.email)+'&value='+S.total,
+      successUrl: BASE_URL+'?status=success&ref='+S.ref+'&email='+encodeURIComponent(S.email)+'&value='+S.total+'&productName='+encodeURIComponent(p.name)+'&productId='+S.pid,
       cancelUrl:  BASE_URL+'?status=cancelled',
     })
   })
