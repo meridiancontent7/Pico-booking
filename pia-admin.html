@@ -261,7 +261,7 @@
         </div>
         <div class="field">
           <label class="flbl">Product / Experience</label>
-          <select class="fi" id="mProduct">
+          <select class="fi" id="mProduct" onchange="toggleCustomProduct()">
             <option value="">Select product</option>
             <option value="Whale & Dolphin Watching — Catamaran">Whale & Dolphin Watching — Catamaran</option>
             <option value="Whale & Dolphin Watching — Zodiac">Whale & Dolphin Watching — Zodiac</option>
@@ -280,6 +280,11 @@
             <option value="Best of Pico Diving">Best of Pico Diving</option>
             <option value="Other">Other</option>
           </select>
+        </div>
+        <div class="field" id="mCustomProductWrap" style="display:none;">
+          <label class="flbl">Custom Product / Package Name</label>
+          <input type="text" class="fi" id="mCustomProduct" placeholder="e.g. Scooter Rental — 3 Days">
+          <p style="font-size:11px;color:#a09880;margin-top:4px;margin-bottom:0;">This exact text is what appears on the guest's payment link and invoice — not the word "Other".</p>
         </div>
         <div class="field">
           <label class="flbl">Tour Date</label>
@@ -1039,11 +1044,19 @@ function genManualRef() {
   return 'PIA-M-' + rand + mm + yy;
 }
 
+function toggleCustomProduct() {
+  var product = document.getElementById('mProduct').value;
+  var wrap = document.getElementById('mCustomProductWrap');
+  wrap.style.display = (product === 'Other') ? 'block' : 'none';
+  if (product !== 'Other') document.getElementById('mCustomProduct').value = '';
+}
+
 async function createManualBooking() {
   var name     = document.getElementById('mName').value.trim();
   var email    = document.getElementById('mEmail').value.trim();
   var whatsapp = document.getElementById('mWhatsapp').value.trim();
   var product  = document.getElementById('mProduct').value;
+  var customProduct = document.getElementById('mCustomProduct').value.trim();
   var date     = document.getElementById('mDate').value;
   var adults   = parseInt(document.getElementById('mAdults').value) || 1;
   var children = parseInt(document.getElementById('mChildren').value) || 0;
@@ -1059,6 +1072,14 @@ async function createManualBooking() {
     return;
   }
 
+  if (product === 'Other' && !customProduct) {
+    msg.textContent = 'Please enter the Custom Product / Package Name.';
+    msg.className = 'form-msg bad';
+    return;
+  }
+
+  var productNameToSave = (product === 'Other') ? customProduct : product;
+
   var ref = genManualRef();
 
   try {
@@ -1067,7 +1088,7 @@ async function createManualBooking() {
       guest_name:   name,
       email:        email || '',
       whatsapp:     whatsapp || '',
-      product_name: product,
+      product_name: productNameToSave,
       tour_date:    date,
       adults:       adults,
       children:     children,
@@ -1086,6 +1107,8 @@ async function createManualBooking() {
       document.getElementById('mEmail').value = '';
       document.getElementById('mWhatsapp').value = '';
       document.getElementById('mProduct').value = '';
+      document.getElementById('mCustomProduct').value = '';
+      document.getElementById('mCustomProductWrap').style.display = 'none';
       document.getElementById('mDate').value = '';
       document.getElementById('mAdults').value = '1';
       document.getElementById('mChildren').value = '0';
