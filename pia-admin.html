@@ -835,6 +835,13 @@ async function viewBooking(ref) {
       h += '<div style="margin-bottom:14px"><div style="font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--tb);margin-bottom:8px">Notes</div>';
       h += '<p style="font-size:13px;color:#94b4cc">' + b.notes + '</p></div>';
     }
+    // Contact history
+    if (b.contacted_manually) {
+      h += '<div style="margin-bottom:14px"><div style="font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#06b6d4;margin-bottom:8px">&#x2713; Contact History</div>';
+      h += row('Contacted', b.contacted_at ? fmtDateShort(b.contacted_at) : '—');
+      if (b.contacted_notes) h += '<p style="font-size:13px;color:#94b4cc;margin-top:6px">' + b.contacted_notes + '</p>';
+      h += '</div>';
+    }
     document.getElementById('bookModalContent').innerHTML = h;
     // Action buttons
     // Action buttons
@@ -911,10 +918,12 @@ async function cancelBooking(ref) {
 }
 
 async function markContacted(ref) {
+  var notes = prompt('What was discussed? (optional, but recommended — this is the only record of this conversation)');
+  if (notes === null) return; // cancelled
   var r = await fetch(SUPABASE_URL + '/rest/v1/pia_bookings?booking_ref=eq.' + ref, {
     method: 'PATCH',
     headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-    body: JSON.stringify({ contacted_manually: true })
+    body: JSON.stringify({ contacted_manually: true, contacted_at: new Date().toISOString(), contacted_notes: notes || '' })
   });
   if (r.ok) { showToast('Marked as contacted'); viewBooking(ref); }
   else { showToast('Error marking as contacted', true); }
