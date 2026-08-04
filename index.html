@@ -1655,6 +1655,10 @@ function doEnq() {
       notes:S.notes,
       guestName:S.name, email:S.email, whatsapp:S.wa, address:S.address, participantNames:S.participantNames,
       indicativePrice: 'From \u20ac' + p.ap + ' per person',
+      utm_source:UTM.utm_source, utm_medium:UTM.utm_medium,
+      utm_campaign:UTM.utm_campaign, utm_term:UTM.utm_term,
+      utm_content:UTM.utm_content,
+      ga_client_id:getGA4ClientId(),
       successUrl: BASE_URL+'?status=sent&ref='+S.ref+'&email='+encodeURIComponent(S.email),
     })
   })
