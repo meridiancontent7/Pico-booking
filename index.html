@@ -413,6 +413,15 @@
         <div class="abadge lim"><span class="adot"></span>Jun 1 &#8212; Oct 15</div>
       </button>
 
+      <button class="pc" id="pc-pico4day" onclick="pickCheck('pico4day')">
+        <span class="pc-tag inst">Instant</span>
+        <span class="pe">&#x1F3C6;</span>
+        <div class="pn">Pico 4 Day TOP Spots Package</div>
+        <div class="pd">Four days, 8 dives, covering Pico's top spots — local reefs, Eagle Ray Cave, Condor Bank sharks and Princess Alice Bank mobula rays.</div>
+        <div class="pp">&#8364;1,049 <span class="ppn">/ person</span></div>
+        <div class="abadge lim"><span class="adot"></span>Jun 1 &#8212; Oct 15</div>
+      </button>
+
       <div class="grid-section">&#x1F4CB; Premium Packages &#8212; Reserve Your Spot</div>
 
       <button class="pc" id="pc-sharkhotel" onclick="pickCheck('sharkhotel')">
@@ -643,6 +652,11 @@
       Princess Alice Bank requires a minimum of Open Water certification. All divers must complete a check dive day before accessing Princess Alice Bank regardless of experience level. No exceptions.
     </div>
 
+    <div class="field" id="addOnsWrap" style="display:none;">
+      <label class="flbl">Optional Add-Ons</label>
+      <div id="addOnsList"></div>
+    </div>
+
     <div class="bst">
       <button class="bn" id="btn4" onclick="go(5)">Continue &rarr;</button>
       <button class="bb" onclick="go(3)">&larr; Back</button>
@@ -833,6 +847,12 @@ var P = {
 basic:      {id:'basic',      name:'Basic Dive Package',                  instant:false, ap:499,  cp:0,   flat:true,  multi:false, seas:false, peak:[],         dive:false, hasChild:false, seasonStart:[5,1],  seasonEnd:[10,31], seasonLabel:'May 1 — Oct 31' },
   advanced:   {id:'advanced',   name:'Advanced Dive Package',               instant:false, ap:949,  cp:0,   flat:true,  multi:false, seas:false, peak:[],         dive:false, hasChild:false, seasonStart:[6,1],  seasonEnd:[10,15], seasonLabel:'Jun 1 — Oct 15' },
   bestpico:   {id:'bestpico',   name:'Best of Pico Diving',                 instant:true,  ap:1499, cp:0,   flat:true,  multi:false, seas:false, peak:[],         dive:true, hasChild:false, seasonStart:[6,1],  seasonEnd:[10,15], seasonLabel:'Jun 1 — Oct 15' },
+  pico4day:   {id:'pico4day',   name:'Pico 4 Day TOP Spots Package',        instant:true,  ap:1049, cp:0,   flat:true,  multi:false, seas:false, peak:[],         dive:true, hasChild:false, seasonStart:[6,1],  seasonEnd:[10,15], seasonLabel:'Jun 1 — Oct 15',
+    addOns: [
+      { id:'sharkspec', name:'Shark Diving Specialty / Shark Ecology', price:79 },
+      { id:'fullequip',  name:'Full Dive Equipment Rental (complete set)', price:140 }
+    ]
+  },
   mobydick:   {id:'mobydick',   name:'Moby Dick Whale Week',                instant:false, ap:449,  cp:0,   flat:true,  multi:false, seas:false, peak:[],         dive:false, hasChild:false, seasonStart:[4,1],  seasonEnd:[10,31], seasonLabel:'Apr 1 — Oct 31' },   zodiac:     {id:'zodiac',     name:'Zodiac Whale Watching — 6 Excursions', instant:false, ap:414,  cp:294, flat:true,  multi:false, seas:false, peak:[],         dive:false, hasChild:true,  seasonStart:[4,1],  seasonEnd:[10,30], seasonLabel:'Apr 1 — Oct 30' },
 };
 
@@ -967,7 +987,7 @@ function clearOperator() {
 }
 
 function updateCardPrices() {
-  var ids = ['whale','whalezodiac','snorkel','pab','highlights','sharkday','shark','sharkhotel','giants','scuba','basic','advanced','bestpico','mobydick','zodiac'];
+  var ids = ['whale','whalezodiac','snorkel','pab','highlights','sharkday','shark','sharkhotel','giants','scuba','basic','advanced','bestpico','pico4day','mobydick','zodiac'];
   for (var i=0; i<ids.length; i++) {
     var p = P[ids[i]];
     var el = document.getElementById('pc-'+ids[i]);
@@ -1033,6 +1053,7 @@ function go(n) {
   cur = n;
   document.getElementById('step'+n).classList.add('on');
   if (n===2) {     var today = new Date();     var yyyy = today.getFullYear();     var mm = String(today.getMonth() + 1).padStart(2, '0');     var dd = String(today.getDate()).padStart(2, '0');     var todayStr = yyyy + '-' + mm + '-' + dd;     var tourDateEl = document.getElementById('tourDate');     if (tourDateEl) tourDateEl.min = todayStr;   }   if (n===3) setupGroup();
+  if (n===4) setupAddOns();
   if (n===6) fillReview();
   drawProg();
   window.scrollTo(0,0);
@@ -1062,6 +1083,7 @@ function pick(id) {
   S.pid = id;
   S.adults = 1; S.children = 0; S.acc = '';
   S.date = null; S.altDate = null; S.dateFrom = null; S.dateTo = null; S.time = null;
+  S.selectedAddOns = [];
   var p = P[id];
   var cards = document.querySelectorAll('.pc');
   for (var i=0; i<cards.length; i++) cards[i].classList.remove('sel');
@@ -1328,6 +1350,35 @@ function adj(t, d) {
   buildParticipantFields();
 }
 
+function setupAddOns() {
+  var p = P[S.pid];
+  var wrap = document.getElementById('addOnsWrap');
+  var list = document.getElementById('addOnsList');
+  if (!p.addOns || !p.addOns.length) {
+    wrap.style.display = 'none';
+    S.selectedAddOns = [];
+    return;
+  }
+  wrap.style.display = 'block';
+  var h = '';
+  for (var i=0; i<p.addOns.length; i++) {
+    var a = p.addOns[i];
+    var checked = S.selectedAddOns.indexOf(a.id) > -1 ? 'checked' : '';
+    h += '<label style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.12);border-radius:10px;cursor:pointer">';
+    h += '<span style="display:flex;align-items:center;gap:10px"><input type="checkbox" onchange="toggleAddOn(\'' + a.id + '\')" ' + checked + '><span>' + a.name + '</span></span>';
+    h += '<span style="font-weight:600">+\u20ac' + a.price + ' / person</span>';
+    h += '</label>';
+  }
+  list.innerHTML = h;
+}
+
+function toggleAddOn(id) {
+  var idx = S.selectedAddOns.indexOf(id);
+  if (idx > -1) S.selectedAddOns.splice(idx, 1);
+  else S.selectedAddOns.push(id);
+  if (S.total > 0) calcPrice();
+}
+
 function calcPrice() {
   var p = P[S.pid];
   var adRate = p.ap;
@@ -1345,12 +1396,29 @@ function calcPrice() {
 
   var adA = adRate * S.adults;
   var adC = (p.hasChild ? cRate * S.children : 0);
-  var subtotal = adA + adC;
+
+  // Add-ons (per person, applied to adults only)
+  var addOnTotal = 0;
+  var addOnLines = '';
+  if (p.addOns && S.selectedAddOns && S.selectedAddOns.length) {
+    for (var ai=0; ai<p.addOns.length; ai++) {
+      var a = p.addOns[ai];
+      if (S.selectedAddOns.indexOf(a.id) > -1) {
+        var lineTotal = a.price * S.adults;
+        addOnTotal += lineTotal;
+        addOnLines += '<div class="pl"><span>' + a.name + ' x ' + S.adults + '</span><span>\u20ac' + lineTotal + '</span></div>';
+      }
+    }
+  }
+
+  var subtotal = adA + adC + addOnTotal;
   S.discountAmt = 0;
   S.vatAmt = 0;
+  S.addOnTotal = addOnTotal;
 
   var h = '<div class="pl"><span>' + S.adults + ' adult' + (S.adults>1?'s':'') + ' x \u20ac' + p.ap + '</span><span>\u20ac' + adA + '</span></div>';
   if (p.hasChild && S.children>0) h += '<div class="pl"><span>' + S.children + ' child' + (S.children>1?'ren':'') + ' x \u20ac' + p.cp + '</span><span>\u20ac' + adC + '</span></div>';
+  h += addOnLines;
 
   if (OP.active && OP.discountPct > 0) {
     // VAT is inclusive in the price — extract it, apply discount, then show breakdown
@@ -1483,6 +1551,13 @@ function fillReview() {
   var h2 = '<div class="rlbl">Group</div>';
   h2 += '<div class="rr"><span class="rk">Adults</span><span class="rv">' + S.adults + '</span></div>';
   if (p.hasChild && S.children>0) h2 += '<div class="rr"><span class="rk">Children</span><span class="rv">' + S.children + '</span></div>';
+  if (p.addOns && S.selectedAddOns && S.selectedAddOns.length) {
+    var addOnNames = [];
+    for (var aj=0; aj<p.addOns.length; aj++) {
+      if (S.selectedAddOns.indexOf(p.addOns[aj].id) > -1) addOnNames.push(p.addOns[aj].name);
+    }
+    h2 += '<div class="rr"><span class="rk">Add-Ons</span><span class="rv">' + addOnNames.join(', ') + '</span></div>';
+  }
   if (p.instant) {
     if (OP.active) {
       var sub2 = (p.ap * S.adults) + (p.hasChild ? p.cp * S.children : 0);
@@ -1576,6 +1651,14 @@ function doPay() {
   btn.disabled=true; lbl.textContent='Preparing payment...'; spn.classList.add('on');
   S.ref = genRef();
   var p = P[S.pid];
+  var fullProductName = p.name;
+  if (p.addOns && S.selectedAddOns && S.selectedAddOns.length) {
+    var addOnNamesForProduct = [];
+    for (var api=0; api<p.addOns.length; api++) {
+      if (S.selectedAddOns.indexOf(p.addOns[api].id) > -1) addOnNamesForProduct.push(p.addOns[api].name);
+    }
+    fullProductName = p.name + ' + ' + addOnNamesForProduct.join(' + ');
+  }
   // GA4 begin_checkout event
   gtag('event', 'begin_checkout', {
     value: S.total,
@@ -1586,7 +1669,7 @@ function doPay() {
     method:'POST', headers:{'Content-Type':'application/json'},
     body: JSON.stringify({
       type: isLastMinute(S.date) ? 'enquiry' : 'booking',
-      bookingRef:S.ref, productId:S.pid, productName:p.name,
+      bookingRef:S.ref, productId:S.pid, productName:fullProductName,
       date:S.date, altDate:S.altDate, dateFrom:S.dateFrom, dateTo:S.dateTo, time:S.time, adults:S.adults, children:S.children,
     isOperator:OP.active, operatorCode:OP.code, operatorName:OP.name, operatorEmail:OP.email,
     discountPct:OP.discountPct, discountAmt:S.discountAmt, vatAmt:S.vatAmt, totalWithVat:S.totalWithVat,
@@ -1597,7 +1680,7 @@ utm_source:UTM.utm_source, utm_medium:UTM.utm_medium,
 utm_campaign:UTM.utm_campaign, utm_term:UTM.utm_term,
 utm_content:UTM.utm_content,
 ga_client_id:getGA4ClientId(),
-      successUrl: BASE_URL+'?status=success&ref='+S.ref+'&email='+encodeURIComponent(S.email)+'&value='+S.total+'&productName='+encodeURIComponent(p.name)+'&productId='+S.pid,
+      successUrl: BASE_URL+'?status=success&ref='+S.ref+'&email='+encodeURIComponent(S.email)+'&value='+S.total+'&productName='+encodeURIComponent(fullProductName)+'&productId='+S.pid,
       cancelUrl:  BASE_URL+'?status=cancelled',
     })
   })
@@ -1736,7 +1819,7 @@ function fmtCert(c) {
   return m[c]||c;
 }
 function markSeasons() {
-  var ids = ['whale','whalezodiac','snorkel','pab','highlights','sharkday','shark','sharkhotel','giants','scuba','basic','advanced','bestpico','mobydick','zodiac'];
+  var ids = ['whale','whalezodiac','snorkel','pab','highlights','sharkday','shark','sharkhotel','giants','scuba','basic','advanced','bestpico','pico4day','mobydick','zodiac'];
   for (var i=0; i<ids.length; i++) {
     var p = P[ids[i]];
     var el = document.getElementById('pc-'+ids[i]);
