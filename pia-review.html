@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rate Your Trip — Pico Island Adventures</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:    #0a1628;
+    --nmid:    #12253f;
+    --teal:    #0891b2;
+    --tb:      #06b6d4;
+    --cream:   #f8f5ef;
+    --muted:   #94b4cc;
+    --ok:      #10b981;
+    --red:     #ef4444;
+    --bdr:     rgba(255,255,255,0.10);
+    --card:    rgba(255,255,255,0.05);
+  }
+  *{box-sizing:border-box;}
+  body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--cream);min-height:100vh;margin:0;
+       display:flex;align-items:center;justify-content:center;padding:24px;}
+  .box{max-width:460px;width:100%;text-align:center;}
+  .brand{font-family:'Cormorant Garamond',serif;font-size:11px;letter-spacing:0.28em;text-transform:uppercase;color:var(--tb);margin-bottom:10px;}
+  h1{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:400;line-height:1.3;margin:0 0 14px;}
+  p.sub{color:var(--muted);font-size:15px;line-height:1.6;margin:0 0 36px;}
+
+  .stars{display:flex;justify-content:center;gap:10px;margin-bottom:8px;}
+  .star{
+    font-size:44px;line-height:1;cursor:pointer;color:rgba(255,255,255,0.18);
+    transition:color 0.15s, transform 0.1s;user-select:none;
+  }
+  .star:hover, .star.active{color:#fbbf24; transform:scale(1.08);}
+  .star-label{font-size:13px;color:var(--muted);min-height:18px;margin-bottom:28px;}
+
+  textarea{
+    width:100%;min-height:110px;background:var(--card);border:1px solid var(--bdr);border-radius:10px;
+    color:var(--cream);font-family:'DM Sans',sans-serif;font-size:14.5px;padding:14px;resize:vertical;
+    margin-bottom:18px;
+  }
+  textarea::placeholder{color:var(--muted);}
+
+  .btn{
+    display:inline-block;width:100%;padding:16px;border-radius:10px;border:none;cursor:pointer;
+    font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;text-decoration:none;
+  }
+  .btn-primary{background:var(--teal);color:#fff;}
+  .btn-google{background:#fff;color:#1a1a1a;}
+  .btn-quiet{background:transparent;color:var(--muted);font-weight:500;font-size:14px;margin-top:14px;border:1px solid var(--bdr);}
+
+  .hidden{display:none;}
+  .thanks-icon{font-size:40px;margin-bottom:18px;}
+  footer{margin-top:44px;font-size:12px;color:var(--muted);}
+</style>
+</head>
+<body>
+
+<div class="box">
+
+  <!-- STEP 1: rate -->
+  <div id="stepRate">
+    <div class="brand">Pico Island Adventures</div>
+    <h1>How was your trip?</h1>
+    <p class="sub">We'd love to know how it went. Tap a star to rate your experience.</p>
+    <div class="stars" id="starRow">
+      <span class="star" data-v="1">&#9733;</span>
+      <span class="star" data-v="2">&#9733;</span>
+      <span class="star" data-v="3">&#9733;</span>
+      <span class="star" data-v="4">&#9733;</span>
+      <span class="star" data-v="5">&#9733;</span>
+    </div>
+    <div class="star-label" id="starLabel">&nbsp;</div>
+  </div>
+
+  <!-- STEP 2a: low rating feedback -->
+  <div id="stepFeedback" class="hidden">
+    <div class="brand">Pico Island Adventures</div>
+    <h1>Thanks for letting us know</h1>
+    <p class="sub">We're sorry it wasn't a great experience. Could you tell us a bit more? Frank reads every message personally.</p>
+    <textarea id="feedbackText" placeholder="What happened?"></textarea>
+    <button class="btn btn-primary" onclick="submitFeedback()">Send feedback</button>
+  </div>
+
+  <!-- STEP 2b: high rating -->
+  <div id="stepGoogle" class="hidden">
+    <div class="brand">Pico Island Adventures</div>
+    <h1>That's wonderful to hear!</h1>
+    <p class="sub">Would you mind sharing that on Google? It genuinely helps a small operator like us, and takes less than a minute.</p>
+    <a class="btn btn-google" id="googleLink" href="#" target="_blank" rel="noopener">Leave a review on Google</a>
+    <button class="btn btn-quiet" onclick="skipGoogle()">Maybe later</button>
+  </div>
+
+  <!-- STEP 3: done -->
+  <div id="stepDone" class="hidden">
+    <div class="thanks-icon">&#10003;</div>
+    <h1 id="doneHeadline">Thank you</h1>
+    <p class="sub" id="doneSub">We really appreciate you taking the time.</p>
+  </div>
+
+  <footer>Pico Island Adventures &middot; Madalena, Pico Island, Azores</footer>
+</div>
+
+<script>
+  var N8N = 'https://n8n.srv1432046.hstgr.cloud/webhook/pia-review';
+  var GOOGLE_REVIEW_URL = 'https://search.google.com/local/writereview?placeid=ChIJAwD0c7ONRwsR-iyvl4ZiYfE';
+
+  var params = new URLSearchParams(window.location.search);
+  var bookingRef = params.get('ref') || '';
+  var chosenRating = 0;
+
+  document.getElementById('googleLink').href = GOOGLE_REVIEW_URL;
+
+  var labels = {1:'Not good — tap Send to tell us more', 2:'Below expectations', 3:'Okay', 4:'Great!', 5:'Excellent!'};
+
+  document.querySelectorAll('.star').forEach(function(star){
+    star.addEventListener('click', function(){
+      chosenRating = parseInt(star.getAttribute('data-v'));
+      document.querySelectorAll('.star').forEach(function(s){
+        s.classList.toggle('active', parseInt(s.getAttribute('data-v')) <= chosenRating);
+      });
+      document.getElementById('starLabel').textContent = labels[chosenRating];
+      setTimeout(proceedAfterRating, 450);
+    });
+  });
+
+  function proceedAfterRating(){
+    document.getElementById('stepRate').classList.add('hidden');
+    if (chosenRating >= 4) {
+      logRating(true);
+      document.getElementById('stepGoogle').classList.remove('hidden');
+    } else {
+      document.getElementById('stepFeedback').classList.remove('hidden');
+    }
+  }
+
+  function logRating(routedToGoogle){
+    fetch(N8N, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ type:'rating', bookingRef: bookingRef, rating: chosenRating, routedToGoogle: !!routedToGoogle })
+    }).catch(function(){});
+  }
+
+  function submitFeedback(){
+    var text = document.getElementById('feedbackText').value.trim();
+    fetch(N8N, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ type:'feedback', bookingRef: bookingRef, rating: chosenRating, feedback: text, routedToGoogle:false })
+    }).catch(function(){});
+    document.getElementById('stepFeedback').classList.add('hidden');
+    document.getElementById('doneHeadline').textContent = 'Thanks for the honesty';
+    document.getElementById('doneSub').textContent = "We've passed this straight to Frank — he'll be in touch if there's anything he can put right.";
+    document.getElementById('stepDone').classList.remove('hidden');
+  }
+
+  function skipGoogle(){
+    document.getElementById('stepGoogle').classList.add('hidden');
+    document.getElementById('doneHeadline').textContent = 'Thank you';
+    document.getElementById('doneSub').textContent = 'We really appreciate you taking the time.';
+    document.getElementById('stepDone').classList.remove('hidden');
+  }
+</script>
+
+</body>
+</html>
