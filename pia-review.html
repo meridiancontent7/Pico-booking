@@ -78,7 +78,7 @@
   <div id="stepFeedback" class="hidden">
     <div class="brand">Pico Island Adventures</div>
     <h1>Thanks for letting us know</h1>
-    <p class="sub">We're sorry it wasn't a great experience. Could you tell us a bit more? Frank reads every message personally.</p>
+    <p class="sub">We're sorry it wasn't a great experience. Could you tell us a bit more? Our team reads every message personally.</p>
     <textarea id="feedbackText" placeholder="What happened?"></textarea>
     <button class="btn btn-primary" onclick="submitFeedback()">Send feedback</button>
   </div>
@@ -150,7 +150,7 @@
     }).catch(function(){});
     document.getElementById('stepFeedback').classList.add('hidden');
     document.getElementById('doneHeadline').textContent = 'Thanks for the honesty';
-    document.getElementById('doneSub').textContent = "We've passed this straight to Frank — he'll be in touch if there's anything he can put right.";
+    document.getElementById('doneSub').textContent = "We've passed this straight to our team — someone will be in touch if there's anything we can put right.";
     document.getElementById('stepDone').classList.remove('hidden');
   }
 
