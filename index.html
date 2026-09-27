@@ -520,6 +520,10 @@
       &#x26A0;&#xFE0F; <strong>Important:</strong> Due to weather conditions and the 100km offshore distance, Princess Alice Bank trips typically run twice a week. The Booking Team will confirm your exact date after booking.
     </div>
 
+    <div class="note warn" id="outOfSeasonWarn" style="margin-top:14px;display:none">
+      <strong>Outside the season:</strong> <span id="outOfSeasonMsg"></span>
+    </div>
+
     <!-- DEPARTURE TIME — whale watching only -->
     <div id="timeWrap" class="hidden" style="margin-top:20px">
       <label class="flbl">Preferred Departure Time</label>
@@ -1132,6 +1136,17 @@ function setMinDate() {
   document.getElementById('dateTo').min    = minStr;
 }
 
+// Does a given yyyy-mm-dd fall inside the product's recurring month/day season window
+// (regardless of which year it's in)?
+function dateInSeasonWindow(p, dateStr) {
+  if (!p.seasonStart || !dateStr) return true;
+  var d = new Date(dateStr + 'T00:00:00');
+  var md = (d.getMonth()+1) * 100 + d.getDate();
+  var start = p.seasonStart[0] * 100 + p.seasonStart[1];
+  var end   = p.seasonEnd[0]   * 100 + p.seasonEnd[1];
+  return md >= start && md <= end;
+}
+
 function applySeasonDates() {
   var p = S.pid ? P[S.pid] : null;
   if (!p || !p.seasonStart) return;
@@ -1140,14 +1155,20 @@ function applySeasonDates() {
   var now = new Date();
   var yr = now.getFullYear();
   var seasonStart = new Date(yr, p.seasonStart[0]-1, p.seasonStart[1]);
-  var seasonEnd   = new Date(yr, p.seasonEnd[0]-1,   p.seasonEnd[1]);
+  var seasonEndThisYear = new Date(yr, p.seasonEnd[0]-1, p.seasonEnd[1]);
 
   // If season hasn't started yet this year use this year's start
   // If season has ended use next year's start
-  if (now > seasonEnd) {
+  if (now > seasonEndThisYear) {
     seasonStart = new Date(yr+1, p.seasonStart[0]-1, p.seasonStart[1]);
-    seasonEnd   = new Date(yr+1, p.seasonEnd[0]-1,   p.seasonEnd[1]);
   }
+
+  // Cap the far end 3 seasons out (not just the immediately-upcoming one) so guests
+  // can pre-book well ahead — e.g. a 2027 tour date when today is in 2026. The native
+  // date-picker min/max is one continuous range, so it can't exclude the off-season
+  // gaps in between; dateInSeasonWindow() catches those at selection time instead.
+  var maxYear = seasonStart.getFullYear() + 2;
+  var seasonEndFar = new Date(maxYear, p.seasonEnd[0]-1, p.seasonEnd[1]);
 
   var fmt = function(dt) {
     var yy = dt.getFullYear();
@@ -1157,7 +1178,7 @@ function applySeasonDates() {
   };
 
   var minS = fmt(seasonStart);
-  var maxS = fmt(seasonEnd);
+  var maxS = fmt(seasonEndFar);
 
   // Apply to all date inputs
   var ids = ['tourDate','altDate','dateFrom','dateTo'];
@@ -1169,7 +1190,7 @@ function applySeasonDates() {
   // Show pre-booking note if off season
   if (!inSeason(p)) {
     var sub = document.getElementById('dateSub');
-    if (sub) sub.innerHTML = '<span style="color:#06b6d4;font-weight:500">Pre-booking open.</span> Select a date within the ' + p.seasonLabel + ' season.';
+    if (sub) sub.innerHTML = '<span style="color:#06b6d4;font-weight:500">Pre-booking open.</span> Select a date within the ' + p.seasonLabel + ' season (any upcoming year).';
   }
 }
 function onDateChange() {
@@ -1205,6 +1226,24 @@ function onDate() {
     S.date    = document.getElementById('tourDate').value || null;
     S.altDate = document.getElementById('altDate').value  || null;
     document.getElementById('btn2').disabled = !S.date;
+  }
+
+  // Out-of-season-window check — the date input's min/max is one continuous range
+  // spanning several years, so it can't by itself exclude the off-season gaps
+  // between each year's window (see applySeasonDates()). Catch that here instead.
+  var oosWarn = document.getElementById('outOfSeasonWarn');
+  if (p && p.seasonStart && S.date) {
+    var dateOk = dateInSeasonWindow(p, S.date);
+    var altOk  = (p.instant && S.altDate) ? dateInSeasonWindow(p, S.altDate) : true;
+    if (!dateOk || !altOk) {
+      document.getElementById('outOfSeasonMsg').textContent = 'This tour runs ' + p.seasonLabel + ' every year. ' + (!dateOk ? 'Your preferred date' : 'Your alternative date') + ' falls outside that window — please choose a date inside it (any upcoming year is fine).';
+      oosWarn.style.display = 'block';
+      document.getElementById('btn2').disabled = true;
+    } else {
+      oosWarn.style.display = 'none';
+    }
+  } else if (oosWarn) {
+    oosWarn.style.display = 'none';
   }
 
   // Seasonal note (Season of Giants)
