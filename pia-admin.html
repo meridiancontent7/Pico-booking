@@ -417,7 +417,8 @@ function doLogout() {
 function showTab(name) {
   document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('on'); });
   document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('on'); });
-  event.target.classList.add('on');
+  var tabBtn = document.querySelector('.tab[onclick="showTab(\'' + name + '\')"]');
+  if (tabBtn) tabBtn.classList.add('on');
   document.getElementById('panel-' + name).classList.add('on');
   if (name === 'bookings') loadBookings();
   if (name === 'pending')  loadPending();
@@ -884,7 +885,7 @@ async function viewBooking(ref) {
     if (xb) xb.onclick = function(){ cancelBooking(bref); };
     var cb = document.getElementById('cbtn_' + bref);
     if (cb) cb.onclick = function(){ markContacted(bref); };
-    if (ib) ib.onclick = function(){ closeBookModal(); document.getElementById('invRef').value = bref; generateInvoice(); };
+    if (ib) ib.onclick = function(){ closeBookModal(); showTab('invoices'); document.getElementById('invRef').value = bref; generateInvoice(); window.scrollTo(0,0); };
     document.getElementById('bookModal').style.display = 'flex';
   } catch(e) { console.error(e); alert('Error loading booking.'); }
 }
