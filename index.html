@@ -173,6 +173,20 @@
     .tcerr{font-size:12px;color:var(--red);margin-top:7px;display:none}
     .tcerr.on{display:block}
 
+    /* CLAUSE POP-UP */
+    .cl-ov{position:fixed;inset:0;background:rgba(5,12,24,0.78);z-index:1000;display:none;align-items:center;justify-content:center;padding:16px}
+    .cl-ov.on{display:flex}
+    .cl-box{background:var(--nmid);border:1px solid var(--bdr);border-radius:14px;max-width:640px;width:100%;max-height:86vh;display:flex;flex-direction:column}
+    .cl-hd{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid var(--bdr)}
+    .cl-hd h3{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:400;color:var(--cream);margin:0}
+    .cl-x{background:transparent;border:1px solid var(--bdr);color:var(--cream);border-radius:8px;width:34px;height:34px;font-size:18px;cursor:pointer;flex-shrink:0}
+    .cl-bd{overflow-y:auto;padding:16px 18px;font-size:13px;font-weight:300;color:var(--muted);line-height:1.7}
+    .cl-bd h4{color:var(--cream);font-weight:500;font-size:13px;margin:14px 0 4px}
+    .cl-bd p{margin-bottom:8px}
+    .cl-bd ul{margin:0 0 8px 18px}
+    .cl-bd strong{color:var(--cream);font-weight:500}
+    .cl-ft{padding:12px 18px;border-top:1px solid var(--bdr);text-align:right}
+
     /* REVIEW */
     .rc{background:var(--card);border:1px solid var(--bdr);border-radius:11px;padding:17px;margin-bottom:11px}
     .rlbl{font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:var(--tb);margin-bottom:11px}
@@ -341,49 +355,100 @@
 
       <div class="grid-section">&#x26A1; Book &amp; Pay Instantly</div>
 
+      <div class="grid-section">&#x1F40B; Whale Watching &amp; Boat Trips</div>
+
       <button class="pc" id="pc-whale" onclick="pickCheck('whale')">
         <span class="pc-tag inst">Instant</span>
         <span class="pe">&#x1F40B;</span>
-        <div class="pn">Whale &amp; Dolphin Watching — Catamaran</div>
-        <div class="pd">13m power catamaran. Stable &amp; spacious. Marine biologist guided. 98% sighting success.</div>
+        <div class="pn">Whale &amp; Dolphin Watching</div>
+        <div class="pd">Choose your departure point: Madalena (Pico), Lajes (Pico) or Horta (Faial). Departures 09:00 and 14:00. Marine biologist guided. 98% sighting success.</div>
         <div class="pp">From &#8364;99 <span class="ppn">/ adult</span></div>
-        <div class="abadge lim"><span class="adot"></span>Apr 1 &#8212; Oct 30</div>
+        <div class="abadge lim"><span class="adot"></span>May 1 &#8212; Oct 15</div>
       </button>
 
-      <button class="pc" id="pc-whalezodiac" onclick="pickCheck('whalezodiac')">
+      <button class="pc" id="pc-sunset" onclick="pickCheck('sunset')">
         <span class="pc-tag inst">Instant</span>
-        <span class="pe">&#x1F6E5;&#xFE0F;</span>
-        <div class="pn">Whale &amp; Dolphin Watching — Zodiac</div>
-        <div class="pd">Power Zodiac RIB. Fast &amp; thrilling. Departs Madalena or Lajes. Marine biologist guided.</div>
-        <div class="pp">From &#8364;79 <span class="ppn">/ adult</span></div>
-        <div class="abadge lim"><span class="adot"></span>Apr 1 &#8212; Oct 30</div>
+        <span class="pe">&#x1F305;</span>
+        <div class="pn">Pico Sunset Trip</div>
+        <div class="pd">Approx. 1.5&#8211;2 hours aboard the catamaran Reefcat from Madalena. We meet about 3 hours before sunset. Soft drinks and snacks included.</div>
+        <div class="pp">&#8364;49 <span class="ppn">/ person</span></div>
+        <div class="abadge lim"><span class="adot"></span>May 1 &#8212; Oct 15</div>
+      </button>
+
+      <button class="pc" id="pc-saojorge" onclick="pickCheck('saojorge')">
+        <span class="pc-tag inst">Instant</span>
+        <span class="pe">&#x26F5;</span>
+        <div class="pn">S&#227;o Jorge Explorer &#8212; Sightseeing &amp; Snorkeling</div>
+        <div class="pd">Full day (approx. 7&#8211;8 h) by power catamaran from Madalena: Ponta dos Rosais, guided snorkeling and about 1 hour ashore in Velas. Gear, snacks, water and soft drinks included.</div>
+        <div class="pp">&#8364;199 <span class="ppn">/ person</span></div>
+        <div class="abadge lim"><span class="adot"></span>Jun 1 &#8212; Sep 30</div>
+      </button>
+
+      <button class="pc" id="pc-sharkwatch" onclick="pickCheck('sharkwatch')">
+        <span class="pc-tag inst">Instant</span>
+        <span class="pe">&#x1F988;</span>
+        <div class="pn">Shark Watching &#8212; No Diving Required</div>
+        <div class="pd">Two trips: Blue Shark Watching at Condor Bank (approx. 4&#8211;6 h) and Hammerhead Shark Watching (approx. 3&#8211;4 h). You stay on the boat, with shark-viewing binoculars.</div>
+        <div class="pp">&#8364;399 <span class="ppn">/ person</span></div>
+        <div class="abadge lim"><span class="adot"></span>Jun 1 &#8212; Sep 30</div>
+      </button>
+
+      <div class="grid-section">&#x1F93F; Snorkeling</div>
+
+      <button class="pc" id="pc-ilheus" onclick="pickCheck('ilheus')">
+        <span class="pc-tag inst">Instant</span>
+        <span class="pe">&#x1F420;</span>
+        <div class="pn">Ilh&#233;us Snorkeling Excursion</div>
+        <div class="pd">Approx. 2&#8211;3 hours aboard the catamaran Reefcat from Madalena. Full gear, snorkeling guide, water and fresh fruit included. Max 8 snorkelers per guide.</div>
+        <div class="pp">&#8364;79 <span class="ppn">/ person</span></div>
+        <div class="abadge lim"><span class="adot"></span>Jun 1 &#8212; Sep 30</div>
+      </button>
+
+      <button class="pc" id="pc-hhsnorkel" onclick="pickCheck('hhsnorkel')">
+        <span class="pc-tag inst">Instant</span>
+        <span class="pe">&#x1F988;</span>
+        <div class="pn">Snorkel with Hammerhead Sharks</div>
+        <div class="pd">Approx. 3&#8211;4 hours with an experienced shark guide. Full snorkeling gear and safety briefing included. Max 8 guests per trip.</div>
+        <div class="pp">&#8364;250 <span class="ppn">/ person</span></div>
+        <div class="abadge lim"><span class="adot"></span>Jun 1 &#8212; Sep 30</div>
       </button>
 
       <button class="pc" id="pc-snorkel" onclick="pickCheck('snorkel')">
         <span class="pc-tag inst">Instant</span>
         <span class="pe">&#x1F30A;</span>
         <div class="pn">Snorkelling &#8212; Princess Alice</div>
-        <div class="pd">Swim with Mobula rays at one of the world's top dive sites. No cert needed.</div>
-        <div class="pp">&#8364;250 <span class="ppn">/ person</span></div>
-        <div class="abadge lim"><span class="adot"></span>Jun 1 &#8212; Oct 15</div>
+        <div class="pd">Swim with Mobula rays at Princess Alice Bank. No cert needed. Starts 06:00&#8211;07:00, returns 16:00&#8211;17:00.</div>
+        <div class="pp">&#8364;270 <span class="ppn">/ person</span></div>
+        <div class="abadge lim"><span class="adot"></span>Jun 15 &#8212; Oct 5</div>
       </button>
+
+      <button class="pc" id="pc-snorkel3" onclick="pickCheck('snorkel3')">
+        <span class="pc-tag inst">Instant</span>
+        <span class="pe">&#x1F30A;</span>
+        <div class="pn">Snorkeling Adventure &#8212; 3 Days Around Pico</div>
+        <div class="pd">Day 1: snorkeling intro and guided bay tour. Day 2: Ilh&#233;us excursion. Day 3: Princess Alice Bank full-day Mobula snorkeling.</div>
+        <div class="pp">&#8364;449 <span class="ppn">/ person</span></div>
+        <div class="abadge lim"><span class="adot"></span>Jun 15 &#8212; Sep 30</div>
+      </button>
+
+      <div class="grid-section">&#x1F93F; Diving &amp; Sharks</div>
 
       <button class="pc" id="pc-pab" onclick="pickCheck('pab')">
         <span class="pc-tag inst">Instant</span>
         <span class="pe">&#x1F93F;</span>
         <div class="pn">Princess Alice Bank Diving</div>
-        <div class="pd">2-day package — check dive + Princess Alice Bank. Open Water cert required.</div>
+        <div class="pd">Base package: 1 day of 2-tank preparation dives around Pico + 1 day of 2-tank diving at Princess Alice Bank. Large boat with toilet, snacks and drinks. Starts 06:00&#8211;07:00, returns 16:00&#8211;17:00. Open Water cert required.</div>
         <div class="pp">&#8364;499 <span class="ppn">/ person</span></div>
-        <div class="abadge lim"><span class="adot"></span>Jun 1 &#8212; Oct 15</div>
+        <div class="abadge lim"><span class="adot"></span>Jun 15 &#8212; Oct 5</div>
       </button>
 
       <button class="pc" id="pc-highlights" onclick="pickCheck('highlights')">
         <span class="pc-tag inst">Instant</span>
         <span class="pe">&#x1F93F;</span>
         <div class="pn">Pico Diving Highlights &#8212; PAB &amp; Condor Bank</div>
-        <div class="pd">3-day package, 6 dives — mandatory check dive, Princess Alice Bank &amp; Condor Bank blue sharks. Open Water cert required.</div>
+        <div class="pd">3-day package, 6 dives &#8212; mandatory check dive, Princess Alice Bank &amp; Condor Bank blue sharks. Open Water cert required.</div>
         <div class="pp">&#8364;899 <span class="ppn">/ person</span></div>
-        <div class="abadge lim"><span class="adot"></span>Jun 1 &#8212; Oct 15</div>
+        <div class="abadge lim"><span class="adot"></span>Jun 15 &#8212; Oct 5</div>
       </button>
 
       <button class="pc" id="pc-sharkday" onclick="pickCheck('sharkday')">
@@ -395,31 +460,40 @@
         <div class="abadge lim"><span class="adot"></span>Jun 27 &#8212; Oct 15</div>
       </button>
 
+      <button class="pc" id="pc-pureshark" onclick="pickCheck('pureshark')">
+        <span class="pc-tag inst">Instant</span>
+        <span class="pe">&#x1F988;</span>
+        <div class="pn">Pure Shark Package</div>
+        <div class="pd">Day 1: 2 shore check dives. Then 3 days of Blue/Mako shark diving (6 shark dives) plus 1 Hammerhead Shark Snorkeling Excursion. Princess Alice Bank on request. Open Water cert required.</div>
+        <div class="pp">&#8364;1,449 <span class="ppn">/ person</span></div>
+        <div class="abadge lim"><span class="adot"></span>Jun 27 &#8212; Sep 30</div>
+      </button>
+
       <button class="pc" id="pc-shark" onclick="pickCheck('shark')">
         <span class="pc-tag inst">Instant</span>
         <span class="pe">&#x1F988;</span>
         <div class="pn">Shark Week &#8212; Without Hotel</div>
         <div class="pd">10-day expedition. 4 shark dives, Princess Alice Bank, whale watching. Book directly.</div>
         <div class="pp">&#8364;1,440 <span class="ppn">/ person</span></div>
-        <div class="abadge lim"><span class="adot"></span>Jun 1 &#8212; Oct 15</div>
+        <div class="abadge lim"><span class="adot"></span>Jun 15 &#8212; Oct 5</div>
       </button>
 
       <button class="pc" id="pc-bestpico" onclick="pickCheck('bestpico')">
         <span class="pc-tag inst">Instant</span>
         <span class="pe">&#x1F3C6;</span>
         <div class="pn">Best of Pico Diving</div>
-        <div class="pd">The ultimate Pico diving week — all major sites including Princess Alice Bank, Condor Bank sharks, night dive and whale watching.</div>
+        <div class="pd">The ultimate Pico diving week &#8212; all major sites including Princess Alice Bank, Condor Bank sharks, night dive and whale watching.</div>
         <div class="pp">&#8364;1,499 <span class="ppn">/ person</span></div>
-        <div class="abadge lim"><span class="adot"></span>Jun 1 &#8212; Oct 15</div>
+        <div class="abadge lim"><span class="adot"></span>Jun 15 &#8212; Oct 5</div>
       </button>
 
       <button class="pc" id="pc-pico4day" onclick="pickCheck('pico4day')">
         <span class="pc-tag inst">Instant</span>
         <span class="pe">&#x1F3C6;</span>
         <div class="pn">Pico 4 Day TOP Spots Package</div>
-        <div class="pd">Four days, 8 dives, covering Pico's top spots — local reefs, Eagle Ray Cave, Condor Bank sharks and Princess Alice Bank mobula rays.</div>
+        <div class="pd">Four days, 8 dives, covering Pico's top spots &#8212; local reefs, Eagle Ray Cave, Condor Bank sharks and Princess Alice Bank mobula rays.</div>
         <div class="pp">&#8364;1,049 <span class="ppn">/ person</span></div>
-        <div class="abadge lim"><span class="adot"></span>Jun 1 &#8212; Oct 15</div>
+        <div class="abadge lim"><span class="adot"></span>Jun 15 &#8212; Oct 5</div>
       </button>
 
       <div class="grid-section">&#x1F4CB; Premium Packages &#8212; Reserve Your Spot</div>
@@ -430,16 +504,25 @@
         <div class="pn">Shark Week &#8212; With Hotel</div>
         <div class="pd">Full package with accommodation. The Booking Team will confirm availability and hotel options.</div>
         <div class="pp">From &#8364;1,440 <span class="ppn">/ person</span></div>
-        <div class="abadge lim"><span class="adot"></span>Jun 1 &#8212; Oct 15</div>
+        <div class="abadge lim"><span class="adot"></span>Jun 15 &#8212; Oct 5</div>
       </button>
 
       <button class="pc" id="pc-giants" onclick="pick('giants')">
         <span class="pc-tag enq">Proposal</span>
-        <span class="pe">&#x1F30A;</span>
-        <div class="pn">Season of the Giants</div>
-        <div class="pd">15-day complete package. Blue, Fin and Sei whales during spring migration.</div>
-        <div class="pp">From &#8364;1,470 <span class="ppn">/ person</span></div>
-        <div class="abadge lim"><span class="adot"></span>Feb &#8212; June only</div>
+        <span class="pe">&#x1F433;</span>
+        <div class="pn">Season of the Giants 2027</div>
+        <div class="pd">1&#8211;15 May 2027. 14 nights in your choice of 9 accommodations, 6 whale &amp; dolphin boat trips, land excursions and airport transfers.</div>
+        <div class="pp">From &#8364;1,890 <span class="ppn">/ person</span></div>
+        <div class="abadge lim"><span class="adot"></span>1 &#8212; 15 May 2027</div>
+      </button>
+
+      <button class="pc" id="pc-sauerland" onclick="pick('sauerland')">
+        <span class="pc-tag enq">Proposal</span>
+        <span class="pe">&#x1F93F;</span>
+        <div class="pn">Azoren Special 2027 &#8212; Tauchschule Sauerland</div>
+        <div class="pd">3.&#8211;16. Juli 2027. 13 N&#228;chte Hotel Caravelhas mit Fr&#252;hst&#252;ck, 3 Tage Pico-Tauchen, 1 Tag Princess Alice Bank, 1 Tag Blauhaie, 2 Tage Pico&#8211;Faial-Kanal (je 2 Flaschen), 1 &#215; Whale Watching. Einzelzimmerzuschlag &#8364;880.</div>
+        <div class="pp">&#8364;2,950 <span class="ppn">/ Person (DZ)</span></div>
+        <div class="abadge lim"><span class="adot"></span>3. &#8212; 16. Juli 2027</div>
       </button>
 
       <button class="pc" id="pc-scuba" onclick="pick('scuba')">
@@ -450,7 +533,8 @@
         <div class="pp">From &#8364;110 <span class="ppn">/ 2-tank dive</span></div>
         <div class="abadge av"><span class="adot"></span>All cert levels welcome</div>
       </button>
-<button class="pc" id="pc-basic" onclick="pick('basic')">
+
+      <button class="pc" id="pc-basic" onclick="pick('basic')">
         <span class="pc-tag enq">Proposal</span>
         <span class="pe">&#x1F30D;</span>
         <div class="pn">Basic Dive Package</div>
@@ -466,24 +550,6 @@
         <div class="pd">Deep-sea pinnacles + Condor Bank shark diving. Advanced + Deep Diver cert required.</div>
         <div class="pp">&#8364;949 <span class="ppn">/ person</span></div>
         <div class="abadge lim"><span class="adot"></span>Jun 1 &#8212; Oct 15</div>
-      </button>
-
-      <button class="pc" id="pc-mobydick" onclick="pick('mobydick')">
-        <span class="pc-tag enq">Proposal</span>
-        <span class="pe">&#x1F40B;</span>
-        <div class="pn">Moby Dick Whale Week</div>
-        <div class="pd">6 whale watching excursions with marine biologist. Blue whales Apr–May, sperm whales Jun–Sep.</div>
-        <div class="pp">&#8364;449 <span class="ppn">/ person</span></div>
-        <div class="abadge lim"><span class="adot"></span>Apr 1 &#8212; Oct 31</div>
-      </button>
-
-      <button class="pc" id="pc-zodiac" onclick="pick('zodiac')">
-        <span class="pc-tag enq">Proposal</span>
-        <span class="pe">&#x1F6E5;&#xFE0F;</span>
-        <div class="pn">Zodiac Whale Watching — 6 Excursions</div>
-        <div class="pd">6 whale watching excursions aboard a Zodiac RIB. Fast, agile and close to the ocean. Groups only.</div>
-        <div class="pp">&#8364;414 <span class="ppn">/ adult</span></div>
-        <div class="abadge lim"><span class="adot"></span>Apr 1 &#8212; Oct 30</div>
       </button>
     </div>
   </div>
@@ -524,6 +590,23 @@
       <strong>Outside the season:</strong> <span id="outOfSeasonMsg"></span>
     </div>
 
+    <!-- FIXED DEPARTURE (fixed-date packages) -->
+    <div class="note info" id="fixedNote" style="display:none;margin-top:14px">
+      &#x1F4C5; <strong>Fixed departure:</strong> <span id="fixedNoteTxt"></span>
+    </div>
+
+    <!-- RECOMMENDED MINIMUM STAY -->
+    <div class="note info" id="minStayNote" style="display:none;margin-top:14px">
+      &#x1F3DD;&#xFE0F; <strong>Recommended minimum stay on Pico: <span id="minStayN"></span> nights.</strong> Our excursions are weather-dependent. This gives us room to reschedule your trip if wind or sea conditions prevent it on the planned day.
+    </div>
+
+    <!-- DEPARTURE POINT — whale watching only -->
+    <div id="depWrap" class="hidden" style="margin-top:20px">
+      <label class="flbl">Departure Point</label>
+      <div class="time-btns" id="depBtns"></div>
+      <p class="fhint">Same price and duration from all three departure points.</p>
+    </div>
+
     <!-- DEPARTURE TIME — whale watching only -->
     <div id="timeWrap" class="hidden" style="margin-top:20px">
       <label class="flbl">Preferred Departure Time</label>
@@ -536,11 +619,8 @@
           <span class="ttime">2:00 PM</span>
           <span class="tdesc">Afternoon</span>
         </button>
-        <button type="button" class="tbtn" id="t-1730" onclick="pickTime('17:30')">
-          <span class="ttime">5:30 PM</span>
-          <span class="tdesc">Sunset</span>
-        </button>
       </div>
+      <p class="fhint">17:00 departure and private charters: on request. <a href="https://wa.me/351292622980" style="color:var(--tb)">WhatsApp us</a>.</p>
     </div>
 
     <div class="bst" style="margin-top:20px">
@@ -595,16 +675,8 @@
     </div>
     <!-- Accommodation selector for Season of the Giants -->
     <div class="acc-wrap hidden" id="accWrap">
-      <label class="acc-lbl" for="accSel">Preferred Accommodation</label>
-      <select class="fsel" id="accSel" onchange="onAcc()">
-        <option value="">Select accommodation type</option>
-        <option value="gh_dbl">Guest house — double room (&#8364;1,470 / person)</option>
-        <option value="gh_sgl">Guest house — single room (&#8364;1,770 / person)</option>
-        <option value="ap_dbl">Apartment Maroicos — double room (&#8364;1,799 / person)</option>
-        <option value="ap_sgl">Apartment Maroicos — single room (&#8364;2,249 / person)</option>
-        <option value="ht_dbl">Hotel Caravellas — double room (&#8364;1,869 / person)</option>
-        <option value="ht_sgl">Hotel Caravellas — single room (&#8364;2,359 / person)</option>
-      </select>
+      <label class="acc-lbl" for="accSel" id="accLbl">Preferred Accommodation</label>
+      <select class="fsel" id="accSel" onchange="onAcc()"></select>
     </div>
 
     <!-- Price box (instant products only) -->
@@ -746,12 +818,12 @@
         <p>Please read the following terms carefully before completing your booking with Pico Island Adventures.</p>
         <h4>1. Bookings and Confirmation</h4>
         <p>Your booking is confirmed upon receipt of full payment. You will receive a confirmation email with your booking reference. Pico Island Adventures operates under Maritime Tourism Licence Nr. 15/2009.</p>
-        <h4>2. Cancellation Policy — No Refunds</h4>
-        <p>All bookings are strictly non-refundable. Once payment has been made, no refunds will be issued under any circumstances, including changes to travel plans, illness, or personal emergencies. We strongly recommend that guests purchase comprehensive travel insurance to cover unforeseen circumstances. All cancellation requests must be submitted in writing to Pico Island Adventures for record purposes.</p>
-        <h4>3. Cancellation by Pico Island Adventures</h4>
-        <p>We reserve the right to cancel or modify any tour due to adverse weather, sea conditions, technical or mechanical issues, or circumstances beyond our control. In such cases, guests will be offered an alternative date or a refund of the amount paid minus applicable credit card processing and bank transfer fees (Stripe processing fee: approximately 1.5% + €0.25 per transaction). No additional compensation will be provided.</p>
-        <h4>4. Weather and Sea Conditions</h4>
-        <p>All tours are weather-dependent. Our skippers and marine biologists make final go or no-go decisions on safety grounds. Guest safety overrides all other considerations.</p>
+        <h4>2. Cancellation by the Guest — No Refunds</h4>
+        <p>Bookings are non-refundable if the guest cancels or is unable to participate for personal reasons, including changes to travel plans, flight or ferry problems, illness or personal emergencies. We strongly recommend that guests purchase comprehensive travel insurance to cover unforeseen circumstances. All cancellation requests must be submitted in writing to Pico Island Adventures for record purposes.</p>
+        <h4>3. Weather, Operational Changes and Cancellation by Pico Island Adventures</h4>
+        <p>All excursions are weather-dependent and safety always comes first. If we cannot operate your excursion, we first try to reschedule it during your stay on Pico. Rescheduling, refunds, the recommended minimum stay, route and dive-site changes are governed by our <a href="#" onclick="openClause();return false;" style="color:var(--tb)">Weather Conditions, Operational Changes &amp; Cancellation Clause</a>, which forms part of these terms.</p>
+        <h4>4. Recommended Minimum Stay</h4>
+        <p>For weather-dependent activities we recommend a minimum stay on Pico, shown for each tour at booking. By booking online you confirm that you have read and accepted the minimum stay for the selected activity.</p>
         <h4>5. Health and Safety</h4>
         <p>Guests must be in good general health to participate. Those with heart conditions, severe seasickness history, recent surgery, or pregnancy should consult a physician before booking. All guests must follow the safety briefing given by the crew.</p>
         <h4>6. Diving Requirements</h4>
@@ -765,7 +837,7 @@
       </div>
       <label class="tcrow">
         <input type="checkbox" id="tcBox" onchange="onTc()">
-        <span>I have read and agree to the <strong>Terms and Conditions</strong>, including the cancellation policy and safety requirements.</span>
+        <span>I have read, understood and agree to the <strong>Terms and Conditions</strong> and the <a href="#" onclick="openClause();return false;" style="color:var(--tb)">Weather Conditions, Operational Changes &amp; Cancellation Clause</a><span id="tcMinStay"></span>.</span>
       </label>
       <p class="tcerr" id="tcErr">Please accept the Terms and Conditions to continue.</p>
     </div>
@@ -792,6 +864,75 @@
 
     <div style="text-align:center;margin-top:14px">
       <button class="bb" onclick="go(5)">&larr; Edit details</button>
+    </div>
+  </div>
+
+  <!-- ═══ WEATHER / CANCELLATION CLAUSE POP-UP ═══ -->
+  <div class="cl-ov" id="clauseOv" onclick="if(event.target===this)closeClause()">
+    <div class="cl-box" role="dialog" aria-modal="true" aria-labelledby="clTitle">
+      <div class="cl-hd">
+        <h3 id="clTitle">Weather Conditions, Operational Changes &amp; Cancellation Clause</h3>
+        <button type="button" class="cl-x" onclick="closeClause()" aria-label="Close">&times;</button>
+      </div>
+      <div class="cl-bd">
+        <h4>1. Weather and Sea Conditions</h4>
+        <p>Our excursions take place in the Mid-Atlantic, where weather, wind, swell and sea conditions can change quickly and cannot always be predicted accurately in advance.</p>
+        <p>We operate our main offshore excursions during the summer months, when weather conditions are generally more stable. Nevertheless, periods of strong wind, high waves, ocean swell or other adverse conditions may occur at any time and may prevent us from safely reaching the planned destination or carrying out the excursion as scheduled.</p>
+        <p><strong>Safety always comes first.</strong> The final decision whether an excursion can operate, whether a route can be followed, or whether a particular dive or snorkeling location can be visited remains entirely with Pico Island Adventures and the captain, skipper, dive supervisor or responsible guide.</p>
+
+        <h4>2. Minimum Stay Requirement</h4>
+        <p>For certain excursions, especially offshore diving, shark diving, Princess Alice Bank trips and other weather-dependent activities, we require guests to stay on Pico for a specified minimum number of days.</p>
+        <p>This minimum stay is requested because it gives us a realistic opportunity to reschedule an excursion if weather or sea conditions prevent us from operating on the originally planned day.</p>
+        <p>By making an online booking, the customer confirms that they have read and accepted the minimum-stay requirements shown for the selected activity.</p>
+
+        <h4>3. Cancellation by Pico Island Adventures Due to Weather</h4>
+        <p>If we are unable to operate the booked excursion on the originally scheduled date because of weather, sea conditions, safety considerations or other operational circumstances beyond our reasonable control, we will first try to reschedule the activity during the customer's remaining stay on Pico.</p>
+        <p>If it is not possible to carry out the booked excursion at any time during the minimum stay period required for that activity, the customer is entitled to a refund of the amount paid for the cancelled service.</p>
+        <p>Any non-refundable online payment processing charges, credit-card charges, bank charges, currency conversion costs or transfer fees may be deducted from the refunded amount.</p>
+
+        <h4>4. Customer Unable to Participate</h4>
+        <p>If the excursion can be operated or rescheduled during the required stay period, but the customer is unable to participate for personal reasons, the booking remains non-refundable.</p>
+        <p>This includes, but is not limited to:</p>
+        <ul>
+          <li>arriving on Pico later than planned;</li>
+          <li>leaving Pico earlier than originally planned;</li>
+          <li>flight delays, flight cancellations or changes to travel arrangements;</li>
+          <li>ferry cancellations or transportation problems;</li>
+          <li>illness, injury or other health-related circumstances;</li>
+          <li>changes to accommodation or onward travel;</li>
+          <li>personal emergencies;</li>
+          <li>choosing not to participate;</li>
+          <li>or any other circumstance affecting the customer's ability to attend the booked activity.</li>
+        </ul>
+        <p>In such cases, the booking will be treated as a <strong>no-show or customer cancellation</strong>, and no refund will be due.</p>
+        <p>For this reason, we strongly recommend purchasing comprehensive travel insurance which includes cancellation, interruption, medical and travel disruption cover and which also covers excursions and activities booked separately during the trip.</p>
+
+        <h4>5. Guests Staying for Less Than the Required Minimum Period</h4>
+        <p>Customers who choose to book an excursion despite staying on Pico for less than the minimum period stated for that activity accept the additional risk that the excursion may not be possible because of weather conditions.</p>
+        <p>If alternative operating dates are available but fall outside the customer's stay because the customer has chosen a shorter stay than required, this does not create an entitlement to a refund.</p>
+
+        <h4>6. Alternative: Last-Minute Booking</h4>
+        <p>Guests who do not wish to accept the conditions connected with advance reservations may visit our booking office at the Port of Madalena after arriving on Pico and enquire about short-notice or last-minute availability.</p>
+        <p>Such bookings are entirely subject to availability, suitable weather and remaining capacity. We cannot guarantee that places will still be available.</p>
+
+        <h4>7. Sightseeing and Snorkeling Excursions</h4>
+        <p>For sightseeing, coastal and snorkeling excursions, the advertised route and locations are indicative.</p>
+        <p>Depending on wind direction, ocean swell, currents, visibility and other sea conditions, Pico Island Adventures may change the route, departure time, order of locations, snorkeling sites or planned stops before or during the excursion.</p>
+        <p>A change of route or location for weather, operational or safety reasons does not constitute a cancellation of the excursion and does not create an entitlement to a refund where a reasonable alternative excursion can be provided.</p>
+        <p>Our objective is always to provide the safest and most enjoyable experience possible under the conditions of the day.</p>
+
+        <h4>8. Diving Excursions and Diving Packages</h4>
+        <p>Diving schedules must remain flexible because diving conditions around Pico and at offshore locations can change significantly depending on wind, swell, currents and visibility.</p>
+        <p>The <strong>check dive is normally scheduled for the first diving day</strong> and must be successfully completed before participation in certain advanced or offshore diving activities where required.</p>
+        <p>After the check dive, Pico Island Adventures may change the order of diving days, departure times, dive locations and planned schedule according to weather, sea conditions, diver safety and operational requirements.</p>
+        <p>Individual dive sites may also be changed immediately before departure or during an excursion if conditions require it.</p>
+        <p>Such changes are made for safety and operational reasons and do not constitute a cancellation of the booked diving package, provided that a suitable alternative dive or activity included within the booked programme can reasonably be offered.</p>
+
+        <h4>9. Acceptance of These Conditions</h4>
+        <p>By completing a booking and accepting our Terms &amp; Conditions, the customer confirms that they have read, understood and accepted this Weather Conditions, Operational Changes &amp; Cancellation Clause.</p>
+        <p>The customer specifically acknowledges that marine activities in the Mid-Atlantic are weather-dependent and that routes, schedules, dive sites and operating days may need to be changed at short notice for safety reasons.</p>
+      </div>
+      <div class="cl-ft"><button type="button" class="bn" style="width:auto;display:inline-flex;padding:11px 22px" onclick="closeClause()">Close</button></div>
     </div>
   </div>
 
@@ -839,26 +980,73 @@ var UTM = getUTMParams();
 /* ── PRODUCT DEFINITIONS ──────────────────────────────────── */
 var P = {
   // seasonStart/End: [month, day] — null means year-round
-  whale:      {id:'whale',      name:'Whale & Dolphin Watching — Catamaran',  instant:true,  ap:99,  cp:69,  flat:false, multi:false, seas:false, peak:[], dive:false, hasChild:true,  seasonStart:[4,1], seasonEnd:[10,30], seasonLabel:'Apr 1 — Oct 30', hasBoat:true, boat:'catamaran', pkg3a:270, pkg3c:190, pkg6a:470, pkg6c:360, grp4:89, grp8:79 }, whalezodiac:{id:'whalezodiac',name:'Whale & Dolphin Watching — Zodiac',      instant:true,  ap:79,  cp:59,  flat:false, multi:false, seas:false, peak:[], dive:false, hasChild:true,  seasonStart:[4,1], seasonEnd:[10,30], seasonLabel:'Apr 1 — Oct 30', hasBoat:true, boat:'zodiac',    pkg3a:220, pkg3c:160, pkg6a:430, pkg6c:330, grp4:69, grp8:69 },
-  snorkel:    {id:'snorkel',    name:'Snorkelling — Princess Alice',        instant:true,  ap:250,  cp:0,   flat:true,  multi:false, seas:false, peak:[],         dive:false, hasChild:false, seasonStart:[6,1],  seasonEnd:[10,15], seasonLabel:'Jun 1 — Oct 15' },
-  pab:        {id:'pab',        name:'Princess Alice Bank Diving',          instant:true,  ap:499,  cp:0,   flat:true,  multi:false, seas:false, peak:[],         dive:true,  hasChild:false, seasonStart:[6,1],  seasonEnd:[10,15], seasonLabel:'Jun 1 — Oct 15' },
-  highlights: {id:'highlights', name:'Pico Diving Highlights — PAB &amp; Condor Bank', instant:true,  ap:899,  cp:0,   flat:true,  multi:false, seas:false, peak:[],         dive:true,  hasChild:false, seasonStart:[6,1],  seasonEnd:[10,15], seasonLabel:'Jun 1 — Oct 15' },
-  sharkday:   {id:'sharkday',   name:'Shark Diving Day Trip',               instant:true,  ap:499,  cp:0,   flat:true,  multi:false, seas:false, peak:[],         dive:true,  hasChild:false, seasonStart:[6,27], seasonEnd:[10,15], seasonLabel:'Jun 27 — Oct 15' },
-  shark:      {id:'shark',      name:'Shark Week — Without Hotel',          instant:true,  ap:1440, cp:0,   flat:true,  multi:false, seas:false, peak:[],         dive:false, hasChild:false, seasonStart:[6,1],  seasonEnd:[10,15], seasonLabel:'Jun 1 — Oct 15' },
-  sharkhotel: {id:'sharkhotel', name:'Shark Week — With Hotel',             instant:false, ap:1440, cp:0,   flat:true,  multi:false, seas:false, peak:[],         dive:false, hasChild:false, seasonStart:[6,1],  seasonEnd:[10,15], seasonLabel:'Jun 1 — Oct 15' },
-  giants:     {id:'giants',     name:'Season of the Giants',                instant:false, ap:1470, cp:0,   flat:false, multi:false, seas:true,  peak:[2,3,4,5,6],dive:false, hasChild:false, seasonStart:[2,1],  seasonEnd:[6,30],  seasonLabel:'Feb 1 — Jun 30', hasAcc:true },
-  scuba:      {id:'scuba',      name:'Scuba Diving',                        instant:false, ap:110,  cp:0,   flat:false, multi:false, seas:false, peak:[],         dive:false, hasChild:false, seasonStart:null,   seasonEnd:null,    seasonLabel:'Year-round' },
-basic:      {id:'basic',      name:'Basic Dive Package',                  instant:false, ap:499,  cp:0,   flat:true,  multi:false, seas:false, peak:[],         dive:false, hasChild:false, seasonStart:[5,1],  seasonEnd:[10,31], seasonLabel:'May 1 — Oct 31' },
-  advanced:   {id:'advanced',   name:'Advanced Dive Package',               instant:false, ap:949,  cp:0,   flat:true,  multi:false, seas:false, peak:[],         dive:false, hasChild:false, seasonStart:[6,1],  seasonEnd:[10,15], seasonLabel:'Jun 1 — Oct 15' },
-  bestpico:   {id:'bestpico',   name:'Best of Pico Diving',                 instant:true,  ap:1499, cp:0,   flat:true,  multi:false, seas:false, peak:[],         dive:true, hasChild:false, seasonStart:[6,1],  seasonEnd:[10,15], seasonLabel:'Jun 1 — Oct 15' },
-  pico4day:   {id:'pico4day',   name:'Pico 4 Day TOP Spots Package',        instant:true,  ap:1049, cp:0,   flat:true,  multi:false, seas:false, peak:[],         dive:true, hasChild:false, seasonStart:[6,1],  seasonEnd:[10,15], seasonLabel:'Jun 1 — Oct 15',
+  // minStay: recommended minimum nights on Pico (null = not applicable)
+  whale:      {id:'whale',      name:'Whale & Dolphin Watching',             instant:true,  ap:99,   cp:69, flat:false, multi:false, seas:false, peak:[], dive:false, hasChild:true,  seasonStart:[5,1],  seasonEnd:[10,15], seasonLabel:'May 1 — Oct 15', minStay:4, depPoints:true, hasBoat:true, pkg3a:270, pkg3c:190, pkg6a:470, pkg6c:360, grp4:89, grp8:79 },
+  sunset:     {id:'sunset',     name:'Pico Sunset Trip',                     instant:true,  ap:49,   cp:0,  flat:true,  multi:false, seas:false, peak:[], dive:false, hasChild:false, seasonStart:[5,1],  seasonEnd:[10,15], seasonLabel:'May 1 — Oct 15', minStay:4 },
+  saojorge:   {id:'saojorge',   name:'São Jorge Explorer — Sightseeing & Snorkeling', instant:true, ap:199, cp:0, flat:true, multi:false, seas:false, peak:[], dive:false, hasChild:false, seasonStart:[6,1], seasonEnd:[9,30], seasonLabel:'Jun 1 — Sep 30', minStay:4 },
+  sharkwatch: {id:'sharkwatch', name:'Shark Watching — No Diving Required',  instant:true,  ap:399,  cp:0,  flat:true,  multi:false, seas:false, peak:[], dive:false, hasChild:false, seasonStart:[6,1],  seasonEnd:[9,30],  seasonLabel:'Jun 1 — Sep 30', minStay:4 },
+  ilheus:     {id:'ilheus',     name:'Ilhéus Snorkeling Excursion',          instant:true,  ap:79,   cp:0,  flat:true,  multi:false, seas:false, peak:[], dive:false, hasChild:false, seasonStart:[6,1],  seasonEnd:[9,30],  seasonLabel:'Jun 1 — Sep 30', minStay:4 },
+  hhsnorkel:  {id:'hhsnorkel',  name:'Snorkel with Hammerhead Sharks',       instant:true,  ap:250,  cp:0,  flat:true,  multi:false, seas:false, peak:[], dive:false, hasChild:false, seasonStart:[6,1],  seasonEnd:[9,30],  seasonLabel:'Jun 1 — Sep 30', minStay:4 },
+  snorkel:    {id:'snorkel',    name:'Snorkelling — Princess Alice',         instant:true,  ap:270,  cp:0,  flat:true,  multi:false, seas:false, peak:[], dive:false, hasChild:false, seasonStart:[6,15], seasonEnd:[10,5],  seasonLabel:'Jun 15 — Oct 5', minStay:4 },
+  snorkel3:   {id:'snorkel3',   name:'Snorkeling Adventure — 3 Days Around Pico', instant:true, ap:449, cp:0, flat:true, multi:false, seas:false, peak:[], dive:false, hasChild:false, seasonStart:[6,15], seasonEnd:[9,30], seasonLabel:'Jun 15 — Sep 30', minStay:5 },
+  pab:        {id:'pab',        name:'Princess Alice Bank Diving',           instant:true,  ap:499,  cp:0,  flat:true,  multi:false, seas:false, peak:[], dive:true,  hasChild:false, seasonStart:[6,15], seasonEnd:[10,5],  seasonLabel:'Jun 15 — Oct 5', minStay:4 },
+  highlights: {id:'highlights', name:'Pico Diving Highlights — PAB &amp; Condor Bank', instant:true, ap:899, cp:0, flat:true, multi:false, seas:false, peak:[], dive:true, hasChild:false, seasonStart:[6,15], seasonEnd:[10,5], seasonLabel:'Jun 15 — Oct 5', minStay:5 },
+  sharkday:   {id:'sharkday',   name:'Shark Diving Day Trip',                instant:true,  ap:499,  cp:0,  flat:true,  multi:false, seas:false, peak:[], dive:true,  hasChild:false, seasonStart:[6,27], seasonEnd:[10,15], seasonLabel:'Jun 27 — Oct 15', minStay:4 },
+  pureshark:  {id:'pureshark',  name:'Pure Shark Package',                   instant:true,  ap:1449, cp:0,  flat:true,  multi:false, seas:false, peak:[], dive:true,  hasChild:false, seasonStart:[6,27], seasonEnd:[9,30],  seasonLabel:'Jun 27 — Sep 30', minStay:7 },
+  shark:      {id:'shark',      name:'Shark Week — Without Hotel',           instant:true,  ap:1440, cp:0,  flat:true,  multi:false, seas:false, peak:[], dive:false, hasChild:false, seasonStart:[6,15], seasonEnd:[10,5],  seasonLabel:'Jun 15 — Oct 5', minStay:12 },
+  bestpico:   {id:'bestpico',   name:'Best of Pico Diving',                  instant:true,  ap:1499, cp:0,  flat:true,  multi:false, seas:false, peak:[], dive:true,  hasChild:false, seasonStart:[6,15], seasonEnd:[10,5],  seasonLabel:'Jun 15 — Oct 5', minStay:10 },
+  pico4day:   {id:'pico4day',   name:'Pico 4 Day TOP Spots Package',         instant:true,  ap:1049, cp:0,  flat:true,  multi:false, seas:false, peak:[], dive:true,  hasChild:false, seasonStart:[6,15], seasonEnd:[10,5],  seasonLabel:'Jun 15 — Oct 5', minStay:6,
     addOns: [
       { id:'sharkspec', name:'Shark Diving Specialty / Shark Ecology', price:79 },
       { id:'fullequip',  name:'Full Dive Equipment Rental (complete set)', price:140 }
     ]
   },
-  mobydick:   {id:'mobydick',   name:'Moby Dick Whale Week',                instant:false, ap:449,  cp:0,   flat:true,  multi:false, seas:false, peak:[],         dive:false, hasChild:false, seasonStart:[4,1],  seasonEnd:[10,31], seasonLabel:'Apr 1 — Oct 31' },   zodiac:     {id:'zodiac',     name:'Zodiac Whale Watching — 6 Excursions', instant:false, ap:414,  cp:294, flat:true,  multi:false, seas:false, peak:[],         dive:false, hasChild:true,  seasonStart:[4,1],  seasonEnd:[10,30], seasonLabel:'Apr 1 — Oct 30' },
+  sharkhotel: {id:'sharkhotel', name:'Shark Week — With Hotel',              instant:false, ap:1440, cp:0,  flat:true,  multi:false, seas:false, peak:[], dive:false, hasChild:false, seasonStart:[6,15], seasonEnd:[10,5],  seasonLabel:'Jun 15 — Oct 5', minStay:null },
+  giants:     {id:'giants',     name:'Season of the Giants 2027',            instant:false, ap:1890, cp:0,  flat:false, multi:false, seas:false, peak:[], dive:false, hasChild:false, seasonStart:[5,1],  seasonEnd:[5,15],  seasonLabel:'1 — 15 May 2027', minStay:null,
+    fixedFrom:'2027-05-01', fixedTo:'2027-05-15', fixedLabel:'1 — 15 May 2027 (14 nights)',
+    accLabel:'Preferred Accommodation',
+    accOpts: [
+      { k:'vila_dbl',   l:'Hotel Vila da Madalena — double room',            price:1890 },
+      { k:'vila_sgl',   l:'Hotel Vila da Madalena — single room (incl. €690 supplement)', price:2580 },
+      { k:'nomar_dbl',  l:'Casa No Mar — double room',                       price:1990 },
+      { k:'nomar_sgl',  l:'Casa No Mar — single room (incl. €790 supplement)', price:2780 },
+      { k:'vbd_dbl',    l:'Villa Barca — double room',                       price:2150 },
+      { k:'vbd_sgl',    l:'Villa Barca — double room, single use (incl. €690 supplement)', price:2840 },
+      { k:'vbm_dbl',    l:'Villa Barca — mini apartment',                    price:2250 },
+      { k:'vbm_sgl',    l:'Villa Barca — mini apartment, single use (incl. €790 supplement)', price:3040 },
+      { k:'voli_dbl',   l:'Vivenda Oliveira Barca — double apartment',       price:2150 },
+      { k:'voli_sgl',   l:'Vivenda Oliveira Barca — single use (incl. €690 supplement)', price:2840 },
+      { k:'sol_dbl',    l:'Studio Por do Sol — incl. owner\'s car (no single option)', price:2490 },
+      { k:'cara_dbl',   l:'Hotel Caravelhas — double room',                  price:2590 },
+      { k:'cara_sgl',   l:'Hotel Caravelhas — single room (incl. €920 supplement)', price:3510 },
+      { k:'limas_dbl',  l:'Solar das Limas — double room (no single option; rental car +€315 pp on request)', price:2690 },
+      { k:'bela_dbl',   l:'Bela Vista, Lajes — double room',                 price:2250 },
+      { k:'bela_sgl',   l:'Bela Vista, Lajes — single room (incl. €690 supplement)', price:2940 }
+    ] },
+  sauerland:  {id:'sauerland',  name:'Azoren Special 2027 — Tauchschule Sauerland', instant:false, ap:2950, cp:0, flat:true, multi:false, seas:false, peak:[], dive:false, hasChild:false, seasonStart:[7,3], seasonEnd:[7,16], seasonLabel:'3. — 16. Juli 2027', minStay:null,
+    fixedFrom:'2027-07-03', fixedTo:'2027-07-16', fixedLabel:'3. — 16. Juli 2027 (13 Nächte)',
+    accLabel:'Zimmer / Room',
+    accOpts: [
+      { k:'dz', l:'Doppel-/Zweibettzimmer (twin/double)', price:2950 },
+      { k:'ez', l:'Einzelzimmer (single, incl. €880 Zuschlag)', price:3830 }
+    ] },
+  scuba:      {id:'scuba',      name:'Scuba Diving',                         instant:false, ap:110,  cp:0,  flat:false, multi:false, seas:false, peak:[], dive:false, hasChild:false, seasonStart:null,   seasonEnd:null,    seasonLabel:'Year-round', minStay:null },
+  basic:      {id:'basic',      name:'Basic Dive Package',                   instant:false, ap:499,  cp:0,  flat:true,  multi:false, seas:false, peak:[], dive:false, hasChild:false, seasonStart:[5,1],  seasonEnd:[10,31], seasonLabel:'May 1 — Oct 31', minStay:7 },
+  advanced:   {id:'advanced',   name:'Advanced Dive Package',                instant:false, ap:949,  cp:0,  flat:true,  multi:false, seas:false, peak:[], dive:false, hasChild:false, seasonStart:[6,1],  seasonEnd:[10,15], seasonLabel:'Jun 1 — Oct 15', minStay:7 }
 };
+
+var DEP_POINTS = ['Madalena (Pico)', 'Lajes (Pico)', 'Horta (Faial)'];
+var TERMS_VERSION = 'PIA-TC-2027-10';
+
+function accOpt(p, k) {
+  if (!p || !p.accOpts) return null;
+  for (var i=0; i<p.accOpts.length; i++) if (p.accOpts[i].k === k) return p.accOpts[i];
+  return null;
+}
+function productLabel() {
+  var p = P[S.pid];
+  return p.name + (p.depPoints && S.dep ? ' — ' + S.dep : '');
+}
 
 // Helper: is today within a product's season?
 function inSeason(p) {
@@ -872,15 +1060,7 @@ function inSeason(p) {
   return cur >= start && cur <= end;
 }
 
-var ACC_PRICES = {
-  gh_dbl:1470, gh_sgl:1770, ap_dbl:1799, ap_sgl:2249, ht_dbl:1869, ht_sgl:2359
-};
 
-var ACC_LABELS = {
-  gh_dbl:'Guest house — double room', gh_sgl:'Guest house — single room',
-  ap_dbl:'Apartment Maroicos — double', ap_sgl:'Apartment Maroicos — single',
-  ht_dbl:'Hotel Caravellas — double', ht_sgl:'Hotel Caravellas — single'
-};
 
 /* ── STEPS ────────────────────────────────────────────────── */
 var STEPS_INST = [{n:1,l:'Experience'},{n:2,l:'Date'},{n:3,l:'Group'},{n:4,l:'Diving'},{n:5,l:'Details'},{n:6,l:'Review'}];
@@ -923,6 +1103,12 @@ window.onload = function() {
       pickCheck(product);
     } else {
       pick(product);
+    }
+    var dep = decodeURIComponent(getParam('dep') || '').toLowerCase();
+    if (dep && P[product].depPoints) {
+      for (var dpi=0; dpi<DEP_POINTS.length; dpi++) {
+        if (DEP_POINTS[dpi].toLowerCase().indexOf(dep) === 0) pickDep(DEP_POINTS[dpi]);
+      }
     }
   }
 };
@@ -991,7 +1177,7 @@ function clearOperator() {
 }
 
 function updateCardPrices() {
-  var ids = ['whale','whalezodiac','snorkel','pab','highlights','sharkday','shark','sharkhotel','giants','scuba','basic','advanced','bestpico','pico4day','mobydick','zodiac'];
+  var ids = Object.keys(P);
   for (var i=0; i<ids.length; i++) {
     var p = P[ids[i]];
     var el = document.getElementById('pc-'+ids[i]);
@@ -1086,7 +1272,7 @@ function isLastMinute(dateStr) {
 function pick(id) {
   S.pid = id;
   S.adults = 1; S.children = 0; S.acc = '';
-  S.date = null; S.altDate = null; S.dateFrom = null; S.dateTo = null; S.time = null;
+  S.date = null; S.altDate = null; S.dateFrom = null; S.dateTo = null; S.time = null; S.dep = null;
   S.selectedAddOns = [];
   var p = P[id];
   var cards = document.querySelectorAll('.pc');
@@ -1101,27 +1287,70 @@ function pick(id) {
 
   // Show PAB notice
   var pabNote = document.getElementById('pabNote');
-  if (id === 'pab' || id === 'snorkel') pabNote.style.display = 'block';
+  if (id === 'pab' || id === 'snorkel' || id === 'snorkel3') pabNote.style.display = 'block';
   else pabNote.style.display = 'none';
 
   // Show time selector for whale watching only
   var tw = document.getElementById('timeWrap');
   if (id === 'whale') tw.classList.remove('hidden');
   else tw.classList.add('hidden');
+  var tbs = document.querySelectorAll('#timeWrap .tbtn');
+  for (var ti=0; ti<tbs.length; ti++) tbs[ti].classList.remove('sel');
+
+  // Departure point (whale watching)
+  var dw = document.getElementById('depWrap');
+  if (p.depPoints) {
+    var dh2 = '';
+    for (var di=0; di<DEP_POINTS.length; di++) {
+      dh2 += '<button type="button" class="tbtn" data-dep="' + DEP_POINTS[di] + '" onclick="pickDep(this.getAttribute(\'data-dep\'))"><span class="ttime">' + DEP_POINTS[di].split(' (')[0] + '</span><span class="tdesc">' + DEP_POINTS[di].split(' (')[1].replace(')','') + '</span></button>';
+    }
+    document.getElementById('depBtns').innerHTML = dh2;
+    dw.classList.remove('hidden');
+  } else dw.classList.add('hidden');
+
+  // Recommended minimum stay
+  var msn = document.getElementById('minStayNote');
+  if (p.minStay) { document.getElementById('minStayN').textContent = p.minStay; msn.style.display = 'block'; }
+  else msn.style.display = 'none';
+
+  // Fixed-date packages: dates are set, guest cannot change them
+  var fn = document.getElementById('fixedNote');
+  var dfrom = document.getElementById('dateFrom'), dto = document.getElementById('dateTo');
+  if (p.fixedFrom) {
+    document.getElementById('fixedNoteTxt').textContent = p.fixedLabel;
+    fn.style.display = 'block';
+    dfrom.value = p.fixedFrom; dto.value = p.fixedTo;
+    dfrom.readOnly = true; dto.readOnly = true;
+  } else {
+    fn.style.display = 'none';
+    if (dfrom.readOnly) { dfrom.value = ''; dto.value = ''; }
+    dfrom.readOnly = false; dto.readOnly = false;
+  }
 
   document.getElementById('btn2').disabled = true;
   applySeasonDates();
+  if (p.fixedFrom) onDate();
   // Update date step heading with product name
   var dh = document.getElementById('dateHeading');
   if (dh) dh.innerHTML = 'When would you<br><i>like to join us for ' + p.name.toLowerCase() + '?</i>';
   setTimeout(function(){ go(2); }, 260);
 }
 
+function pickDep(d) {
+  S.dep = d;
+  var btns = document.querySelectorAll('#depBtns .tbtn');
+  for (var i=0; i<btns.length; i++) {
+    if (btns[i].getAttribute('data-dep') === d) btns[i].classList.add('sel');
+    else btns[i].classList.remove('sel');
+  }
+  onDate();
+}
+
 function pickTime(t) {
   S.time = t;
-  var btns = document.querySelectorAll('.tbtn');
+  var btns = document.querySelectorAll('#timeWrap .tbtn');
   for (var i=0; i<btns.length; i++) btns[i].classList.remove('sel');
-  var map = {'09:00':'t-9','14:00':'t-14','17:30':'t-1730'};
+  var map = {'09:00':'t-9','14:00':'t-14'};
   if (map[t]) document.getElementById(map[t]).classList.add('sel');
 }
 
@@ -1225,7 +1454,7 @@ function onDate() {
     // Instant products — wish date + alternative
     S.date    = document.getElementById('tourDate').value || null;
     S.altDate = document.getElementById('altDate').value  || null;
-    document.getElementById('btn2').disabled = !S.date;
+    document.getElementById('btn2').disabled = !S.date || (p && p.depPoints && !S.dep);
   }
 
   // Out-of-season-window check — the date input's min/max is one continuous range
@@ -1257,7 +1486,7 @@ function onDate() {
 
   // PAB notice
   var pabNote = document.getElementById('pabNote');
-  if (p && (p.id === 'pab' || p.id === 'snorkel')) {
+  if (p && (p.id === 'pab' || p.id === 'snorkel' || p.id === 'snorkel3')) {
     pabNote.style.display = 'block';
   } else {
     pabNote.style.display = 'none';
@@ -1276,11 +1505,13 @@ function setupGroup() {
   var p = P[S.pid];
   document.getElementById('flowBadge3').innerHTML = flowBadge(p.instant?'instant':'enquiry');
 
-  // Reset date fields
+  // Reset date fields (fixed-date packages keep theirs)
   document.getElementById('tourDate').value = '';
   document.getElementById('altDate').value  = '';
-  document.getElementById('dateFrom').value = '';
-  document.getElementById('dateTo').value   = '';
+  if (!p.fixedFrom) {
+    document.getElementById('dateFrom').value = '';
+    document.getElementById('dateTo').value   = '';
+  }
   document.getElementById('btn2').disabled  = true;
   document.getElementById('seasonNote').classList.remove('on');
   document.getElementById('pabNote').style.display = 'none';
@@ -1320,10 +1551,20 @@ function setupGroup() {
     S.pkg = null;
   }
 
-  // Accommodation (Season of Giants)
+  // Accommodation / room choice (Season of the Giants, Sauerland)
   var aw = document.getElementById('accWrap');
-  if (p.hasAcc) aw.classList.remove('hidden');
-  else { aw.classList.add('hidden'); S.acc = ''; }
+  if (p.accOpts) {
+    var sel = document.getElementById('accSel');
+    var oh = '<option value="">Select an option</option>';
+    for (var ai2=0; ai2<p.accOpts.length; ai2++) {
+      var o = p.accOpts[ai2];
+      oh += '<option value="' + o.k + '">' + o.l + ' (\u20ac' + o.price.toLocaleString('en-US') + ' / person)</option>';
+    }
+    sel.innerHTML = oh;
+    document.getElementById('accLbl').textContent = p.accLabel || 'Preferred Accommodation';
+    S.acc = '';
+    aw.classList.remove('hidden');
+  } else { aw.classList.add('hidden'); S.acc = ''; }
 
   // Price box vs enquiry box
   var pb = document.getElementById('pbox');
@@ -1338,6 +1579,9 @@ function setupGroup() {
 
   if (p.instant) { pb.classList.remove('hidden'); eb.classList.add('hidden'); calcPrice(); }
   else { pb.classList.add('hidden'); eb.classList.remove('hidden'); }
+  // The live total bar only makes sense for instant (priced) bookings
+  var lpb0 = document.getElementById('livePriceBar');
+  if (lpb0 && !p.instant) lpb0.style.display = 'none';
   buildParticipantFields();
 }
 
@@ -1371,7 +1615,6 @@ function pickPkg(pkg) {
 }
 function onAcc() {
   S.acc = document.getElementById('accSel').value;
-  if (S.acc) { S.pid; P['giants'].ap = ACC_PRICES[S.acc]; }
 }
 
 function adj(t, d) {
@@ -1455,8 +1698,8 @@ function calcPrice() {
   S.vatAmt = 0;
   S.addOnTotal = addOnTotal;
 
-  var h = '<div class="pl"><span>' + S.adults + ' adult' + (S.adults>1?'s':'') + ' x \u20ac' + p.ap + '</span><span>\u20ac' + adA + '</span></div>';
-  if (p.hasChild && S.children>0) h += '<div class="pl"><span>' + S.children + ' child' + (S.children>1?'ren':'') + ' x \u20ac' + p.cp + '</span><span>\u20ac' + adC + '</span></div>';
+  var h = '<div class="pl"><span>' + S.adults + ' adult' + (S.adults>1?'s':'') + ' x \u20ac' + adRate + '</span><span>\u20ac' + adA + '</span></div>';
+  if (p.hasChild && S.children>0) h += '<div class="pl"><span>' + S.children + ' child' + (S.children>1?'ren':'') + ' x \u20ac' + cRate + '</span><span>\u20ac' + adC + '</span></div>';
   h += addOnLines;
 
   if (OP.active && OP.discountPct > 0) {
@@ -1574,15 +1817,18 @@ function fillReview() {
   // Experience card
   var h1 = '<div class="rlbl">Your Experience</div>';
   h1 += '<div class="rr"><span class="rk">Experience</span><span class="rv">' + p.name + '</span></div>';
+  if (p.fixedFrom) h1 += '<div class="rr"><span class="rk">Dates</span><span class="rv">' + p.fixedLabel + '</span></div>';
   if (p.instant) {
     h1 += '<div class="rr"><span class="rk">Preferred Date</span><span class="rv">' + fmtDate(S.date) + '</span></div>';
     if (S.time) h1 += '<div class="rr"><span class="rk">Departure Time</span><span class="rv">' + S.time + '</span></div>';
     if (S.altDate) h1 += '<div class="rr"><span class="rk">Alternative Date</span><span class="rv">' + fmtDate(S.altDate) + '</span></div>';
-  } else {
+  } else if (!p.fixedFrom) {
     h1 += '<div class="rr"><span class="rk">First Possible Day</span><span class="rv">' + fmtDate(S.dateFrom) + '</span></div>';
     h1 += '<div class="rr"><span class="rk">Last Possible Day</span><span class="rv">' + fmtDate(S.dateTo) + '</span></div>';
   }
-  if (p.hasAcc && S.acc) h1 += '<div class="rr"><span class="rk">Accommodation</span><span class="rv">' + (ACC_LABELS[S.acc]||S.acc) + '</span></div>';
+  if (p.depPoints && S.dep) h1 += '<div class="rr"><span class="rk">Departure Point</span><span class="rv">' + S.dep + '</span></div>';
+  if (p.accOpts && S.acc) h1 += '<div class="rr"><span class="rk">' + (p.accLabel||'Accommodation') + '</span><span class="rv">' + accOpt(p, S.acc).l + '</span></div>';
+  if (p.minStay) h1 += '<div class="rr"><span class="rk">Recommended minimum stay</span><span class="rv">' + p.minStay + ' nights on Pico</span></div>';
   if (p.hasBoat && S.pkg) { var pkgLabel = S.pkg==='1'?'1 Excursion':S.pkg==='3'?'3 Excursions':'6 Excursions'; h1 += '<div class="rr"><span class="rk">Package</span><span class="rv">' + pkgLabel + '</span></div>'; }
   document.getElementById('rExp').innerHTML = h1;
 
@@ -1608,7 +1854,8 @@ function fillReview() {
       h2 += '<div class="rr"><span class="rk">Total</span><span class="rv">\u20ac' + S.total + '</span></div>';
     }
   } else {
-    var priceStr = p.flat ? ('From \u20ac' + p.ap + ' per person') : ('From \u20ac' + p.ap + ' per person — The Booking Team will confirm');
+    var ao = accOpt(p, S.acc);
+    var priceStr = ao ? ('\u20ac' + ao.price.toLocaleString('en-US') + ' per person') : (p.flat ? ('From \u20ac' + p.ap + ' per person') : ('From \u20ac' + p.ap + ' per person — The Booking Team will confirm'));
     h2 += '<div class="rr"><span class="rk">Indicative price</span><span class="rv">' + priceStr + '</span></div>';
   }
   if (p.dive && S.cert) h2 += '<div class="rr"><span class="rk">Cert level</span><span class="rv">' + fmtCert(S.cert) + '</span></div>';
@@ -1650,6 +1897,8 @@ function fillReview() {
 
   // Reset T&C
   document.getElementById('tcBox').checked = false;
+  S.termsAcceptedAt = null;
+  document.getElementById('tcMinStay').innerHTML = p.minStay ? ', including the recommended minimum stay of <strong>' + p.minStay + ' nights</strong> on Pico for this tour' : '';
   document.getElementById('btnPay').disabled = true;
   document.getElementById('btnEnq').disabled = true;
   document.getElementById('tcErr').classList.remove('on');
@@ -1669,9 +1918,15 @@ function fillReview() {
   }
 }
 
+/* ── WEATHER / CANCELLATION CLAUSE POP-UP ─────────────────── */
+function openClause() { document.getElementById('clauseOv').classList.add('on'); }
+function closeClause() { document.getElementById('clauseOv').classList.remove('on'); }
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeClause(); });
+
 /* ── T&C ──────────────────────────────────────────────────── */
 function onTc() {
   var ok = document.getElementById('tcBox').checked;
+  S.termsAcceptedAt = ok ? new Date().toISOString() : null;
   document.getElementById('btnPay').disabled = !ok;
   document.getElementById('btnEnq').disabled = !ok;
   if (ok) document.getElementById('tcErr').classList.remove('on');
@@ -1690,13 +1945,13 @@ function doPay() {
   btn.disabled=true; lbl.textContent='Preparing payment...'; spn.classList.add('on');
   S.ref = genRef();
   var p = P[S.pid];
-  var fullProductName = p.name;
+  var fullProductName = productLabel();
   if (p.addOns && S.selectedAddOns && S.selectedAddOns.length) {
     var addOnNamesForProduct = [];
     for (var api=0; api<p.addOns.length; api++) {
       if (S.selectedAddOns.indexOf(p.addOns[api].id) > -1) addOnNamesForProduct.push(p.addOns[api].name);
     }
-    fullProductName = p.name + ' + ' + addOnNamesForProduct.join(' + ');
+    fullProductName = productLabel() + ' + ' + addOnNamesForProduct.join(' + ');
   }
   // GA4 begin_checkout event
   gtag('event', 'begin_checkout', {
@@ -1715,6 +1970,7 @@ function doPay() {
       certLevel:S.cert, loggedDives:S.dives,
       guestName:S.name, email:S.email, whatsapp:S.wa, address:S.address, participantNames:S.participantNames,
       totalPrice:S.total, currency:'EUR',
+      termsAcceptedAt:S.termsAcceptedAt, termsVersion:TERMS_VERSION,
 utm_source:UTM.utm_source, utm_medium:UTM.utm_medium,
 utm_campaign:UTM.utm_campaign, utm_term:UTM.utm_term,
 utm_content:UTM.utm_content,
@@ -1771,12 +2027,13 @@ function doEnq() {
     method:'POST', headers:{'Content-Type':'application/json'},
     body: JSON.stringify({
       type:'enquiry',
-      bookingRef:S.ref, productId:S.pid, productName:p.name,
+      bookingRef:S.ref, productId:S.pid, productName:productLabel(),
       date:S.date, altDate:S.altDate, dateFrom:S.dateFrom, dateTo:S.dateTo, adults:S.adults,
-      accommodation: S.acc ? (ACC_LABELS[S.acc]||S.acc) : '',
+      accommodation: S.acc ? accOpt(p, S.acc).l : '',
       notes:S.notes,
       guestName:S.name, email:S.email, whatsapp:S.wa, address:S.address, participantNames:S.participantNames,
-      indicativePrice: 'From \u20ac' + p.ap + ' per person',
+      indicativePrice: accOpt(p, S.acc) ? ('\u20ac' + accOpt(p, S.acc).price + ' per person') : ('From \u20ac' + p.ap + ' per person'),
+      termsAcceptedAt:S.termsAcceptedAt, termsVersion:TERMS_VERSION,
       utm_source:UTM.utm_source, utm_medium:UTM.utm_medium,
       utm_campaign:UTM.utm_campaign, utm_term:UTM.utm_term,
       utm_content:UTM.utm_content,
@@ -1858,7 +2115,7 @@ function fmtCert(c) {
   return m[c]||c;
 }
 function markSeasons() {
-  var ids = ['whale','whalezodiac','snorkel','pab','highlights','sharkday','shark','sharkhotel','giants','scuba','basic','advanced','bestpico','pico4day','mobydick','zodiac'];
+  var ids = Object.keys(P);
   for (var i=0; i<ids.length; i++) {
     var p = P[ids[i]];
     var el = document.getElementById('pc-'+ids[i]);
@@ -1939,7 +2196,7 @@ function genRef() {
 var FAQ_PROXY = 'https://n8n.srv1432046.hstgr.cloud/webhook/pia-chat';
 var FAQ_HISTORY = [];
 var FAQ_OPEN = false;
-var FAQ_KB = 'PICO ISLAND ADVENTURES — AI ASSISTANT KNOWLEDGE BASE\nVersion 2.0 | Last updated March 2026\n\nABOUT: Pico Island Adventures (Pico Sport) — 33+ years. Frank Wirth. Port Velho 33, Madalena, Pico Island, Azores. Licence Nr. 15/2009.\nContact: +351 292 622 980 | info@pico-island-adventures.com | WhatsApp: +351 292 622 980\nBook: https://booking.pico-island-adventures.com\n\nCANCELLATION: All bookings strictly non-refundable EXCEPT if trip cannot run due to weather — full refund in that case. Travel insurance strongly recommended.\n\nTOURS:\n\n1. WHALE & DOLPHIN WATCHING — EUR 99/adult, EUR 69/child under 12. Apr 1–Oct 30. Instant booking. 98% sighting success. Departures 9am, 2pm, 5:30pm sunset. Marine biologist guided. 28 species recorded. Sperm whales year-round. Blue/Fin/Sei whales Feb–Jun. Children welcome, no minimum age. Non-swimmers fine (stay on boat). Boats: power RIBs or 12m Cheetah Marine catamaran.\n\n2. SNORKELLING — PRINCESS ALICE BANK — EUR 225/person. Jun 1–Oct 15. Instant booking. No cert required — OWD and non-divers welcome. Full day, departs ~06:00, returns 16:00–17:00, meet 06:30 at dive centre. 100km offshore — cannot depart daily, flexible dates required. Boat: 12m Cheetah Marine catamaran (toilet, spacious deck). Species: Mobula rays (99% probability, groups 2–50 animals), whale sharks (Aug–Sep), tuna, kingfish, sailfish, marlin, barracuda, manta rays, stingrays, bonito. Light breakfast and simple lunch provided. Wetsuit and snorkel gear provided. Equipment: SMB and acoustic signal required, full diving kit, towel, sunscreen, seasick meds. No alcohol or drugs on board. Children welcome with parental supervision. Evening before: pack equipment at dive centre before 18:00.\n\n3. PRINCESS ALICE BANK DIVING — EUR 499/person. Jun 1–Oct 15. Instant booking. 2-day package. Open Water minimum (OWD sufficient — no AOW required). Mandatory check dive day before PAB. Same boat, timing, species and safety as snorkelling above. Day 1: 2-tank check dives around Pico. Day 2: 2-tank PAB. Returning guests who already did standard dives: EUR 99 deducted. Children from 12 yrs, certified, with parent.\n\n4. SHARK WEEK NO HOTEL — EUR 1,440/person. Jun 1–Oct 15. Instant booking. 10-day expedition. 2 days Condor Bank (4 shark dives), 1 day PAB (2 dives), 1 day Baixa Rosais (2 dives), 1 day Pico coast (2 dives), 1 whale watching. Shark safety briefing by Megalodon Project team. Includes transfers. 10 dives total. Shark briefing evening before departure is mandatory.\n\n5. SHARK WEEK WITH HOTEL — From EUR 1,440/person. Jun 1–Oct 15. Proposal request. Same as above + accommodation arranged by our team.\n\n6. SEASON OF THE GIANTS — From EUR 1,470/person. Feb 1–Jun 30 only. Proposal. 15-day package. Guest house dbl EUR 1,470 / sgl EUR 1,770. Apartment dbl EUR 1,799 / sgl EUR 2,249. Hotel dbl EUR 1,869 / sgl EUR 2,359. Includes 14 nights, 6 whale excursions, island tours, vineyard hike, highland exploration, whale watcher visit, Faial island tour, lava cave. German-speaking support.\n\n7. SCUBA DIVING — From EUR 110/2-tank dive. Year-round. Proposal. Land EUR 110 (OW), boat EUR 125 (OW), premium EUR 150 (AOW), offshore EUR 225 (AOW+deep), 10-dive pkg EUR 499 (OW), night dive EUR 75 (OW). Check dive mandatory before advanced sites.\n\nCONDOR BANK SHARK DIVING DETAILS: 22nm from Pico. Protected plateau. Blue sharks main species, Mako possible. Season Jun–Oct. Departs ~08:30, returns 12:00–14:00. High-speed power RIBs, 1.5hr travel. Mandatory: full neoprene suit, hood, gloves. No yellow/white/silver reflecting fins. Stays on current line. Shark briefing evening before. Alternative site Pe de Sousa used as Plan B in bad weather. Water and fruit provided.\n\nCERTS: Whale watching/snorkelling — none. PAB diving — OWD minimum. Scuba boat — OWD. Scuba premium — AOW. Shark/offshore — AOW recommended. All diving: check dive mandatory before advanced sites.\n\nSEASONS: Whale watching Apr–Oct. Snorkel/PAB/Shark Jun–Oct. Giants Feb–Jun. Scuba year-round. Sperm whales year-round. Blue/Fin/Sei Feb–Jun.\n\nPAB NOTE: ~100km offshore, runs ~twice/week. Final time confirmed 48–12hrs before. Must reconfirm after arriving on Pico.\n\nBOAT: 12m x 5.2m Cheetah Marine power catamaran (since 2026) for PAB trips. Power RIBs for shark diving.\n\nSAFETY: Fully licensed, annual inspections. Satellite comms, VHF, life rafts, life jackets. O2 rescue sets on board. Staff trained marine first aid. Portuguese man-of-war jellyfish risk in some seasons.\n\nGETTING HERE: Pico Airport (PIX) 8km from base. Ferry Faial/Horta to Madalena 30min — base opposite terminal. Car rental: www.pico-rentacar.com\n\nMEETING POINT: Port Velho 33, Madalena. 15 mins before departure. Our team WhatsApps 48–12hrs before with exact time. PAB/Shark trips: meet dive centre evening before to pack gear.\n\nWHAT TO BRING ALL TRIPS: Warm layer, waterproof jacket, reef-safe sunscreen, sunglasses, seasick meds, towel, camera/GoPro, personal snacks. DIVERS ADD: C-card mandatory, logbook, full wetsuit, SMB, acoustic signal.\n\nFAQs:\n- Children? Whale watching: no minimum, under 12 = EUR 69. Snorkelling: yes with parent. Diving/sharks: 12+ certified with parent.\n- Mobula guarantee? No but 99% probability in season.\n- Non-swimmers OK? Yes for whale watching (stay on boat).\n- Non-diving partners? Can join land dive days (cafes nearby).\n- Climb Pico mountain? Do it before diving (altitude/decompression risk).\n- German spoken? Yes — Frank is German, full German support on all tours.\n- Santa Maria? Yes — combined itineraries available.\n- Book how far ahead? Day trips: few days. Multi-day: weeks/months.\n- Alcohol on board? Strictly forbidden on all boats.\n- Seasick? Bring own medication. Catamaran is very stable.\n- Weather cancels? Full refund if tour impossible within your dates.\n\nESCALATION: WhatsApp +351 292 622 980 | info@pico-island-adventures.com | 08:00–20:00 Azores Time (UTC-1)\n';
+var FAQ_KB = 'PICO ISLAND ADVENTURES — AI ASSISTANT KNOWLEDGE BASE\nVersion 3.0 | Last updated October 2026 (2027 season)\n\nABOUT: Pico Island Adventures (Pico Sport) — 33+ years. Frank Wirth. Port Velho 33, Madalena, Pico Island, Azores. Licence Nr. 15/2009.\nContact: +351 292 622 980 | info@pico-island-adventures.com | WhatsApp: +351 292 622 980\nBook: https://booking.pico-island-adventures.com\n\nCANCELLATION: If the guest cancels or cannot take part for personal reasons (late arrival, early departure, flight/ferry problems, illness), the booking is non-refundable. If we cannot operate because of weather or safety, we first try to reschedule during the guest’s stay on Pico; if that is impossible within the recommended minimum stay, the amount paid is refunded (non-refundable payment processing/bank/currency charges may be deducted). Full wording: Weather Conditions, Operational Changes & Cancellation Clause, shown at booking. Travel insurance strongly recommended.\n\nMINIMUM STAY: Each tour shows a recommended minimum stay on Pico (e.g. 4 nights for day trips) so weather-cancelled trips can be rescheduled.\n\nTOURS:\n\n1. WHALE & DOLPHIN WATCHING — EUR 99/adult, EUR 69/child under 12. 3 excursions EUR 270/190, 6 excursions EUR 470/360, groups of 4 EUR 89 pp, groups of 8 EUR 79 pp. 1 May–15 Oct 2027. Instant booking. Choose a departure point: Madalena (Pico), Lajes (Pico) or Horta (Faial) — same price and duration. Departures 09:00 and 14:00. 17:00 departure and private charters on request only. 98% sighting success. Marine biologist guided. 28 species recorded. Sperm whales year-round. Blue/Fin/Sei whales Feb–Jun. Children welcome, no minimum age. Non-swimmers fine (stay on boat).\n\n2. SNORKELLING — PRINCESS ALICE BANK — EUR 270/person. 15 Jun–5 Oct. Instant booking. No cert required — OWD and non-divers welcome. Full day, starts between 06:00 and 07:00, returns by 16:00–17:00. 100km offshore — cannot depart daily, flexible dates required. Boat: comfortable large boat with toilet, snacks and drinks. Species: Mobula rays (99% probability, groups 2–50 animals), whale sharks (Aug–Sep), tuna, kingfish, sailfish, marlin, barracuda, manta rays, stingrays, bonito. Light breakfast and simple lunch provided. Wetsuit and snorkel gear provided. Equipment: SMB and acoustic signal required, full diving kit, towel, sunscreen, seasick meds. No alcohol or drugs on board. Children welcome with parental supervision. Evening before: pack equipment at dive centre before 18:00.\n\n3. PRINCESS ALICE BANK DIVING (Base package) — EUR 499/person. 15 Jun–5 Oct only. Instant booking. 2-day package. Starts 06:00–07:00, returns 16:00–17:00. Open Water minimum (OWD sufficient — no AOW required). Mandatory check dive day before PAB. Same boat, timing, species and safety as snorkelling above. Day 1: 2-tank check dives around Pico. Day 2: 2-tank PAB. Returning guests who already did standard dives: EUR 99 deducted. Children from 12 yrs, certified, with parent.\n\n4. SHARK WEEK NO HOTEL — EUR 1,440/person. 15 Jun–5 Oct. Instant booking. 10-day expedition. 2 days Condor Bank (4 shark dives), 1 day PAB (2 dives), 1 day Baixa Rosais (2 dives), 1 day Pico coast (2 dives), 1 whale watching. Shark safety briefing by Megalodon Project team. Includes transfers. 10 dives total. Shark briefing evening before departure is mandatory.\n\n5. SHARK WEEK WITH HOTEL — From EUR 1,440/person. 15 Jun–5 Oct. Proposal request. Same as above + accommodation arranged by our team.\n\n6. SEASON OF THE GIANTS 2027 — one departure, 1–15 May 2027 (14 nights). Proposal. Price per person sharing a double room / single supplement: Hotel Vila da Madalena EUR 1,890 / +690; Casa No Mar EUR 1,990 / +790; Villa Barca double room EUR 2,150 / +690; Villa Barca mini apartment EUR 2,250 / +790; Vivenda Oliveira Barca EUR 2,150 / +690; Studio Por do Sol (incl. owner’s car) EUR 2,490 / no single; Hotel Caravelhas EUR 2,590 / +920; Solar das Limas EUR 2,690 / no single (rental car +EUR 315 pp); Bela Vista Lajes EUR 2,250 / +690. Includes airport transfers, six whale and dolphin boat trips (from Lajes or Madalena), Whaling and Agricultural Museum in Lajes, land-based whale lookout, Cory’s shearwater nesting sites, highland tour, vineyard walk, day excursion to the north-coast wine villages. English-speaking skippers and guides; local contact via WhatsApp (approx. 8 a.m.–6 p.m.).\n\nNEW 2027 TOURS (instant booking unless noted):\n- PICO SUNSET TRIP — EUR 49. 1 May–15 Oct. Approx. 1.5–2 h aboard catamaran Reefcat from Madalena; meet about 3 h before sunset. Soft drinks and snacks.\n- SAO JORGE EXPLORER (sightseeing & snorkeling) — EUR 199. Full day approx. 7–8 h by power catamaran from Madalena: Ponta dos Rosais, guided snorkeling, about 1 h ashore in Velas. Crew, gear, snacks, water and soft drinks included. Min. stay 4 nights.\n- SHARK WATCHING, NO DIVING REQUIRED — EUR 399 package: Blue Shark Watching at Condor Bank (approx. 4–6 h) + Hammerhead Shark Watching (approx. 3–4 h). Guests stay on the boat. 1 Jun–30 Sep.\n- ILHEUS SNORKELING — EUR 79. Approx. 2–3 h aboard Reefcat from Madalena. Gear, guide, water, fresh fruit. Max 8 snorkelers per guide. 1 Jun–30 Sep.\n- SNORKEL WITH HAMMERHEAD SHARKS — EUR 250. Approx. 3–4 h. Gear, safety briefing, experienced shark guide. Max 8 guests per trip. 1 Jun–30 Sep.\n- SNORKELING ADVENTURE, 3 DAYS AROUND PICO — EUR 449. Day 1 snorkeling intro and guided bay tour; Day 2 Ilheus excursion; Day 3 Princess Alice Bank Mobula snorkeling. Min. stay 5 nights.\n- PURE SHARK PACKAGE — EUR 1,449. Day 1: 2 shore check dives; 3 days Blue/Mako shark diving (6 shark dives) + 1 Hammerhead Shark Snorkeling Excursion. PAB on request. Min. stay 7 nights.\n- AZOREN SPECIAL 2027, TAUCHSCHULE SAUERLAND (German group trip) — 3–16 Jul 2027, EUR 2,950 pp twin/double, single supplement EUR 880. Proposal.\n\n7. SCUBA DIVING — From EUR 110/2-tank dive. Year-round. Proposal. Land EUR 110 (OW), boat EUR 125 (OW), premium EUR 150 (AOW), offshore EUR 225 (AOW+deep), 10-dive pkg EUR 499 (OW), night dive EUR 75 (OW). Check dive mandatory before advanced sites.\n\nCONDOR BANK SHARK DIVING DETAILS: 22nm from Pico. Protected plateau. Blue sharks main species, Mako possible. Season Jun–Oct. Departs ~08:30, returns 12:00–14:00. High-speed power RIBs, 1.5hr travel. Mandatory: full neoprene suit, hood, gloves. No yellow/white/silver reflecting fins. Stays on current line. Shark briefing evening before. Alternative site Pe de Sousa used as Plan B in bad weather. Water and fruit provided.\n\nCERTS: Whale watching/snorkelling — none. PAB diving — OWD minimum. Scuba boat — OWD. Scuba premium — AOW. Shark/offshore — AOW recommended. All diving: check dive mandatory before advanced sites.\n\nSEASONS 2027: Whale watching 1 May–15 Oct. Princess Alice Bank (diving and snorkeling) 15 Jun–5 Oct. Shark watching, hammerhead snorkeling, Ilheus 1 Jun–30 Sep. Sunset trip 1 May–15 Oct. Season of the Giants 1–15 May 2027. Scuba year-round. Sperm whales year-round. Blue/Fin/Sei Feb–Jun.\n\nPAB NOTE: ~100km offshore, runs ~twice/week. Final time confirmed 48–12hrs before. Must reconfirm after arriving on Pico.\n\nBOAT: comfortable large boat with toilet, snacks and drinks for PAB trips. Power RIBs for shark diving.\n\nSAFETY: Fully licensed, annual inspections. Satellite comms, VHF, life rafts, life jackets. O2 rescue sets on board. Staff trained marine first aid. Portuguese man-of-war jellyfish risk in some seasons.\n\nGETTING HERE: Pico Airport (PIX) 8km from base. Ferry Faial/Horta to Madalena 30min — base opposite terminal. Car rental: www.pico-rentacar.com\n\nMEETING POINT: Port Velho 33, Madalena. 15 mins before departure. Our team WhatsApps 48–12hrs before with exact time. PAB/Shark trips: meet dive centre evening before to pack gear.\n\nWHAT TO BRING ALL TRIPS: Warm layer, waterproof jacket, reef-safe sunscreen, sunglasses, seasick meds, towel, camera/GoPro, personal snacks. DIVERS ADD: C-card mandatory, logbook, full wetsuit, SMB, acoustic signal.\n\nFAQs:\n- Children? Whale watching: no minimum, under 12 = EUR 69. Snorkelling: yes with parent. Diving/sharks: 12+ certified with parent.\n- Mobula guarantee? No but 99% probability in season.\n- Non-swimmers OK? Yes for whale watching (stay on boat).\n- Non-diving partners? Can join land dive days (cafes nearby).\n- Climb Pico mountain? Do it before diving (altitude/decompression risk).\n- German spoken? Yes — Frank is German, full German support on all tours.\n- Santa Maria? Yes — combined itineraries available.\n- Book how far ahead? Day trips: few days. Multi-day: weeks/months.\n- Alcohol on board? Strictly forbidden on all boats.\n- Seasick? Bring own medication.\n- Weather cancels? We first reschedule during your stay; if impossible within the recommended minimum stay, the amount paid is refunded (processing/bank charges may be deducted).\n\nESCALATION: WhatsApp +351 292 622 980 | info@pico-island-adventures.com | 08:00–20:00 Azores Time (UTC-1)\n';
 
 var FAQ_SYSTEM = 'You are the friendly AI assistant for Pico Island Adventures, a marine tour company on Pico Island in the Azores, Portugal. You answer questions warmly and knowledgeably, like a trusted local expert. You only answer questions using the information in the knowledge base below. If you cannot answer from the knowledge base, say so honestly and direct the guest to WhatsApp +351 292 622 980. Never invent prices, dates, or policies. Always encourage booking when appropriate — the goal is to convert interest into a confirmed booking. Respond in the same language the guest writes in — English or German. Keep responses concise and friendly, under 120 words where possible.\n\nKNOWLEDGE BASE:\n' + FAQ_KB;
 
