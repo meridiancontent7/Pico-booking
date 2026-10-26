@@ -1036,6 +1036,14 @@ var P = {
 };
 
 var DEP_POINTS = ['Madalena (Pico)', 'Lajes (Pico)', 'Horta (Faial)'];
+
+// Deep-link slugs for accommodation: ?product=giants&acc=caravelhas (&room=single)
+var ACC_SLUGS = {
+  giants: { vila:'vila_dbl', nomar:'nomar_dbl', villabarca:'vbd_dbl', 'villabarca-apartment':'vbm_dbl',
+            oliveira:'voli_dbl', pordosol:'sol_dbl', caravelhas:'cara_dbl', limas:'limas_dbl', belavista:'bela_dbl' },
+  sauerland: { double:'dz', single:'ez' }
+};
+var PRESET_ACC = '';
 var TERMS_VERSION = 'PIA-TC-2027-10';
 
 function accOpt(p, k) {
@@ -1103,6 +1111,15 @@ window.onload = function() {
       pickCheck(product);
     } else {
       pick(product);
+    }
+    var accSlug = decodeURIComponent(getParam('acc') || '').toLowerCase();
+    var map = ACC_SLUGS[product];
+    if (accSlug && map && map[accSlug]) {
+      PRESET_ACC = map[accSlug];
+      if (decodeURIComponent(getParam('room') || '').toLowerCase() === 'single' && /_dbl$/.test(PRESET_ACC)) {
+        var sgl = PRESET_ACC.replace(/_dbl$/, '_sgl');
+        if (accOpt(P[product], sgl)) PRESET_ACC = sgl;
+      }
     }
     var dep = decodeURIComponent(getParam('dep') || '').toLowerCase();
     if (dep && P[product].depPoints) {
@@ -1563,6 +1580,7 @@ function setupGroup() {
     sel.innerHTML = oh;
     document.getElementById('accLbl').textContent = p.accLabel || 'Preferred Accommodation';
     S.acc = '';
+    if (PRESET_ACC && accOpt(p, PRESET_ACC)) { sel.value = PRESET_ACC; S.acc = PRESET_ACC; }
     aw.classList.remove('hidden');
   } else { aw.classList.add('hidden'); S.acc = ''; }
 
