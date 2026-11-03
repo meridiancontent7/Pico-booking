@@ -269,6 +269,25 @@
     .tbtn .tdesc{font-size:10px;display:block;margin-top:2px}
     @media(max-width:480px){.htitle{font-size:24px}.sh{font-size:26px}.pline{width:18px}.pdot{width:23px;height:23px;font-size:10px}}
   </style>
+  <!-- Calendar -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/themes/dark.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.js"></script>
+  <style>
+    /* Calendar (flatpickr) — matches the page palette; unavailable dates are greyed out */
+    body .flatpickr-calendar{font-family:'DM Sans',sans-serif;background:var(--nmid);border:1px solid var(--bdr);box-shadow:0 12px 32px rgba(0,0,0,0.45)}
+    .flatpickr-calendar.arrowTop:after,.flatpickr-calendar.arrowTop:before{border-bottom-color:var(--nmid)}
+    .flatpickr-calendar.arrowBottom:after,.flatpickr-calendar.arrowBottom:before{border-top-color:var(--nmid)}
+    .flatpickr-months .flatpickr-month,.flatpickr-weekdays,span.flatpickr-weekday,.flatpickr-monthDropdown-months{background:var(--nmid)}
+    .flatpickr-day{color:var(--cream)}
+    .flatpickr-day:hover{background:rgba(6,182,212,0.18);border-color:rgba(6,182,212,0.35)}
+    .flatpickr-day.today{border-color:var(--muted)}
+    .flatpickr-day.selected,.flatpickr-day.selected:hover{background:var(--tb);border-color:var(--tb);color:var(--navy);font-weight:500}
+    .flatpickr-day.flatpickr-disabled,.flatpickr-day.flatpickr-disabled:hover{color:rgba(248,245,239,0.18);background:transparent;border-color:transparent;cursor:not-allowed}
+    .flatpickr-day.prevMonthDay,.flatpickr-day.nextMonthDay{color:rgba(248,245,239,0.35)}
+    .flatpickr-months .flatpickr-prev-month.flatpickr-disabled,.flatpickr-months .flatpickr-next-month.flatpickr-disabled{display:none}
+    .di.flatpickr-input[readonly]{cursor:pointer}
+  </style>
   <!-- Stripe.js -->
   <script src="https://js.stripe.com/v3/"></script>
 
@@ -1277,7 +1296,7 @@ function go(n) {
   document.getElementById('step'+cur).classList.remove('on');
   cur = n;
   document.getElementById('step'+n).classList.add('on');
-  if (n===2) {     var today = new Date();     var yyyy = today.getFullYear();     var mm = String(today.getMonth() + 1).padStart(2, '0');     var dd = String(today.getDate()).padStart(2, '0');     var todayStr = yyyy + '-' + mm + '-' + dd;     var tourDateEl = document.getElementById('tourDate');     if (tourDateEl) tourDateEl.min = todayStr;   }   if (n===3) setupGroup();
+  if (n===3) setupGroup();
   if (n===4) setupAddOns();
   if (n===6) fillReview();
   drawProg();
@@ -1364,12 +1383,8 @@ function pick(id) {
 
   document.getElementById('btn2').disabled = true;
   applySeasonDates();
+  setupPickers(p);
   if (p.dateMin) {
-    var dlims = ['tourDate','altDate','dateFrom','dateTo'];
-    for (var dli=0; dli<dlims.length; dli++) {
-      var dle = document.getElementById(dlims[dli]);
-      if (dle) { dle.min = p.dateMin; dle.max = p.dateMax; }
-    }
     var dsub = document.getElementById('dateSub');
     if (dsub) dsub.innerHTML = '<span style="color:#06b6d4;font-weight:500">Dates: ' + p.dateRangeLabel + ' only.</span> Choose your arrival and departure within this window.';
   }
@@ -1418,6 +1433,95 @@ function dateInSeasonWindow(p, dateStr) {
   var start = p.seasonStart[0] * 100 + p.seasonStart[1];
   var end   = p.seasonEnd[0]   * 100 + p.seasonEnd[1];
   return md >= start && md <= end;
+}
+
+/* ── CALENDAR: only bookable dates can be picked ───────────── */
+var FP = {};                       // flatpickr instances by input id
+var DATE_LIMITS = {min:'', max:''};
+var DATE_IDS = ['tourDate','altDate','dateFrom','dateTo'];
+function ymdLocal(dt) {
+  return dt.getFullYear() + '-' + ('0'+(dt.getMonth()+1)).slice(-2) + '-' + ('0'+dt.getDate()).slice(-2);
+}
+function setDateVal(id, v) {
+  var f = FP[id];
+  if (f) { if (v) f.setDate(v, false); else f.clear(false); }
+  else { var el = document.getElementById(id); if (el) el.value = v || ''; }
+}
+// Bookable windows for a product: fixed dates, a one-off window, or the season
+// for the next three seasons. null = no season restriction.
+function dateWindows(p) {
+  if (p.fixedFrom) return [{from:p.fixedFrom, to:p.fixedTo}];
+  if (p.dateMin)   return [{from:p.dateMin,   to:p.dateMax}];
+  if (!p.seasonStart || !p.seasonEnd) return null;
+  var now = new Date(), yr = now.getFullYear();
+  var todayS = ymdLocal(now);
+  var endThis = ymdLocal(new Date(yr, p.seasonEnd[0]-1, p.seasonEnd[1]));
+  var y0 = todayS > endThis ? yr + 1 : yr;
+  var w = [];
+  for (var y = y0; y <= y0 + 2; y++) {
+    w.push({from: ymdLocal(new Date(y, p.seasonStart[0]-1, p.seasonStart[1])),
+            to:   ymdLocal(new Date(y, p.seasonEnd[0]-1,   p.seasonEnd[1]))});
+  }
+  return w;
+}
+function setupPickers(p) {
+  var todayS = ymdLocal(new Date());
+  var wins = dateWindows(p);
+  var minD = todayS, maxD = '';
+  if (wins) {
+    if (wins[0].from > minD) minD = wins[0].from;
+    maxD = wins[wins.length-1].to;
+  }
+  DATE_LIMITS = {min:minD, max:maxD};
+  var fixed = !!p.fixedFrom;
+  var useFp = typeof window.flatpickr === 'function';
+
+  for (var i = 0; i < DATE_IDS.length; i++) {
+    var id = DATE_IDS[i];
+    var el = document.getElementById(id);
+    if (!el) continue;
+    var isRange = (id === 'dateFrom' || id === 'dateTo');
+    var keep = fixed && isRange ? (id === 'dateFrom' ? p.fixedFrom : p.fixedTo) : '';
+    if (FP[id]) { FP[id].destroy(); delete FP[id]; }
+    if (el.type === 'hidden') el.type = 'text';
+    el.removeAttribute('value');
+    el.value = keep;
+
+    if (!useFp) {
+      // Fallback if the calendar script fails to load: native picker with min/max;
+      // dateInSeasonWindow() still warns about off-season gaps.
+      el.type = 'date';
+      el.min = minD; el.max = maxD;
+      el.readOnly = fixed && isRange;
+      continue;
+    }
+    el.type = 'text';
+    var cfg = {
+      dateFormat: 'Y-m-d', altInput: true, altFormat: 'D j M Y',
+      disableMobile: true, allowInput: false,
+      minDate: minD, maxDate: maxD || null,
+      locale: { firstDayOfWeek: 1 }, monthSelectorType: 'static'
+    };
+    if (wins) cfg.enable = wins;
+    if (keep) { cfg.defaultDate = keep; cfg.clickOpens = false; }
+    if (id === 'dateFrom' && !fixed) {
+      cfg.onChange = function(sd, str) {
+        if (!FP.dateTo) return;
+        FP.dateTo.set('minDate', str || DATE_LIMITS.min);
+        if (str && FP.dateTo.input.value && FP.dateTo.input.value < str) { FP.dateTo.clear(false); S.dateTo = null; }
+      };
+    }
+    FP[id] = window.flatpickr(el, cfg);
+    if (FP[id].altInput) {
+      FP[id].altInput.style.cssText = el.style.cssText;
+      FP[id].altInput.placeholder = keep ? '' : 'Select a date';
+      if (keep) FP[id].altInput.style.cursor = 'default';
+    }
+  }
+  if (!fixed) {
+    S.date = null; S.altDate = null; S.dateFrom = null; S.dateTo = null;
+    var ow = document.getElementById('outOfSeasonWarn'); if (ow) ow.style.display = 'none';
+  }
 }
 
 function applySeasonDates() {
@@ -1472,15 +1576,14 @@ function onDateChange() {
   var tourDate = document.getElementById('tourDate').value;
   var altDate = document.getElementById('altDate');
   if (tourDate) {
-    var nextDay = new Date(tourDate);
-    nextDay.setDate(nextDay.getDate() + 1);
-    var yyyy = nextDay.getFullYear();
-    var mm = String(nextDay.getMonth() + 1).padStart(2, '0');
-    var dd = String(nextDay.getDate()).padStart(2, '0');
-    altDate.min = yyyy + '-' + mm + '-' + dd;
+    var tp = tourDate.split('-');
+    var nextDay = new Date(+tp[0], +tp[1]-1, +tp[2] + 1);
+    var nd = ymdLocal(nextDay);
+    if (nd < DATE_LIMITS.min) nd = DATE_LIMITS.min;
+    if (FP.altDate) FP.altDate.set('minDate', nd); else altDate.min = nd;
     // Clear alt date if it's now before the min
     if (altDate.value && altDate.value <= tourDate) {
-      altDate.value = '';
+      setDateVal('altDate', '');
       S.altDate = '';
     }
   }
@@ -1559,11 +1662,11 @@ function setupGroup() {
   document.getElementById('flowBadge3').innerHTML = flowBadge(p.instant?'instant':'enquiry');
 
   // Reset date fields (fixed-date packages keep theirs)
-  document.getElementById('tourDate').value = '';
-  document.getElementById('altDate').value  = '';
+  setDateVal('tourDate', '');
+  setDateVal('altDate', '');
   if (!p.fixedFrom) {
-    document.getElementById('dateFrom').value = '';
-    document.getElementById('dateTo').value   = '';
+    setDateVal('dateFrom', '');
+    setDateVal('dateTo', '');
   }
   document.getElementById('btn2').disabled  = true;
   document.getElementById('seasonNote').classList.remove('on');
