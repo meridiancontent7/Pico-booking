@@ -827,8 +827,8 @@
     <!-- Total bar (instant only) -->
     <div class="rtot hidden" id="rtot">
       <div>
-        <div class="rtlbl">Total to Pay</div>
-        <div class="rtsub">Secure payment via Stripe</div>
+        <div class="rtlbl" id="rtotLbl">Total to Pay</div>
+        <div class="rtsub" id="rtotSub">Secure payment via Stripe</div>
       </div>
       <div class="rtamt">&#8364;<span id="rtotAmt">0</span></div>
     </div>
@@ -845,7 +845,7 @@
       <div class="tcs">
         <p>Please read the following terms carefully before completing your booking with Pico Island Adventures.</p>
         <h4>1. Bookings and Confirmation</h4>
-        <p>Your booking is confirmed upon receipt of full payment. You will receive a confirmation email with your booking reference. Pico Island Adventures operates under Maritime Tourism Licence Nr. 15/2009.</p>
+        <p>Your booking is confirmed upon receipt of payment. For bookings made more than 30 days before the activity date, a non-refundable deposit of 20% is charged at booking and the balance is due 30 days before the activity; we email you a secure payment link for the balance on that day. Bookings made 30 days or less before the activity are paid in full at booking. You will receive a confirmation email with your booking reference. Pico Island Adventures operates under Maritime Tourism Licence Nr. 15/2009.</p>
         <h4>2. Cancellation by the Guest — No Refunds</h4>
         <p>Bookings are non-refundable if the guest cancels or is unable to participate for personal reasons, including changes to travel plans, flight or ferry problems, illness or personal emergencies. We strongly recommend that guests purchase comprehensive travel insurance to cover unforeseen circumstances. All cancellation requests must be submitted in writing to Pico Island Adventures for record purposes.</p>
         <h4>3. Weather, Operational Changes and Cancellation by Pico Island Adventures</h4>
@@ -1081,7 +1081,30 @@ var ACC_SLUGS = {
   sauerland: { double:'dz', single:'ez' }
 };
 var PRESET_ACC = '';
-var TERMS_VERSION = 'PIA-TC-2027-10';
+var TERMS_VERSION = 'PIA-TC-2027-11';
+var N8N_BALANCE = 'https://n8n.srv1432046.hstgr.cloud/webhook/pia-balance';
+// Deposit rule: trips more than 30 days away pay a 20% non-refundable deposit now;
+// the balance link is emailed 30 days before the trip.
+var DEPOSIT_PCT = 0.20, DEPOSIT_DAYS = 30;
+function payPlan(total, dateStr) {
+  total = Math.round((parseFloat(total) || 0) * 100) / 100;
+  var full = {plan:'full', now:total, balance:0, dueDate:null};
+  if (!dateStr || !total) return full;
+  var t = dateStr.split('-'), trip = new Date(+t[0], +t[1]-1, +t[2]);
+  var today = new Date(); today.setHours(0,0,0,0);
+  var days = Math.round((trip - today) / 86400000);
+  if (days <= DEPOSIT_DAYS) return full;
+  var dep = Math.round(total * DEPOSIT_PCT * 100) / 100;
+  var due = new Date(+t[0], +t[1]-1, +t[2] - DEPOSIT_DAYS);
+  return {plan:'deposit', now:dep, balance:Math.round((total - dep) * 100) / 100, dueDate:ymdLocal(due)};
+}
+function payNote(plan) {
+  if (!plan || plan.plan !== 'deposit') return '';
+  var t = plan.dueDate.split('-');
+  var d = new Date(+t[0], +t[1]-1, +t[2]).toLocaleDateString('en-GB', {day:'numeric', month:'long', year:'numeric'});
+  return '20% deposit. Balance of \u20ac' + plan.balance.toFixed(2) + ' due ' + d + '; we will email you a secure payment link that day.';
+}
+function eur(n) { return '\u20ac' + (Math.round(n * 100) / 100).toFixed(2).replace(/\.00$/, ''); }
 
 function accOpt(p, k) {
   if (!p || !p.accOpts) return null;
@@ -1131,6 +1154,14 @@ var cur = 1;
 /* ── INIT ─────────────────────────────────────────────────── */
 window.onload = function() {
   var qs = window.location.search;
+  if (getParam('status') === 'balance_paid') {
+    showSuc('balance', getParam('ref'), '');
+    return;
+  }
+  if (getParam('pay')) {
+    startBalancePayment(decodeURIComponent(getParam('pay')).toUpperCase());
+    return;
+  }
   if (qs.indexOf('status=success') > -1) {
     showSuc('paid', getParam('ref'), decodeURIComponent(getParam('email')));
     return;
@@ -2010,6 +2041,11 @@ function fillReview() {
     } else {
       h2 += '<div class="rr"><span class="rk">Total</span><span class="rv">\u20ac' + S.total + '</span></div>';
     }
+    S.plan = payPlan(S.total, S.date);
+    if (S.plan.plan === 'deposit' && !isLastMinute(S.date)) {
+      h2 += '<div class="rr"><span class="rk">Deposit due today (20%, non-refundable)</span><span class="rv">' + eur(S.plan.now) + '</span></div>';
+      h2 += '<div class="rr"><span class="rk">Balance due ' + fmtDate(S.plan.dueDate) + '</span><span class="rv">' + eur(S.plan.balance) + '</span></div>';
+    }
   } else {
     var ao = accOpt(p, S.acc);
     var priceStr = ao ? ('\u20ac' + ao.price.toLocaleString('en-US') + ' per person') : (p.flat ? ('From \u20ac' + p.ap + ' per person') : ('From \u20ac' + p.ap + ' per person — The Booking Team will confirm'));
@@ -2038,7 +2074,12 @@ function fillReview() {
   var lmNote = document.getElementById('lastMinNote');
   if (lmNote) { if (lastMin) lmNote.classList.remove('hidden'); else lmNote.classList.add('hidden'); }
   if (p.instant && !lastMin) {
-    document.getElementById('rtotAmt').textContent = typeof S.total === 'number' ? S.total.toFixed(2) : S.total;
+    var isDep = S.plan && S.plan.plan === 'deposit';
+    document.getElementById('rtotAmt').textContent = (isDep ? S.plan.now : S.total).toFixed(2);
+    document.getElementById('rtotLbl').textContent = isDep ? 'Deposit to Pay Today' : 'Total to Pay';
+    document.getElementById('rtotSub').textContent = isDep
+      ? '20% deposit. Balance of ' + eur(S.plan.balance) + ' due ' + fmtDate(S.plan.dueDate) + '. We will email you a secure payment link that day.'
+      : 'Secure payment via Stripe';
     rt.classList.remove('hidden'); es.classList.add('hidden');
     bp.classList.remove('hidden'); be.classList.add('hidden');
     pn.classList.remove('hidden'); en.classList.add('hidden');
@@ -2110,6 +2151,8 @@ function doPay() {
     }
     fullProductName = productLabel() + ' + ' + addOnNamesForProduct.join(' + ');
   }
+  var plan = payPlan(S.total, S.date);
+  if (isLastMinute(S.date)) plan = {plan:'full', now:S.total, balance:0, dueDate:null};
   // GA4 begin_checkout event
   gtag('event', 'begin_checkout', {
     value: S.total,
@@ -2127,12 +2170,13 @@ function doPay() {
       certLevel:S.cert, loggedDives:S.dives,
       guestName:S.name, email:S.email, whatsapp:S.wa, address:S.address, participantNames:S.participantNames,
       totalPrice:S.total, currency:'EUR',
+      paymentType: plan.plan, amountDueNow: plan.now, balanceDue: plan.balance, balanceDueDate: plan.dueDate, paymentNote: payNote(plan),
       termsAcceptedAt:S.termsAcceptedAt, termsVersion:TERMS_VERSION,
 utm_source:UTM.utm_source, utm_medium:UTM.utm_medium,
 utm_campaign:UTM.utm_campaign, utm_term:UTM.utm_term,
 utm_content:UTM.utm_content,
 ga_client_id:getGA4ClientId(),
-      successUrl: BASE_URL+'?status=success&ref='+S.ref+'&email='+encodeURIComponent(S.email)+'&value='+S.total+'&productName='+encodeURIComponent(fullProductName)+'&productId='+S.pid,
+      successUrl: BASE_URL+'?status=success&ref='+S.ref+'&email='+encodeURIComponent(S.email)+'&value='+S.total+'&productName='+encodeURIComponent(fullProductName)+'&productId='+S.pid+(plan.plan==='deposit' ? '&plan=deposit&paid='+plan.now+'&bal='+plan.balance+'&due='+plan.dueDate : ''),
       cancelUrl:  BASE_URL+'?status=cancelled',
     })
   })
@@ -2218,7 +2262,7 @@ function showSuc(type, ref, email) {
   var s = document.getElementById('suc');
   s.classList.add('on');
   // Show countdown timer for hold bookings
-  if (type === 'paid' || type === 'enquiry' || type === 'sent') {
+  if (type === 'paid' || type === 'enquiry' || type === 'sent' || type === 'balance' || type === 'payBalance') {
     document.getElementById('holdTimer').style.display = 'none';
   } else {
     document.getElementById('holdTimer').style.display = 'block';
@@ -2237,16 +2281,43 @@ function showSuc(type, ref, email) {
     }, 1000);
   }
 
+  if (type==='balance') {
+    document.getElementById('sucRing').innerHTML='&#10003;';
+    document.getElementById('sucRing').className='sring paid';
+    document.getElementById('sucTitle').textContent='Balance received, thank you!';
+    document.getElementById('sucMsg').innerHTML='Your booking is now paid in full. A receipt is on its way to your inbox.';
+    document.getElementById('sucNext').innerHTML = '<div class="nxlbl">What happens next</div>'
+      + '<div class="nxi"><div class="nxn">1</div><div class="nxt"><b>48 hours before your tour</b> — you will receive a WhatsApp message with the meeting point and what to bring.</div></div>';
+    document.getElementById('sucRef').textContent = ref||'\u2014';
+    return;
+  }
+  if (type==='payBalance') {
+    document.getElementById('sucRing').innerHTML='&#x1F512;';
+    document.getElementById('sucRing').className='sring sent';
+    document.getElementById('sucTitle').textContent='Pay your balance';
+    document.getElementById('sucMsg').innerHTML='Preparing your secure payment&hellip;';
+    document.getElementById('sucNext').innerHTML = '';
+    document.getElementById('sucRef').textContent = ref||'\u2014';
+    return;
+  }
   if (type==='paid') {
     // Conversion handled by head tag — duplicate removed
     document.getElementById('sucRing').innerHTML='&#10003;';
     document.getElementById('sucRing').className='sring paid';
     document.getElementById('sucTitle').textContent='You are all set!';
     document.getElementById('sucMsg').innerHTML='Your booking is confirmed. A confirmation email is on its way to <strong>' + (email||'your inbox') + '</strong>.';
+    var sPlan = getParam('plan'), sDue = getParam('due');
+    var balStep = '';
+    if (sPlan === 'deposit' && /^\d{4}-\d{2}-\d{2}$/.test(sDue)) {
+      var sPaid = parseFloat(getParam('paid')) || 0, sBal = parseFloat(getParam('bal')) || 0;
+      document.getElementById('sucMsg').innerHTML = 'Your deposit of <strong>' + eur(sPaid) + '</strong> is received and your booking is confirmed. A confirmation email is on its way to <strong>' + (email||'your inbox') + '</strong>.';
+      balStep = '<div class="nxi"><div class="nxn">2</div><div class="nxt"><b>Balance of ' + eur(sBal) + '</b> — due ' + fmtDate(sDue) + '. We will email you a secure payment link that day.</div></div>';
+    }
     document.getElementById('sucNext').innerHTML = '<div class="nxlbl">What happens next</div>'
       + '<div class="nxi"><div class="nxn">1</div><div class="nxt"><b>Check your inbox</b> — your confirmation email with full booking details is on its way.</div></div>'
-      + '<div class="nxi"><div class="nxn">2</div><div class="nxt"><b>48 hours before your tour</b> — you will receive a WhatsApp message with the meeting point and what to bring.</div></div>'
-      + '<div class="nxi"><div class="nxn">3</div><div class="nxt"><b>On the day</b> — arrive at Madalena harbour 15 minutes before departure at Port Velho 33.</div></div>';
+      + balStep
+      + '<div class="nxi"><div class="nxn">' + (balStep ? 3 : 2) + '</div><div class="nxt"><b>48 hours before your tour</b> — you will receive a WhatsApp message with the meeting point and what to bring.</div></div>'
+      + '<div class="nxi"><div class="nxn">' + (balStep ? 4 : 3) + '</div><div class="nxt"><b>On the day</b> — arrive at Madalena harbour 15 minutes before departure at Port Velho 33.</div></div>';
   } else {
     document.getElementById('sucRing').innerHTML='&#x1F4E8;';
     document.getElementById('sucRing').className='sring sent';
@@ -2259,6 +2330,26 @@ function showSuc(type, ref, email) {
   }
 
   document.getElementById('sucRef').textContent = ref||'&#8212;';
+}
+
+/* ── BALANCE PAYMENT (?pay=REF, link emailed 30 days before the trip) ── */
+function startBalancePayment(ref) {
+  showSuc('payBalance', ref, '');
+  var msg = document.getElementById('sucMsg');
+  var help = ' Questions? WhatsApp us on <a href="https://wa.me/351292622980" style="color:var(--tb)">+351 292 622 980</a>.';
+  if (!/^PIA-[A-Z0-9-]{4,12}$/.test(ref)) { msg.innerHTML = 'This payment link is not valid.' + help; return; }
+  fetch(N8N_BALANCE, {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ bookingRef: ref })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    if (d && d.url) { msg.innerHTML = 'Redirecting you to secure payment&hellip;'; window.location.href = d.url; return; }
+    msg.innerHTML = 'There is no balance to pay on this booking. It may already be paid in full.' + help;
+  })
+  .catch(function(){
+    msg.innerHTML = 'We could not open the payment page just now. Please try again in a moment.' + help;
+  });
 }
 
 /* ── HELPERS ──────────────────────────────────────────────── */
@@ -2353,7 +2444,7 @@ function genRef() {
 var FAQ_PROXY = 'https://n8n.srv1432046.hstgr.cloud/webhook/pia-chat';
 var FAQ_HISTORY = [];
 var FAQ_OPEN = false;
-var FAQ_KB = 'PICO ISLAND ADVENTURES — AI ASSISTANT KNOWLEDGE BASE\nVersion 3.0 | Last updated October 2026 (2027 season)\n\nABOUT: Pico Island Adventures (Pico Sport) — 33+ years. Frank Wirth. Port Velho 33, Madalena, Pico Island, Azores. Licence Nr. 15/2009.\nContact: +351 292 622 980 | info@pico-island-adventures.com | WhatsApp: +351 292 622 980\nBook: https://booking.pico-island-adventures.com\n\nCANCELLATION: If the guest cancels or cannot take part for personal reasons (late arrival, early departure, flight/ferry problems, illness), the booking is non-refundable. If we cannot operate because of weather or safety, we first try to reschedule during the guest’s stay on Pico; if that is impossible within the recommended minimum stay, the amount paid is refunded (non-refundable payment processing/bank/currency charges may be deducted). Full wording: Weather Conditions, Operational Changes & Cancellation Clause, shown at booking. Travel insurance strongly recommended.\n\nMINIMUM STAY: Each tour shows a recommended minimum stay on Pico (e.g. 4 nights for day trips) so weather-cancelled trips can be rescheduled.\n\nTOURS:\n\n1. WHALE & DOLPHIN WATCHING — EUR 99/adult, EUR 69/child under 12. 3 excursions EUR 270/190, 6 excursions EUR 470/360, groups of 4 EUR 89 pp, groups of 8 EUR 79 pp. 1 May–15 Oct 2027. Instant booking. Choose a departure point: Madalena (Pico), Lajes (Pico) or Horta (Faial) — same price and duration. Departures 09:00 and 14:00. 17:00 departure and private charters on request only. 98% sighting success. Marine biologist guided. 28 species recorded. Sperm whales year-round. Blue/Fin/Sei whales Feb–Jun. Children welcome, no minimum age. Non-swimmers fine (stay on boat).\n\n2. SNORKELLING — PRINCESS ALICE BANK — EUR 270/person. 15 Jun–5 Oct. Instant booking. No cert required — OWD and non-divers welcome. Full day, starts between 06:00 and 07:00, returns by 16:00–17:00. 100km offshore — cannot depart daily, flexible dates required. Boat: comfortable large boat with toilet, snacks and drinks. Species: Mobula rays (99% probability, groups 2–50 animals), whale sharks (Aug–Sep), tuna, kingfish, sailfish, marlin, barracuda, manta rays, stingrays, bonito. Light breakfast and simple lunch provided. Wetsuit and snorkel gear provided. Equipment: SMB and acoustic signal required, full diving kit, towel, sunscreen, seasick meds. No alcohol or drugs on board. Children welcome with parental supervision. Evening before: pack equipment at dive centre before 18:00.\n\n3. PRINCESS ALICE BANK DIVING (Base package) — EUR 499/person. 15 Jun–5 Oct only. Instant booking. 2-day package. Starts 06:00–07:00, returns 16:00–17:00. Open Water minimum (OWD sufficient — no AOW required). Mandatory check dive day before PAB. Same boat, timing, species and safety as snorkelling above. Day 1: 2-tank check dives around Pico. Day 2: 2-tank PAB. Returning guests who already did standard dives: EUR 99 deducted. Children from 12 yrs, certified, with parent.\n\n4. SHARK WEEK NO HOTEL — EUR 1,440/person. 15 Jun–5 Oct. Instant booking. 10-day expedition. 2 days Condor Bank (4 shark dives), 1 day PAB (2 dives), 1 day Baixa Rosais (2 dives), 1 day Pico coast (2 dives), 1 whale watching. Shark safety briefing by Megalodon Project team. Includes transfers. 10 dives total. Shark briefing evening before departure is mandatory.\n\n5. SHARK WEEK WITH HOTEL — From EUR 1,440/person. 15 Jun–5 Oct. Proposal request. Same as above + accommodation arranged by our team.\n\n6. SEASON OF THE GIANTS 2027 — one departure, 1–15 May 2027 (14 nights). Proposal. Price per person sharing a double room / single supplement: Hotel Vila da Madalena EUR 1,890 / +690; Casa No Mar EUR 1,990 / +790; Villa Barca double room EUR 2,150 / +690; Villa Barca mini apartment EUR 2,250 / +790; Vivenda Oliveira Barca EUR 2,150 / +690; Studio Por do Sol (incl. owner’s car) EUR 2,490 / no single; Hotel Caravelhas EUR 2,590 / +920; Solar das Limas EUR 2,690 / no single (rental car +EUR 315 pp); Bela Vista Lajes EUR 2,250 / +690. Includes airport transfers, six whale and dolphin boat trips (from Lajes or Madalena), Whaling and Agricultural Museum in Lajes, land-based whale lookout, Cory’s shearwater nesting sites, highland tour, vineyard walk, day excursion to the north-coast wine villages. English-speaking skippers and guides; local contact via WhatsApp (approx. 8 a.m.–6 p.m.).\n\nNEW 2027 TOURS (instant booking unless noted):\n- PICO SUNSET TRIP — EUR 49. 1 May–15 Oct. Approx. 1.5–2 h aboard catamaran Reefcat from Madalena; meet about 3 h before sunset. Soft drinks and snacks.\n- SAO JORGE EXPLORER (sightseeing & snorkeling) — EUR 199. Full day approx. 7–8 h by power catamaran from Madalena: Ponta dos Rosais, guided snorkeling, about 1 h ashore in Velas. Crew, gear, snacks, water and soft drinks included. Min. stay 4 nights.\n- SHARK WATCHING, NO DIVING REQUIRED — EUR 399 package: Blue Shark Watching at Condor Bank (approx. 4–6 h) + Hammerhead Shark Watching (approx. 3–4 h). Guests stay on the boat. 1 Jun–30 Sep.\n- ILHEUS SNORKELING — EUR 79. Approx. 2–3 h aboard Reefcat from Madalena. Gear, guide, water, fresh fruit. Max 8 snorkelers per guide. 1 Jun–30 Sep.\n- SNORKEL WITH HAMMERHEAD SHARKS — EUR 250. Approx. 3–4 h. Gear, safety briefing, experienced shark guide. Max 8 guests per trip. 1 Jun–30 Sep.\n- SNORKELING ADVENTURE, 3 DAYS AROUND PICO — EUR 449. Day 1 snorkeling intro and guided bay tour; Day 2 Ilheus excursion; Day 3 Princess Alice Bank Mobula snorkeling. Min. stay 5 nights.\n- PURE SHARK PACKAGE — EUR 1,449. Day 1: 2 shore check dives; 3 days Blue/Mako shark diving (6 shark dives) + 1 Hammerhead Shark Snorkeling Excursion. PAB on request. Min. stay 7 nights.\n- MAKO SHARK SPECIAL, JUNE 2027 — any dates in June 2027. From EUR 1,799 pp: 9 nights guesthouse in Madalena (double room), 1 check-dive day (2 dives), 2 days mako and blue shark diving (2 tanks each), 1 hammerhead snorkelling trip, 1 full day Princess Alice Bank, Pico airport transfers. Upgrades pp: Apartment Por do Sol with rental car +EUR 450, Hotel Caravelas +EUR 450, Apartment Oliveira +EUR 330. Shark Diving Specialty course on request. Proposal.\n- AZOREN SPECIAL 2027, TAUCHSCHULE SAUERLAND (German group trip) — 3–16 Jul 2027, EUR 2,950 pp twin/double, single supplement EUR 880. Proposal.\n\n7. SCUBA DIVING — From EUR 110/2-tank dive. Year-round. Proposal. Land EUR 110 (OW), boat EUR 125 (OW), premium EUR 150 (AOW), offshore EUR 225 (AOW+deep), 10-dive pkg EUR 499 (OW), night dive EUR 75 (OW). Check dive mandatory before advanced sites.\n\nCONDOR BANK SHARK DIVING DETAILS: 22nm from Pico. Protected plateau. Blue sharks main species, Mako possible. Season Jun–Oct. Departs ~08:30, returns 12:00–14:00. High-speed power RIBs, 1.5hr travel. Mandatory: full neoprene suit, hood, gloves. No yellow/white/silver reflecting fins. Stays on current line. Shark briefing evening before. Alternative site Pe de Sousa used as Plan B in bad weather. Water and fruit provided.\n\nCERTS: Whale watching/snorkelling — none. PAB diving — OWD minimum. Scuba boat — OWD. Scuba premium — AOW. Shark/offshore — AOW recommended. All diving: check dive mandatory before advanced sites.\n\nSEASONS 2027: Whale watching 1 May–15 Oct. Princess Alice Bank (diving and snorkeling) 15 Jun–5 Oct. Shark watching, hammerhead snorkeling, Ilheus 1 Jun–30 Sep. Sunset trip 1 May–15 Oct. Season of the Giants 1–15 May 2027. Scuba year-round. Sperm whales year-round. Blue/Fin/Sei Feb–Jun.\n\nPAB NOTE: ~100km offshore, runs ~twice/week. Final time confirmed 48–12hrs before. Must reconfirm after arriving on Pico.\n\nBOAT: comfortable large boat with toilet, snacks and drinks for PAB trips. Power RIBs for shark diving.\n\nSAFETY: Fully licensed, annual inspections. Satellite comms, VHF, life rafts, life jackets. O2 rescue sets on board. Staff trained marine first aid. Portuguese man-of-war jellyfish risk in some seasons.\n\nGETTING HERE: Pico Airport (PIX) 8km from base. Ferry Faial/Horta to Madalena 30min — base opposite terminal. Car rental: www.pico-rentacar.com\n\nMEETING POINT: Port Velho 33, Madalena. 15 mins before departure. Our team WhatsApps 48–12hrs before with exact time. PAB/Shark trips: meet dive centre evening before to pack gear.\n\nWHAT TO BRING ALL TRIPS: Warm layer, waterproof jacket, reef-safe sunscreen, sunglasses, seasick meds, towel, camera/GoPro, personal snacks. DIVERS ADD: C-card mandatory, logbook, full wetsuit, SMB, acoustic signal.\n\nFAQs:\n- Children? Whale watching: no minimum, under 12 = EUR 69. Snorkelling: yes with parent. Diving/sharks: 12+ certified with parent.\n- Mobula guarantee? No but 99% probability in season.\n- Non-swimmers OK? Yes for whale watching (stay on boat).\n- Non-diving partners? Can join land dive days (cafes nearby).\n- Climb Pico mountain? Do it before diving (altitude/decompression risk).\n- German spoken? Yes — Frank is German, full German support on all tours.\n- Santa Maria? Yes — combined itineraries available.\n- Book how far ahead? Day trips: few days. Multi-day: weeks/months.\n- Alcohol on board? Strictly forbidden on all boats.\n- Seasick? Bring own medication.\n- Weather cancels? We first reschedule during your stay; if impossible within the recommended minimum stay, the amount paid is refunded (processing/bank charges may be deducted).\n\nESCALATION: WhatsApp +351 292 622 980 | info@pico-island-adventures.com | 08:00–20:00 Azores Time (UTC-1)\n';
+var FAQ_KB = 'PICO ISLAND ADVENTURES — AI ASSISTANT KNOWLEDGE BASE\nVersion 3.0 | Last updated October 2026 (2027 season)\n\nABOUT: Pico Island Adventures (Pico Sport) — 33+ years. Frank Wirth. Port Velho 33, Madalena, Pico Island, Azores. Licence Nr. 15/2009.\nContact: +351 292 622 980 | info@pico-island-adventures.com | WhatsApp: +351 292 622 980\nBook: https://booking.pico-island-adventures.com\n\nCANCELLATION: If the guest cancels or cannot take part for personal reasons (late arrival, early departure, flight/ferry problems, illness), the booking is non-refundable. If we cannot operate because of weather or safety, we first try to reschedule during the guest’s stay on Pico; if that is impossible within the recommended minimum stay, the amount paid is refunded (non-refundable payment processing/bank/currency charges may be deducted). Full wording: Weather Conditions, Operational Changes & Cancellation Clause, shown at booking. Travel insurance strongly recommended.\n\nPAYMENT: Bookings made more than 30 days before the activity pay a 20% non-refundable deposit at booking; the balance is due 30 days before the activity and we email a secure payment link that day. Bookings made 30 days or less before the activity are paid in full at booking. Card payment via Stripe.\n\nMINIMUM STAY: Each tour shows a recommended minimum stay on Pico (e.g. 4 nights for day trips) so weather-cancelled trips can be rescheduled.\n\nTOURS:\n\n1. WHALE & DOLPHIN WATCHING — EUR 99/adult, EUR 69/child under 12. 3 excursions EUR 270/190, 6 excursions EUR 470/360, groups of 4 EUR 89 pp, groups of 8 EUR 79 pp. 1 May–15 Oct 2027. Instant booking. Choose a departure point: Madalena (Pico), Lajes (Pico) or Horta (Faial) — same price and duration. Departures 09:00 and 14:00. 17:00 departure and private charters on request only. 98% sighting success. Marine biologist guided. 28 species recorded. Sperm whales year-round. Blue/Fin/Sei whales Feb–Jun. Children welcome, no minimum age. Non-swimmers fine (stay on boat).\n\n2. SNORKELLING — PRINCESS ALICE BANK — EUR 270/person. 15 Jun–5 Oct. Instant booking. No cert required — OWD and non-divers welcome. Full day, starts between 06:00 and 07:00, returns by 16:00–17:00. 100km offshore — cannot depart daily, flexible dates required. Boat: comfortable large boat with toilet, snacks and drinks. Species: Mobula rays (99% probability, groups 2–50 animals), whale sharks (Aug–Sep), tuna, kingfish, sailfish, marlin, barracuda, manta rays, stingrays, bonito. Light breakfast and simple lunch provided. Wetsuit and snorkel gear provided. Equipment: SMB and acoustic signal required, full diving kit, towel, sunscreen, seasick meds. No alcohol or drugs on board. Children welcome with parental supervision. Evening before: pack equipment at dive centre before 18:00.\n\n3. PRINCESS ALICE BANK DIVING (Base package) — EUR 499/person. 15 Jun–5 Oct only. Instant booking. 2-day package. Starts 06:00–07:00, returns 16:00–17:00. Open Water minimum (OWD sufficient — no AOW required). Mandatory check dive day before PAB. Same boat, timing, species and safety as snorkelling above. Day 1: 2-tank check dives around Pico. Day 2: 2-tank PAB. Returning guests who already did standard dives: EUR 99 deducted. Children from 12 yrs, certified, with parent.\n\n4. SHARK WEEK NO HOTEL — EUR 1,440/person. 15 Jun–5 Oct. Instant booking. 10-day expedition. 2 days Condor Bank (4 shark dives), 1 day PAB (2 dives), 1 day Baixa Rosais (2 dives), 1 day Pico coast (2 dives), 1 whale watching. Shark safety briefing by Megalodon Project team. Includes transfers. 10 dives total. Shark briefing evening before departure is mandatory.\n\n5. SHARK WEEK WITH HOTEL — From EUR 1,440/person. 15 Jun–5 Oct. Proposal request. Same as above + accommodation arranged by our team.\n\n6. SEASON OF THE GIANTS 2027 — one departure, 1–15 May 2027 (14 nights). Proposal. Price per person sharing a double room / single supplement: Hotel Vila da Madalena EUR 1,890 / +690; Casa No Mar EUR 1,990 / +790; Villa Barca double room EUR 2,150 / +690; Villa Barca mini apartment EUR 2,250 / +790; Vivenda Oliveira Barca EUR 2,150 / +690; Studio Por do Sol (incl. owner’s car) EUR 2,490 / no single; Hotel Caravelhas EUR 2,590 / +920; Solar das Limas EUR 2,690 / no single (rental car +EUR 315 pp); Bela Vista Lajes EUR 2,250 / +690. Includes airport transfers, six whale and dolphin boat trips (from Lajes or Madalena), Whaling and Agricultural Museum in Lajes, land-based whale lookout, Cory’s shearwater nesting sites, highland tour, vineyard walk, day excursion to the north-coast wine villages. English-speaking skippers and guides; local contact via WhatsApp (approx. 8 a.m.–6 p.m.).\n\nNEW 2027 TOURS (instant booking unless noted):\n- PICO SUNSET TRIP — EUR 49. 1 May–15 Oct. Approx. 1.5–2 h aboard catamaran Reefcat from Madalena; meet about 3 h before sunset. Soft drinks and snacks.\n- SAO JORGE EXPLORER (sightseeing & snorkeling) — EUR 199. Full day approx. 7–8 h by power catamaran from Madalena: Ponta dos Rosais, guided snorkeling, about 1 h ashore in Velas. Crew, gear, snacks, water and soft drinks included. Min. stay 4 nights.\n- SHARK WATCHING, NO DIVING REQUIRED — EUR 399 package: Blue Shark Watching at Condor Bank (approx. 4–6 h) + Hammerhead Shark Watching (approx. 3–4 h). Guests stay on the boat. 1 Jun–30 Sep.\n- ILHEUS SNORKELING — EUR 79. Approx. 2–3 h aboard Reefcat from Madalena. Gear, guide, water, fresh fruit. Max 8 snorkelers per guide. 1 Jun–30 Sep.\n- SNORKEL WITH HAMMERHEAD SHARKS — EUR 250. Approx. 3–4 h. Gear, safety briefing, experienced shark guide. Max 8 guests per trip. 1 Jun–30 Sep.\n- SNORKELING ADVENTURE, 3 DAYS AROUND PICO — EUR 449. Day 1 snorkeling intro and guided bay tour; Day 2 Ilheus excursion; Day 3 Princess Alice Bank Mobula snorkeling. Min. stay 5 nights.\n- PURE SHARK PACKAGE — EUR 1,449. Day 1: 2 shore check dives; 3 days Blue/Mako shark diving (6 shark dives) + 1 Hammerhead Shark Snorkeling Excursion. PAB on request. Min. stay 7 nights.\n- MAKO SHARK SPECIAL, JUNE 2027 — any dates in June 2027. From EUR 1,799 pp: 9 nights guesthouse in Madalena (double room), 1 check-dive day (2 dives), 2 days mako and blue shark diving (2 tanks each), 1 hammerhead snorkelling trip, 1 full day Princess Alice Bank, Pico airport transfers. Upgrades pp: Apartment Por do Sol with rental car +EUR 450, Hotel Caravelas +EUR 450, Apartment Oliveira +EUR 330. Shark Diving Specialty course on request. Proposal.\n- AZOREN SPECIAL 2027, TAUCHSCHULE SAUERLAND (German group trip) — 3–16 Jul 2027, EUR 2,950 pp twin/double, single supplement EUR 880. Proposal.\n\n7. SCUBA DIVING — From EUR 110/2-tank dive. Year-round. Proposal. Land EUR 110 (OW), boat EUR 125 (OW), premium EUR 150 (AOW), offshore EUR 225 (AOW+deep), 10-dive pkg EUR 499 (OW), night dive EUR 75 (OW). Check dive mandatory before advanced sites.\n\nCONDOR BANK SHARK DIVING DETAILS: 22nm from Pico. Protected plateau. Blue sharks main species, Mako possible. Season Jun–Oct. Departs ~08:30, returns 12:00–14:00. High-speed power RIBs, 1.5hr travel. Mandatory: full neoprene suit, hood, gloves. No yellow/white/silver reflecting fins. Stays on current line. Shark briefing evening before. Alternative site Pe de Sousa used as Plan B in bad weather. Water and fruit provided.\n\nCERTS: Whale watching/snorkelling — none. PAB diving — OWD minimum. Scuba boat — OWD. Scuba premium — AOW. Shark/offshore — AOW recommended. All diving: check dive mandatory before advanced sites.\n\nSEASONS 2027: Whale watching 1 May–15 Oct. Princess Alice Bank (diving and snorkeling) 15 Jun–5 Oct. Shark watching, hammerhead snorkeling, Ilheus 1 Jun–30 Sep. Sunset trip 1 May–15 Oct. Season of the Giants 1–15 May 2027. Scuba year-round. Sperm whales year-round. Blue/Fin/Sei Feb–Jun.\n\nPAB NOTE: ~100km offshore, runs ~twice/week. Final time confirmed 48–12hrs before. Must reconfirm after arriving on Pico.\n\nBOAT: comfortable large boat with toilet, snacks and drinks for PAB trips. Power RIBs for shark diving.\n\nSAFETY: Fully licensed, annual inspections. Satellite comms, VHF, life rafts, life jackets. O2 rescue sets on board. Staff trained marine first aid. Portuguese man-of-war jellyfish risk in some seasons.\n\nGETTING HERE: Pico Airport (PIX) 8km from base. Ferry Faial/Horta to Madalena 30min — base opposite terminal. Car rental: www.pico-rentacar.com\n\nMEETING POINT: Port Velho 33, Madalena. 15 mins before departure. Our team WhatsApps 48–12hrs before with exact time. PAB/Shark trips: meet dive centre evening before to pack gear.\n\nWHAT TO BRING ALL TRIPS: Warm layer, waterproof jacket, reef-safe sunscreen, sunglasses, seasick meds, towel, camera/GoPro, personal snacks. DIVERS ADD: C-card mandatory, logbook, full wetsuit, SMB, acoustic signal.\n\nFAQs:\n- Children? Whale watching: no minimum, under 12 = EUR 69. Snorkelling: yes with parent. Diving/sharks: 12+ certified with parent.\n- Mobula guarantee? No but 99% probability in season.\n- Non-swimmers OK? Yes for whale watching (stay on boat).\n- Non-diving partners? Can join land dive days (cafes nearby).\n- Climb Pico mountain? Do it before diving (altitude/decompression risk).\n- German spoken? Yes — Frank is German, full German support on all tours.\n- Santa Maria? Yes — combined itineraries available.\n- Book how far ahead? Day trips: few days. Multi-day: weeks/months.\n- Alcohol on board? Strictly forbidden on all boats.\n- Seasick? Bring own medication.\n- Weather cancels? We first reschedule during your stay; if impossible within the recommended minimum stay, the amount paid is refunded (processing/bank charges may be deducted).\n\nESCALATION: WhatsApp +351 292 622 980 | info@pico-island-adventures.com | 08:00–20:00 Azores Time (UTC-1)\n';
 
 var FAQ_SYSTEM = 'You are the friendly AI assistant for Pico Island Adventures, a marine tour company on Pico Island in the Azores, Portugal. You answer questions warmly and knowledgeably, like a trusted local expert. You only answer questions using the information in the knowledge base below. If you cannot answer from the knowledge base, say so honestly and direct the guest to WhatsApp +351 292 622 980. Never invent prices, dates, or policies. Always encourage booking when appropriate — the goal is to convert interest into a confirmed booking. Respond in the same language the guest writes in — English or German. Keep responses concise and friendly, under 120 words where possible.\n\nKNOWLEDGE BASE:\n' + FAQ_KB;
 
