@@ -689,7 +689,7 @@ async function loadBookings() {
         '<td>' + (b.tour_date||'—') + '</td>' +
         '<td>' + (b.adults||0) + (b.children>0?' + '+b.children+'c':'') + '</td>' +
         '<td>&#8364;' + (b.total_price||0) + '</td>' +
-        '<td><span class="badge ' + (b.status||'') + '">' + (b.status||'—') + '</span></td>' +
+        '<td><span class="badge ' + (b.status||'') + '">' + (b.status||'—') + '</span>' + (b.payment_status === 'deposit_paid' && b.status !== 'cancelled' ? '<br><span class="badge payment_sent" style="margin-top:4px">balance &#8364;' + (b.balance_due||0) + ' due</span>' : '') + '</td>' +
         '<td>' + (b.operator_name ? '<strong>' + b.operator_name + '</strong><br><span class="code-chip" style="font-size:10px">' + (b.operator_code||'') + '</span>' : '—') + '</td>' +
         '<td>' + fmtDateShort(b.created_at) + '</td>' +
         '<td><button class="action-btn" onclick="viewBooking(\'' + (b.booking_ref||'') + '\')">View</button></td>' +
@@ -784,6 +784,9 @@ function buildInvoice(b) {
           '<td style="padding:14px;font-weight:bold;font-size:15px">Total</td>' +
           '<td style="padding:14px;text-align:right;font-weight:bold;font-size:15px;color:#0891b2">&euro;' + grandTotal.toFixed(2) + '</td>' +
         '</tr>' +
+        (b.payment_status === 'deposit_paid' ?
+          '<tr><td style="padding:12px 14px;border-bottom:1px solid #f0f0f0;color:#555">Deposit paid (20%)</td><td style="padding:12px 14px;text-align:right;border-bottom:1px solid #f0f0f0;color:#555">&euro;' + (parseFloat(b.amount_paid)||0).toFixed(2) + '</td></tr>' +
+          '<tr><td style="padding:12px 14px;font-weight:bold">Balance due ' + (b.balance_due_date ? fmtDateShort(b.balance_due_date) : '') + '</td><td style="padding:12px 14px;text-align:right;font-weight:bold">&euro;' + (parseFloat(b.balance_due)||0).toFixed(2) + '</td></tr>' : '') +
       '</tbody>' +
     '</table>' +
     '<div style="font-size:11px;color:#888;border-top:1px solid #eee;padding-top:16px;text-align:center">' +
@@ -836,6 +839,14 @@ async function viewBooking(ref) {
     // Pricing
     h += '<div style="margin-bottom:14px"><div style="font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--tb);margin-bottom:8px">Pricing</div>';
     h += row('Total', '€' + (b.total_price||0));
+    if (b.payment_status || b.payment_plan) {
+      h += row('Payment', b.payment_status === 'deposit_paid' ? '20% deposit paid' : b.payment_status === 'paid_in_full' ? 'Paid in full' : (b.payment_plan === 'deposit' ? '20% deposit (not paid yet)' : 'Full payment (not paid yet)'));
+      if (b.amount_paid != null) h += row('Paid so far', '€' + (parseFloat(b.amount_paid)||0).toFixed(2));
+      if (b.payment_status === 'deposit_paid') {
+        h += row('Balance due', '€' + (parseFloat(b.balance_due)||0).toFixed(2) + (b.balance_due_date ? ' on ' + fmtDateShort(b.balance_due_date) : ''));
+        h += row('Balance link emailed', b.balance_link_sent_at ? fmtDateShort(b.balance_link_sent_at) : 'Not yet (sent automatically on the due date)');
+      }
+    }
     if (b.is_operator) {
       h += row('Operator', b.operator_name + ' (' + b.operator_code + ')');
       h += row('Discount', (b.discount_pct||0) + '% = -€' + (b.discount_amt||0));
@@ -877,6 +888,10 @@ async function viewBooking(ref) {
     if (b.status === 'confirmed') {
       actions += '<button class="btn-secondary" id="ibtn_' + bref + '">&#x1F9FE; Generate Invoice</button>';
     }
+    // Deposit paid — balance outstanding
+    if (b.payment_status === 'deposit_paid' && parseFloat(b.balance_due) > 0 && b.status !== 'cancelled') {
+      actions += '<button class="btn-secondary" id="blbtn_' + bref + '">&#x1F517; Copy Balance Link</button>';
+    }
     // Cancel available for all except cancelled
    if (b.status !== 'cancelled') {
       if (!b.contacted_manually && b.status !== 'cancelled' && b.status !== 'confirmed') {
@@ -896,6 +911,8 @@ async function viewBooking(ref) {
     if (xb) xb.onclick = function(){ cancelBooking(bref); };
     var cb = document.getElementById('cbtn_' + bref);
     if (cb) cb.onclick = function(){ markContacted(bref); };
+    var blb = document.getElementById('blbtn_' + bref);
+    if (blb) blb.onclick = function(){ copyBalanceLink(bref); };
     if (ib) ib.onclick = function(){ closeBookModal(); showTab('invoices'); document.getElementById('invRef').value = bref; generateInvoice(); window.scrollTo(0,0); };
     document.getElementById('bookModal').style.display = 'flex';
   } catch(e) { console.error(e); alert('Error loading booking.'); }
@@ -946,9 +963,49 @@ function fmtDateShort(s) {
   if (!s) return '—';
   return new Date(s).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
 }
+if (typeof showToast !== 'function') {
+  var showToast = function(msg, isErr) {
+    var t = document.createElement('div');
+    t.textContent = msg;
+    t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:9999;padding:10px 18px;border-radius:8px;font-family:DM Sans,sans-serif;font-size:13px;color:#fff;background:' + (isErr ? '#b91c1c' : '#0891b2') + ';box-shadow:0 6px 20px rgba(0,0,0,0.35)';
+    document.body.appendChild(t);
+    setTimeout(function(){ t.remove(); }, 2600);
+  };
+}
+var BOOKING_URL = 'https://booking.pico-island-adventures.com/';
+function balanceLink(ref) { return BOOKING_URL + '?pay=' + encodeURIComponent(ref); }
+function copyBalanceLink(ref) {
+  var link = balanceLink(ref);
+  var done = function(){ showToast('Balance link copied'); };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(link).then(done, function(){ prompt('Copy this balance link:', link); });
+  else prompt('Copy this balance link:', link);
+}
+// Same rule as the booking page: trips more than 30 days away pay a 20% deposit now,
+// the balance link is emailed automatically 30 days before the trip.
+function adminPayPlan(total, dateStr) {
+  total = Math.round((parseFloat(total) || 0) * 100) / 100;
+  var full = {plan:'full', now:total, balance:0, dueDate:null};
+  if (!dateStr || !/^\d{4}-\d{2}-\d{2}/.test(dateStr)) return full;
+  var t = dateStr.slice(0,10).split('-'), trip = new Date(+t[0], +t[1]-1, +t[2]);
+  var today = new Date(); today.setHours(0,0,0,0);
+  if (Math.round((trip - today) / 86400000) <= 30) return full;
+  var dep = Math.round(total * 0.20 * 100) / 100;
+  var due = new Date(+t[0], +t[1]-1, +t[2] - 30);
+  var ds = due.getFullYear() + '-' + ('0'+(due.getMonth()+1)).slice(-2) + '-' + ('0'+due.getDate()).slice(-2);
+  return {plan:'deposit', now:dep, balance:Math.round((total - dep) * 100) / 100, dueDate:ds};
+}
 async function sendPaymentLink(b) {
-  var amount = prompt('Enter the amount to charge in EUR (e.g. 198):', b.total_price || '');
+  var amount = prompt('Enter the TOTAL booking price in EUR (e.g. 198):', b.total_price || '');
   if (!amount) return;
+  amount = parseFloat(String(amount).replace(',', '.'));
+  if (!(amount > 0)) { alert('Please enter a valid amount.'); return; }
+  var plan = adminPayPlan(amount, b.tour_date);
+  if (plan.plan === 'deposit') {
+    var useDeposit = confirm('The trip (' + b.tour_date + ') is more than 30 days away.\n\n' +
+      'OK = charge a 20% deposit of €' + plan.now.toFixed(2) + ' now. The balance of €' + plan.balance.toFixed(2) + ' is emailed automatically on ' + plan.dueDate + '.\n\n' +
+      'Cancel = charge the full €' + amount.toFixed(2) + ' now.');
+    if (!useDeposit) plan = {plan:'full', now:amount, balance:0, dueDate:null};
+  }
   try {
     // Create Stripe payment link via n8n
     var res = await fetch('https://n8n.srv1432046.hstgr.cloud/webhook/pia-booking', {
@@ -961,7 +1018,9 @@ async function sendPaymentLink(b) {
         guestName: b.guest_name,
         email: b.email,
         whatsapp: b.whatsapp,
-        totalPrice: parseFloat(amount),
+        totalPrice: amount,
+        paymentType: plan.plan, amountDueNow: plan.now, balanceDue: plan.balance, balanceDueDate: plan.dueDate,
+        paymentNote: plan.plan === 'deposit' ? '20% deposit. Balance of €' + plan.balance.toFixed(2) + ' due ' + new Date(plan.dueDate + 'T12:00:00').toLocaleDateString('en-GB', {day:'numeric', month:'long', year:'numeric'}) + '; we will email you a secure payment link that day.' : '',
         date: b.tour_date,
         time: b.departure_time,
         adults: b.adults,
@@ -969,7 +1028,7 @@ async function sendPaymentLink(b) {
         participant_names: b.participant_names,
         address: b.address,
         notes: b.notes,
-        successUrl: 'https://booking.pico-island-adventures.com/?status=success&ref=' + b.booking_ref + '&email=' + encodeURIComponent(b.email),
+        successUrl: 'https://booking.pico-island-adventures.com/?status=success&ref=' + b.booking_ref + '&email=' + encodeURIComponent(b.email) + (plan.plan === 'deposit' ? '&plan=deposit&paid=' + plan.now + '&bal=' + plan.balance + '&due=' + plan.dueDate : ''),
         cancelUrl: 'https://booking.pico-island-adventures.com/?status=cancelled'
       })
     });
@@ -979,9 +1038,9 @@ async function sendPaymentLink(b) {
       await fetch(SUPABASE_URL + '/rest/v1/pia_bookings?booking_ref=eq.' + b.booking_ref, {
         method: 'PATCH',
         headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-        body: JSON.stringify({ status: 'payment_sent' })
+        body: JSON.stringify({ status: 'payment_sent', total_price: amount, payment_plan: plan.plan, deposit_amount: plan.now, balance_due: plan.balance, balance_due_date: plan.dueDate })
       });
-      alert('Payment link sent to ' + b.email + '!\n\nLink: ' + data.url);
+      alert('Payment link sent to ' + b.email + (plan.plan === 'deposit' ? ' (20% deposit: €' + plan.now.toFixed(2) + ')' : '') + '!\n\nLink: ' + data.url);
       closeBookModal();
       loadBookings();
     } else {
