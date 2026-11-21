@@ -728,6 +728,15 @@ function buildInvoice(b) {
   var vatAmt     = parseFloat(b.vat_amt) || Math.round(afterDisc / 1.16 * 0.16 * 100) / 100;
   var netExVat   = Math.round(afterDisc / 1.16 * 100) / 100;
   var grandTotal = afterDisc; // VAT is inclusive — guest pays afterDisc
+  // Bookings since the 4% payment processing fee: total_price is what the guest pays (tour price after discount + fee)
+  var feeAmt     = parseFloat(b.booking_fee) || 0;
+  if (feeAmt > 0) {
+    grandTotal = subtotal;
+    afterDisc  = Math.round((subtotal - feeAmt) * 100) / 100;
+    subtotal   = Math.round((afterDisc + discAmt) * 100) / 100;
+    vatAmt     = parseFloat(b.vat_amt) || Math.round(afterDisc / 1.16 * 0.16 * 100) / 100;
+    netExVat   = Math.round(afterDisc / 1.16 * 100) / 100;
+  }
   var isOp       = b.is_operator;
   var invNum     = 'PIA-INV-' + (b.booking_ref||'').replace('PIA-','') + '-' + new Date().getFullYear();
   var today      = new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
@@ -780,6 +789,7 @@ function buildInvoice(b) {
         (discAmt > 0 ? '<tr><td style="padding:12px 14px;border-bottom:1px solid #f0f0f0;color:#555">Total after discount (inc. VAT)</td><td style="padding:12px 14px;text-align:right;border-bottom:1px solid #f0f0f0;color:#555">&euro;' + afterDisc.toFixed(2) + '</td></tr>' : '') +
         (isOp ? '<tr><td style="padding:12px 14px;border-bottom:1px solid #f0f0f0;color:#555">VAT content (IVA 16% inclusive)</td><td style="padding:12px 14px;text-align:right;border-bottom:1px solid #f0f0f0;color:#555">&euro;' + vatAmt.toFixed(2) + '</td></tr>' : '') +
         (isOp ? '<tr><td style="padding:12px 14px;border-bottom:1px solid #f0f0f0;color:#555">Net amount (ex VAT)</td><td style="padding:12px 14px;text-align:right;border-bottom:1px solid #f0f0f0;color:#555">&euro;' + netExVat.toFixed(2) + '</td></tr>' : '') +
+        (feeAmt > 0 ? '<tr><td style="padding:12px 14px;border-bottom:1px solid #f0f0f0;color:#555">Payment processing fee (4%)</td><td style="padding:12px 14px;text-align:right;border-bottom:1px solid #f0f0f0;color:#555">&euro;' + feeAmt.toFixed(2) + '</td></tr>' : '') +
         '<tr style="background:#f5f9fc">' +
           '<td style="padding:14px;font-weight:bold;font-size:15px">Total</td>' +
           '<td style="padding:14px;text-align:right;font-weight:bold;font-size:15px;color:#0891b2">&euro;' + grandTotal.toFixed(2) + '</td>' +
@@ -838,6 +848,7 @@ async function viewBooking(ref) {
     h += '</div>';
     // Pricing
     h += '<div style="margin-bottom:14px"><div style="font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--tb);margin-bottom:8px">Pricing</div>';
+    if (parseFloat(b.booking_fee) > 0) h += row('Payment processing fee (4%)', '€' + parseFloat(b.booking_fee).toFixed(2) + ' (included in total)');
     h += row('Total', '€' + (b.total_price||0));
     if (b.payment_status || b.payment_plan) {
       h += row('Payment', b.payment_status === 'deposit_paid' ? '20% deposit paid' : b.payment_status === 'paid_in_full' ? 'Paid in full' : (b.payment_plan === 'deposit' ? '20% deposit (not paid yet)' : 'Full payment (not paid yet)'));
@@ -972,6 +983,25 @@ if (typeof showToast !== 'function') {
     setTimeout(function(){ t.remove(); }, 2600);
   };
 }
+// Two clear buttons instead of OK/Cancel for the deposit-or-full choice. Resolves 'deposit', 'full' or null (closed).
+function choosePayPlan(html, depLabel, fullLabel) {
+  return new Promise(function(resolve) {
+    var ov = document.createElement('div');
+    ov.style.cssText = 'position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:16px';
+    ov.innerHTML = '<div style="background:#0f1e33;color:#f8f5ef;border:1px solid rgba(255,255,255,0.15);border-radius:12px;max-width:440px;width:100%;padding:24px;font-family:DM Sans,sans-serif;font-size:14px;line-height:1.6">' +
+      '<div style="font-size:16px;font-weight:600;margin-bottom:10px">How much should the guest pay now?</div>' +
+      '<div style="margin-bottom:20px;color:rgba(248,245,239,0.85)">' + html + '</div>' +
+      '<button data-c="deposit" style="display:block;width:100%;margin-bottom:10px;padding:12px;border:0;border-radius:8px;background:#06b6d4;color:#0b1626;font-weight:600;font-size:14px;cursor:pointer">' + depLabel + '</button>' +
+      '<button data-c="full" style="display:block;width:100%;margin-bottom:10px;padding:12px;border:1px solid #06b6d4;border-radius:8px;background:transparent;color:#f8f5ef;font-weight:600;font-size:14px;cursor:pointer">' + fullLabel + '</button>' +
+      '<button data-c="" style="display:block;width:100%;padding:8px;border:0;background:transparent;color:rgba(248,245,239,0.6);font-size:13px;cursor:pointer">Cancel, send nothing</button></div>';
+    ov.addEventListener('click', function(e) {
+      var c = e.target.getAttribute && e.target.getAttribute('data-c');
+      if (c === null && e.target !== ov) return;
+      ov.remove(); resolve(c ? c : null);
+    });
+    document.body.appendChild(ov);
+  });
+}
 var BOOKING_URL = 'https://booking.pico-island-adventures.com/';
 function balanceLink(ref) { return BOOKING_URL + '?pay=' + encodeURIComponent(ref); }
 function copyBalanceLink(ref) {
@@ -995,16 +1025,22 @@ function adminPayPlan(total, dateStr) {
   return {plan:'deposit', now:dep, balance:Math.round((total - dep) * 100) / 100, dueDate:ds};
 }
 async function sendPaymentLink(b) {
-  var amount = prompt('Enter the TOTAL booking price in EUR (e.g. 198):', b.total_price || '');
-  if (!amount) return;
-  amount = parseFloat(String(amount).replace(',', '.'));
-  if (!(amount > 0)) { alert('Please enter a valid amount.'); return; }
+  var prevFee = parseFloat(b.booking_fee) || 0;
+  var suggested = b.total_price ? Math.round((parseFloat(b.total_price) - prevFee) * 100) / 100 : '';
+  var price = prompt('Enter the TOUR PRICE in EUR, before the 4% payment processing fee (e.g. 198).\nThe fee is added automatically.', suggested);
+  if (!price) return;
+  price = parseFloat(String(price).replace(',', '.'));
+  if (!(price > 0)) { alert('Please enter a valid amount.'); return; }
+  var fee = Math.round(price * 0.04 * 100) / 100;
+  var amount = Math.round((price + fee) * 100) / 100;
   var plan = adminPayPlan(amount, b.tour_date);
   if (plan.plan === 'deposit') {
-    var useDeposit = confirm('The trip (' + b.tour_date + ') is more than 30 days away.\n\n' +
-      'OK = charge a 20% deposit of €' + plan.now.toFixed(2) + ' now. The balance of €' + plan.balance.toFixed(2) + ' is emailed automatically on ' + plan.dueDate + '.\n\n' +
-      'Cancel = charge the full €' + amount.toFixed(2) + ' now.');
-    if (!useDeposit) plan = {plan:'full', now:amount, balance:0, dueDate:null};
+    var choice = await choosePayPlan(
+      'Tour price €' + price.toFixed(2) + ' + 4% fee €' + fee.toFixed(2) + ' = <b>total €' + amount.toFixed(2) + '</b>.<br><br>' +
+      'The trip (' + b.tour_date + ') is more than 30 days away, so the guest can pay a 20% deposit now. The balance of €' + plan.balance.toFixed(2) + ' is then emailed automatically on ' + plan.dueDate + '.',
+      'Charge 20% deposit: €' + plan.now.toFixed(2), 'Charge full amount: €' + amount.toFixed(2));
+    if (choice === null) return;
+    if (choice === 'full') plan = {plan:'full', now:amount, balance:0, dueDate:null};
   }
   try {
     // Create Stripe payment link via n8n
@@ -1020,14 +1056,15 @@ async function sendPaymentLink(b) {
         whatsapp: b.whatsapp,
         totalPrice: amount,
         paymentType: plan.plan, amountDueNow: plan.now, balanceDue: plan.balance, balanceDueDate: plan.dueDate,
-        paymentNote: plan.plan === 'deposit' ? '20% deposit. Balance of €' + plan.balance.toFixed(2) + ' due ' + new Date(plan.dueDate + 'T12:00:00').toLocaleDateString('en-GB', {day:'numeric', month:'long', year:'numeric'}) + '; we will email you a secure payment link that day.' : '',
+        paymentNote: (plan.plan === 'deposit' ? '20% deposit. Balance of €' + plan.balance.toFixed(2) + ' due ' + new Date(plan.dueDate + 'T12:00:00').toLocaleDateString('en-GB', {day:'numeric', month:'long', year:'numeric'}) + '; we will email you a secure payment link that day. ' : '') + 'Includes a 4% payment processing fee of €' + fee.toFixed(2) + '.',
+        productPrice: price, bookingFee: fee,
         date: b.tour_date,
         time: b.departure_time,
         adults: b.adults,
         children: b.children,
         participant_names: b.participant_names,
-        address: b.address,
-        notes: b.notes,
+        address: String(b.address || '').slice(0, 490),
+        notes: String(b.notes || '').slice(0, 490),
         successUrl: 'https://booking.pico-island-adventures.com/?status=success&ref=' + b.booking_ref + '&email=' + encodeURIComponent(b.email) + (plan.plan === 'deposit' ? '&plan=deposit&paid=' + plan.now + '&bal=' + plan.balance + '&due=' + plan.dueDate : ''),
         cancelUrl: 'https://booking.pico-island-adventures.com/?status=cancelled'
       })
@@ -1038,9 +1075,9 @@ async function sendPaymentLink(b) {
       await fetch(SUPABASE_URL + '/rest/v1/pia_bookings?booking_ref=eq.' + b.booking_ref, {
         method: 'PATCH',
         headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-        body: JSON.stringify({ status: 'payment_sent', total_price: amount, payment_plan: plan.plan, deposit_amount: plan.now, balance_due: plan.balance, balance_due_date: plan.dueDate })
+        body: JSON.stringify({ status: 'payment_sent', total_price: amount, booking_fee: fee, payment_plan: plan.plan, deposit_amount: plan.now, balance_due: plan.balance, balance_due_date: plan.dueDate })
       });
-      alert('Payment link sent to ' + b.email + (plan.plan === 'deposit' ? ' (20% deposit: €' + plan.now.toFixed(2) + ')' : '') + '!\n\nLink: ' + data.url);
+      alert('Payment link sent to ' + b.email + ' for €' + plan.now.toFixed(2) + (plan.plan === 'deposit' ? ' (20% deposit of €' + amount.toFixed(2) + ' incl. 4% fee)' : ' (incl. 4% fee)') + '!\n\nLink: ' + data.url);
       closeBookModal();
       loadBookings();
     } else {
